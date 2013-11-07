@@ -21,6 +21,36 @@ class ModelValidationTest extends \Webforge\Doctrine\Compiler\Test\Base {
     $this->assertValid($jsonModel);
   }
 
+  public function testExpandsPropertyValues() {
+    $jsonModel = <<<'JSON'
+{
+  "namespace": "ACME\\Blog\\Entities",
+
+  "entities": [
+    {
+      "name": "User",
+
+      "members": {
+        "id": { "type": "DefaultId" },
+        "email": { }
+      }
+    }
+  ]
+}    
+JSON;
+
+    $jsonModel = $this->assertValid($this->json($jsonModel));
+
+    $this->assertObjectHasAttribute('entities', $jsonModel);
+    $this->assertArrayHasKey(0, $jsonModel->entities);
+
+    $user = $jsonModel->entities[0];
+
+    $this->assertEquals('String', $user->properties->email->type, 'Type should be expanded to string for empty member');
+    $this->assertFalse($user->properties->id->nullable, 'nullable should be expanded to FALSE for not empty property');
+    $this->assertFalse($user->properties->email->nullable, 'nullable should be expanded to FALSE for empty property');
+  }
+
   public function testDoesNotLikeEmptyModels() {
     $this->assertInvalid(new stdClass());
   }
