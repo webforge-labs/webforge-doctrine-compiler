@@ -48,8 +48,12 @@ JSON;
 
     $this->assertEquals($expectedClassName, $className, 'The written class name does not match');
 
-    require $file;
 
-    return $this->assertThatGClass($this->webforge->getClassElevator()->getGClass($classFQN));
+    try {
+      return $this->assertThatGClass($this->webforge->getClassElevator()->getGClass($classFQN));
+    } catch (\RuntimeException $e) {
+      print $contents = $file->getContents();
+      throw $e;
+    }
   }
 }

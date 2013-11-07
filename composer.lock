@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "3d40b70f171e28bdbd71d366e280e05b",
+    "hash": "36cd8604c4ad58316e2648da9b5f99e8",
     "packages": [
         {
             "name": "beberlei/assert",
@@ -1937,6 +1937,7 @@
         "webforge/webforge": 20,
         "beberlei/assert": 0,
         "mockery/mockery": 20,
+        "webforge/types": 20,
         "satooshi/php-coveralls": 20,
         "mikey179/vfsstream": 20
     },

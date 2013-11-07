@@ -3,6 +3,8 @@
 namespace Webforge\Doctrine\Compiler\Test;
 
 use Webforge\Doctrine\Compiler\Compiler;
+use Webforge\Doctrine\Compiler\EntityGenerator;
+use Webforge\Doctrine\Compiler\Inflector;
 use org\bovigo\vfs\vfsStream;
 use Webforge\Common\System\Dir;
 use Webforge\Common\Preg;
@@ -19,15 +21,18 @@ class Base extends \Webforge\Code\Test\Base {
     parent::setUp();
 
     $this->webforge = $this->frameworkHelper->getWebforge();
+
+    // fake a local package in the virtual dir
     $this->testPackage = $this->webforge->getPackageRegistry()->addComposerPackageFromDirectory(
       $this->getVirtualDirectory('packageroot')
     );
     $this->psr0Directory = $this->testPackage->getDirectory('lib');
 
+    // inject classmapper (see unique file hack)
     $this->mapper = m::mock('Webforge\Code\Generator\ClassFileMapper');
     $this->webforge->setClassFileMapper($this->mapper);
 
-    $this->compiler = new Compiler($this->webforge->getClassWriter());
+    $this->compiler = new Compiler($this->webforge->getClassWriter(), new EntityGenerator(new Inflector));
   }
 
   protected function getVirtualDirectory($name) {
@@ -39,8 +44,6 @@ class Base extends \Webforge\Code\Test\Base {
   }
 
   protected function changeUniqueClassName($file, &$foundClassName) {
-
-
     // quick and dirty
     $newClassName = NULL;
     $file->writeContents(

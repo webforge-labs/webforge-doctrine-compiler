@@ -5,7 +5,8 @@
     "webforge/doctrine":"1.2.*@dev",
     "webforge/webforge":"1.7.*@dev",
     "beberlei/assert": "1.6.*@stable",
-    "mockery/mockery": "dev-master"
+    "mockery/mockery": "dev-master",
+    "webforge/types": "1.0.*@dev"
   },
   "license":"MIT",
   "authors":[
