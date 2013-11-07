@@ -4,7 +4,8 @@
   "require":{
     "webforge/doctrine":"1.2.*@dev",
     "webforge/webforge":"1.7.*@dev",
-    "beberlei/assert": "1.6.*@stable"
+    "beberlei/assert": "1.6.*@stable",
+    "mockery/mockery": "dev-master"
   },
   "license":"MIT",
   "authors":[
@@ -17,7 +18,7 @@
   "autoload":{
     "psr-0":{
       "Webforge\\Doctrine\\Compiler":["lib/", "tests/"],
-      "Webforge\\Webforge": "D:\\www\\webforge\\lib"
+      "Webforge": "D:\\www\\webforge\\lib"
     }
   },
   "require-dev": {

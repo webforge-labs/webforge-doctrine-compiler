@@ -12,5 +12,6 @@ $ds = DIRECTORY_SEPARATOR;
 require_once __DIR__.$ds.'lib'.$ds.'package.boot.php';
 $bootLoader = new BootLoader(__DIR__, 'Webforge\Setup\BootContainer');
 $bootLoader->loadComposer();
+$bootLoader->registerPackageRoot();
 return $bootLoader->registerContainer();
-//$bootLoader->registerPackageRoot();
+

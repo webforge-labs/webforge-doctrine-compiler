@@ -1,0 +1,16 @@
+{
+    "name": "acme/blog",
+    "description": "A new awesome blog for acme",
+    "authors": [
+        {
+            "name": "p.scheit",
+            "email": "p.scheit@ps-webforge.com"
+        }
+    ],
+    "require": {
+
+    },
+    "autoload": {
+        "psr-0": {"ACME\\Blog": ["lib/", "tests/"]}
+    }
+}
