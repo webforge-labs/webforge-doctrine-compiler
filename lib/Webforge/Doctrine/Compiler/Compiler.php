@@ -84,10 +84,6 @@ class Compiler {
       throw new InvalidModelException('Entity in model with key "'.$key.'" has to have a non empty property name');
     }
 
-    if (isset($entity->members)) {
-      $entity->properties = $entity->members;
-    }
-
     if (!isset($entity->properties)) {
       $entity->properties = new stdClass;
     }

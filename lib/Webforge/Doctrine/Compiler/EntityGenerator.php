@@ -26,7 +26,7 @@ class EntityGenerator {
     $this->entity = $entity;
     $this->gClass = new GClass($fqn);
 
-    $this->generateProperties($this->entity->members);
+    $this->generateProperties($this->entity->properties);
 
     return $this->gClass;
   }

@@ -13,7 +13,7 @@ class ModelValidationTest extends \Webforge\Doctrine\Compiler\Test\Base {
       'entities'=>Array(
         (object) array(
           'name'=>'User',
-          'members'=>array()
+          'properties'=>array()
         )
       )
     );
@@ -30,7 +30,7 @@ class ModelValidationTest extends \Webforge\Doctrine\Compiler\Test\Base {
     {
       "name": "User",
 
-      "members": {
+      "properties": {
         "id": { "type": "DefaultId" },
         "email": { }
       }
@@ -67,13 +67,12 @@ JSON;
     $jsonModel = (object) array(
       'entities'=>array(
         'name'=>'User',
-        'members'=>array()
+        'properties'=>array()
       )
     );
 
     $this->assertInvalid($jsonModel);
   }
-
 
   protected function assertInvalid(stdClass $jsonModel) {
     $this->setExpectedException(__NAMESPACE__.'\\InvalidModelException');

@@ -12,7 +12,7 @@ Therefore a JSON format for creating entities should be used. This is a rough dr
     {
       "name": "User",
   
-      "members": {
+      "properties": {
         "id": { "type": "DefaultId" },
         "email": { "type": "String" }
       }
@@ -21,7 +21,7 @@ Therefore a JSON format for creating entities should be used. This is a rough dr
     {
       "name": "Post",
   
-      "members": {
+      "properties": {
         "id": { "type": "DefaultId" },
         "author": { "type": "Author" },
         "revisor": { "type": "Author", "nullable": true },
@@ -35,7 +35,7 @@ Therefore a JSON format for creating entities should be used. This is a rough dr
       "name": "Author",
       "extends": "User",
   
-      "members": {    
+      "properties": {    
         "writtenPosts": { "type": "Collection<Post>"},
         "revisionedPosts": { "type": "Collection<Post>", "relation": "revisor" }
       }
@@ -45,7 +45,7 @@ Therefore a JSON format for creating entities should be used. This is a rough dr
       "name": "Category",
       "plural": "categories",
 
-      "members": {
+      "properties": {
         "id": "DefaultId",
         "posts": { "type": "Collection<Post>" }
       }

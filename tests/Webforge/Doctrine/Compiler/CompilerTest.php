@@ -21,7 +21,7 @@ class CompilerTest extends \Webforge\Doctrine\Compiler\Test\Base {
     {
       "name": "User",
 
-      "members": {
+      "properties": {
         "id": { "type": "DefaultId" },
         "email": { "type": "String" }
       }
