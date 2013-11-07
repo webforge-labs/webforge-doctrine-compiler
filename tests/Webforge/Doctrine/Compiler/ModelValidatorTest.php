@@ -4,7 +4,12 @@ namespace Webforge\Doctrine\Compiler;
 
 use stdClass;
 
-class ModelValidationTest extends \Webforge\Doctrine\Compiler\Test\Base {
+class ModelValidatorTest extends \Webforge\Doctrine\Compiler\Test\Base {
+
+  public function setUp() {
+    $this->validator = new ModelValidator();
+  }
+
   
   public function testLikesAValidModel() {
     $jsonModel = (object) array(
@@ -76,10 +81,10 @@ JSON;
 
   protected function assertInvalid(stdClass $jsonModel) {
     $this->setExpectedException(__NAMESPACE__.'\\InvalidModelException');
-    $this->compiler->validateModel($jsonModel);
+    $this->validator->validateModel($jsonModel);
   }
 
   protected function assertValid(stdClass $jsonModel) {
-    return $this->compiler->validateModel($jsonModel);
+    return $this->validator->validateModel($jsonModel);
   }
 }

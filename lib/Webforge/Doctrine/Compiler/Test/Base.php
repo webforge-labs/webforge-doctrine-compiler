@@ -5,6 +5,7 @@ namespace Webforge\Doctrine\Compiler\Test;
 use Webforge\Doctrine\Compiler\Compiler;
 use Webforge\Doctrine\Compiler\EntityGenerator;
 use Webforge\Doctrine\Compiler\Inflector;
+use Webforge\Doctrine\Compiler\ModelValidator;
 use org\bovigo\vfs\vfsStream;
 use Webforge\Common\System\Dir;
 use Webforge\Common\Preg;
@@ -32,7 +33,11 @@ class Base extends \Webforge\Code\Test\Base {
     $this->mapper = m::mock('Webforge\Code\Generator\ClassFileMapper');
     $this->webforge->setClassFileMapper($this->mapper);
 
-    $this->compiler = new Compiler($this->webforge->getClassWriter(), new EntityGenerator(new Inflector));
+    $this->compiler = new Compiler(
+      $this->webforge->getClassWriter(), 
+      new EntityGenerator(new Inflector),
+      new ModelValidator
+    );
   }
 
   protected function getVirtualDirectory($name) {
