@@ -20,6 +20,7 @@ A very basic model (with one entity) could look like this:
         "email": { "type": "String" }
       }
     }
+  ]
 }
 ```
 
