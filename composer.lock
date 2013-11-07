@@ -3,8 +3,49 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "653649dfeee9984f74f3c42c74b1070a",
+    "hash": "6738fdaebc7a738598dd186b374878e6",
     "packages": [
+        {
+            "name": "beberlei/assert",
+            "version": "v1.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/beberlei/assert.git",
+                "reference": "6c0069d271323e441c47d2ff26cb18cf3b7cc695"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/beberlei/assert/zipball/6c0069d271323e441c47d2ff26cb18cf3b7cc695",
+                "reference": "6c0069d271323e441c47d2ff26cb18cf3b7cc695",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mbstring": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Assert": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Benjamin Eberlei",
+                    "email": "kontakt@beberlei.de"
+                }
+            ],
+            "description": "Thin assertion library for input validation in business models.",
+            "keywords": [
+                "assert",
+                "assertion",
+                "validation"
+            ],
+            "time": "2013-11-05 12:28:46"
+        },
         {
             "name": "doctrine/annotations",
             "version": "v1.1.2",
@@ -1739,6 +1780,44 @@
     ],
     "packages-dev": [
         {
+            "name": "mikey179/vfsStream",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mikey179/vfsStream.git",
+                "reference": "6cc4209e5f1ef334ebb4674686a491f415dd71ac"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mikey179/vfsStream/zipball/6cc4209e5f1ef334ebb4674686a491f415dd71ac",
+                "reference": "6cc4209e5f1ef334ebb4674686a491f415dd71ac",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~3.7"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.3.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "org\\bovigo\\vfs\\": "src/main/php"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD"
+            ],
+            "homepage": "http://vfs.bovigo.org/",
+            "time": "2013-10-29 22:28:40"
+        },
+        {
             "name": "webforge/testplate",
             "version": "dev-master",
             "source": {
@@ -1801,7 +1880,10 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "webforge/doctrine": 20,
-        "webforge/webforge": 20
+        "webforge/webforge": 20,
+        "beberlei/assert": 0,
+        "satooshi/php-coveralls": 20,
+        "mikey179/vfsstream": 20
     },
     "platform": [
 
