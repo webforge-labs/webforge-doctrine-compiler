@@ -48,6 +48,11 @@ class BootLoader {
    * @var {$this->containerClass}
    */
   protected $container;
+
+  /**
+   * @var Composer\AutoLoad\ClassLoader
+   */
+  protected $autoLoader;
   
   /**
    * Init the BootPackage with the bootloadDirectory
@@ -78,10 +83,10 @@ class BootLoader {
    */
   public function loadComposer() {
     if ($ownVendor = $this->tryPath('vendor/', BootLoader::RELATIVE | BootLoader::VALIDATE)) {
-      require $ownVendor.'autoload.php';
+      $this->autoLoader = require $ownVendor.'autoload.php';
     } else {
       // when bootstrapping is inside a dependency of another project
-      require $this->getPath('../../', BootLoader::RELATIVE | BootLoader::VALIDATE).'autoload.php';
+      $this->autoLoader = require $this->getPath('../../', BootLoader::RELATIVE | BootLoader::VALIDATE).'autoload.php';
     }
   }
   
@@ -100,6 +105,7 @@ class BootLoader {
     if (!isset($this->container)) {
       $container = $this->containerClass;
       $this->container = new $container($this->dir);
+      $this->container->setAutoLoader($this->getAutoLoader());
       $this->container->init();
     }
     
@@ -124,7 +130,7 @@ class BootLoader {
    * @return {$this->containerClass}
    */
   public function registerContainer() {
-    return $GLOBALS['env']['container'] = $this->getCMSContainer();
+    return $GLOBALS['env']['container'] = $this->getContainer();
   }
 
   /**
@@ -140,6 +146,11 @@ class BootLoader {
 
   public function registerRootDirectory() {
     return $this->registerPackageRoot();
+  }
+
+
+  public function getAutoLoader() {
+    return $this->autoLoader;
   }
 
   /**

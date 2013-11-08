@@ -11,8 +11,15 @@
          bootstrap="./bootstrap.php"
 >
     <testsuites>
-        <testsuite name="Doctrine-compiler">
+        <testsuite name="unit">
             <directory suffix="Test.php">./tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <testsuites>
+        <!-- this test suite is manually ordered -->
+        <testsuite name="model">
+          <file>model-tests/CreateModelTest.php</file>
         </testsuite>
     </testsuites>
 

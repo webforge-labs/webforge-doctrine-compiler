@@ -5,7 +5,7 @@ Therefore a JSON format for creating entities should be used. This is a rough dr
 
 ```json
 {
-  "namespace": "ACME\Entities",
+  "namespace": "ACME\\Entities",
 
   "entities": [
 
@@ -26,7 +26,7 @@ Therefore a JSON format for creating entities should be used. This is a rough dr
         "author": { "type": "Author" },
         "revisor": { "type": "Author", "nullable": true },
         "categories": { "type": "Collection<Category>", "isOwning": true },
-        "created": { "type": "DateTime" }
+        "created": { "type": "DateTime" },
         "modified": { "type": "DateTime", "nullable": true }
       }
     },

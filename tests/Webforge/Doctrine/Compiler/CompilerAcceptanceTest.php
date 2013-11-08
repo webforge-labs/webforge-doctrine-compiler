@@ -45,21 +45,6 @@ JSON;
     $this->assertDoctrineMetadata($gClass->getFQN());
   }
 
-  protected function assertDoctrineMetadata($entityName) {
-    $metadataFactory = $this->em->getMetadataFactory();
-
-    try {
-      $info = $metadataFactory->getMetadataFor($entityName);
-    } catch (\Doctrine\ORM\Mapping\MappingException $e) {
-      $e = new \RuntimeException("Doctrine cannot read the file-contents:\n".$this->doctrineFile->getContents()."\nError was: ".$e->getMessage());
-      throw $e;
-    }
-
-    $this->assertEquals($entityName, $info->name, 'The name is expected to be other than the read one from doctrine - thats an testing error');
-
-    return $info;
-  }
-
   protected function assertWrittenDoctrineEntity($file, $expectedClassName) {
     $this->assertFileExists($file, 'expected to get a written file for '.$expectedClassName);
     $className = '';

@@ -12,5 +12,10 @@
     },
     "autoload": {
         "psr-0": {"ACME\\Blog": ["lib/", "tests/"]}
+    },
+    "extra": {
+        "directory-locations": {
+            "doctrine-entities": "lib/ACME/Blog/Entities"
+        }
     }
 }

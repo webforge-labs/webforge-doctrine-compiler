@@ -20,6 +20,7 @@
     "psr-0":{
       "Webforge\\Doctrine\\Compiler":["lib/", "tests/"],
       "Webforge\\Doctrine":["D:\\www\\webforge-doctrine\\lib"],
+      "Webforge\\Types":["D:\\www\\webforge-types\\lib"],
       "Webforge": "D:\\www\\webforge\\lib"
     }
   },
