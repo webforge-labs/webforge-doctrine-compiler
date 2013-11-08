@@ -13,6 +13,7 @@ use Webforge\Common\System\Dir;
 use Webforge\Common\Preg;
 use Webforge\Common\JS\JSONConverter;
 use Mockery as m;
+use Webforge\Code\Generator\GClass;
 
 class Base extends \Webforge\Doctrine\Test\SchemaTestCase {
 
@@ -35,7 +36,8 @@ class Base extends \Webforge\Doctrine\Test\SchemaTestCase {
     $this->compiler = new Compiler(
       $this->webforge->getClassWriter(), 
       new EntityGenerator($inflector = new Inflector, new EntityMappingGenerator($writer = new AnnotationsWriter, $inflector)),
-      new ModelValidator
+      new ModelValidator,
+      $this->webforge->getClassElevator()
     );
   }
 
@@ -115,5 +117,25 @@ class Base extends \Webforge\Doctrine\Test\SchemaTestCase {
 
   protected function json($string) {
     return JSONConverter::create()->parse($string);
+  }
+
+  protected function elevateFull($fqn) {
+    if ($fqn instanceof GClass) {
+      $fqn = $fqn->getFQN();
+    }
+
+    $elevator = $this->webforge->getClassElevator();
+
+    $gClass = $elevator->getGClass($fqn);
+    $elevator->elevateParent($gClass);
+
+    return $gClass;
+  }
+
+  protected function getCompiledClass($entityClass) {
+    $entityClass = new GClass($entityClass);
+    $parentClass = new GClass($entityClass->getFQN());
+    $parentClass->setName('Compiled'.$entityClass->getName());
+    return $parentClass;
   }
 }

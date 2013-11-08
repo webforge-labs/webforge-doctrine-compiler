@@ -24,6 +24,24 @@ class ModelValidator {
 
     $this->model = new Model($model->namespace, $entities);
 
+    // snd pass: check names
+    foreach ($this->model->getEntities() as $entity) {
+      if (isset($entity->extends)) {
+
+        if (empty($entity->extends)) {
+          throw new InvalidModelException('Entity in model with key "'.$key.'" has to have a non empty value in "extends"');
+        }
+
+        if (!$this->model->hasEntity($entity->extends)) {
+          throw new InvalidModelException('Entity '.$entity->name.' extends an unknown entity "'.$entity->extends.'".');
+        }
+
+        $entity->extends = $this->model->getEntity($entity->extends);
+      } else {
+        $entity->extends = NULL;
+      }
+    }
+
     return $this->model;
   }
 

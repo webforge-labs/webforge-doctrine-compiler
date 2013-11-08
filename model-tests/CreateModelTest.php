@@ -70,24 +70,4 @@ class CreateModelTest extends \Webforge\Doctrine\Compiler\Test\Base {
 
     $this->assertNotContains('@', $compiledClass->getDocBlock()->toString(), 'The docblock from the compiled entity should not include any annotation.');
   }
-
-  protected function elevateFull($fqn) {
-    if ($fqn instanceof GClass) {
-      $fqn = $fqn->getFQN();
-    }
-
-    $elevator = $this->webforge->getClassElevator();
-
-    $gClass = $elevator->getGClass($fqn);
-    $elevator->elevateParent($gClass);
-
-    return $gClass;
-  }
-
-  protected function getCompiledClass($entityClass) {
-    $entityClass = new GClass($entityClass);
-    $parentClass = new GClass($entityClass->getFQN());
-    $parentClass->setName('Compiled'.$entityClass->getName());
-    return $parentClass;
-  }
 }
