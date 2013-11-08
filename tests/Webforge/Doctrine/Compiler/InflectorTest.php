@@ -60,4 +60,26 @@ class InflectorTest extends \Webforge\Code\Test\Base {
   
     return $tests;
   }
+
+
+  /**
+   * @dataProvider provideTableName
+   */
+  public function testTableName(\stdClass $entity, $expectedTableName) {
+    $this->assertEquals($expectedTableName, $this->inflector->tableName($entity));
+  }
+  
+  public static function provideTableName() {
+    $tests = array();
+  
+    $test = function() use (&$tests) {
+      $tests[] = func_get_args();
+    };
+  
+    $test((object) array('name'=>'User'), 'users');
+    $test((object) array('name'=>'Author'), 'authors');
+    $test((object) array('name'=>'OID', 'tableName'=>'tiptoi_oids'), 'tiptoi_oids');
+  
+    return $tests;
+  }
 }

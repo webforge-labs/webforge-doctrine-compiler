@@ -60,6 +60,4 @@ class Compiler {
   protected function getWriteFQN(stdClass $entity) {
     return ClassUtil::expandNamespace($entity->name, $this->model->namespace);
   }
-
-
 }

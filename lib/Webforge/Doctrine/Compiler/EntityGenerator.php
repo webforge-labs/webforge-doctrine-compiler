@@ -17,9 +17,11 @@ class EntityGenerator {
   protected $entity;
   protected $gClass;
   protected $inflector;
+  protected $mappingGenerator;
 
-  public function __construct(Inflector $inflector) {
+  public function __construct(Inflector $inflector, EntityMappingGenerator $mappingGenerator) {
     $this->inflector = $inflector;
+    $this->mappingGenerator = $mappingGenerator;
   }
 
   public function generate(stdClass $entity, $fqn) {
@@ -27,6 +29,9 @@ class EntityGenerator {
     $this->gClass = new GClass($fqn);
 
     $this->generateProperties($this->entity->properties);
+
+    $this->mappingGenerator->init($entity);
+    $this->mappingGenerator->annotate($this->gClass);
 
     return $this->gClass;
   }

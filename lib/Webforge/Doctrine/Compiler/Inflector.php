@@ -4,6 +4,7 @@ namespace Webforge\Doctrine\Compiler;
 
 use Webforge\Code\Generator\GProperty;
 use stdClass;
+use Doctrine\Common\Inflector\Inflector as DCInflector;
 
 class Inflector {
 
@@ -25,5 +26,13 @@ class Inflector {
     $upcaseName = ucfirst($property->getName());
 
     return 'get'.$upcaseName;
+  }
+
+  public function tableName(stdClass $entity) {
+    if (isset($entity->tableName)) {
+      return $entity->tableName;
+    }
+
+    return DCInflector::pluralize(DCInflector::tableize($entity->name));
   }
 }
