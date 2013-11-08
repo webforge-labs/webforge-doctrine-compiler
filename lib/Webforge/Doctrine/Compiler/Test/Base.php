@@ -22,28 +22,34 @@ class Base extends \Webforge\Doctrine\Test\SchemaTestCase {
 
   public static $schemaCreated = TRUE;
 
+  public static $package;
+
   public function setUp() {
     $this->virtualPackageDirectory = $this->getVirtualDirectory('packageroot');
     parent::setUp();
 
     $this->webforge = $this->frameworkHelper->getWebforge();
 
-    // fake a local package in the virtual dir
-    $this->testPackage = $this->webforge->getPackageRegistry()->addComposerPackageFromDirectory(
-      $this->virtualPackageDirectory
-    );
-    $this->psr0Directory = $this->testPackage->getDirectory('lib');
-
-
-    // inject classmapper (see unique file hack)
-    $this->mapper = m::mock('Webforge\Code\Generator\ClassFileMapper');
-    $this->webforge->setClassFileMapper($this->mapper);
+    $this->setUpPackage();
 
     $this->compiler = new Compiler(
       $this->webforge->getClassWriter(), 
       new EntityGenerator($inflector = new Inflector, new EntityMappingGenerator($writer = new AnnotationsWriter, $inflector)),
       new ModelValidator
     );
+  }
+
+  protected function setUpPackage() {
+    // fake a local package in the virtual dir
+    $this->blogPackage = $this->webforge->getPackageRegistry()->addComposerPackageFromDirectory(
+      $this->virtualPackageDirectory
+    );
+    $this->psr0Directory = $this->blogPackage->getDirectory('lib');
+
+
+    // inject classmapper (see unique file hack)
+    $this->mapper = m::mock('Webforge\Code\Generator\ClassFileMapper');
+    $this->webforge->setClassFileMapper($this->mapper);
   }
 
   protected function initEntitiesPaths() {
@@ -57,6 +63,22 @@ class Base extends \Webforge\Doctrine\Test\SchemaTestCase {
     vfsStream::copyFromFileSystem((string) $this->getTestDirectory('acme-blog/'), $dir, 1024*8);
 
     return new Dir(vfsStream::url($name).'/');
+  }
+
+  protected function assertDoctrineMetadata($entityName) {
+    $metadataFactory = $this->em->getMetadataFactory();
+
+    try {
+      $info = $metadataFactory->getMetadataFor($entityName);
+    } catch (\Doctrine\ORM\Mapping\MappingException $e) {
+      $errorFile = $this->webforge->getClassFileMapper()->getFile($entityName);
+      $e = new \RuntimeException("Doctrine cannot read the file-contents:\n".$errorFile->getContents()."\nError was: ".$e->getMessage());
+      throw $e;
+    }
+
+    $this->assertEquals($entityName, $info->name, 'The name is expected to be other than the read one from doctrine - thats an testing error');
+
+    return $info;
   }
 
   protected function changeUniqueClassName($file, &$foundClassName) {

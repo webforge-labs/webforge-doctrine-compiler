@@ -11,6 +11,8 @@ use Webforge\Code\Generator\GFunctionBody;
 use Webforge\Types\Type;
 use Webforge\Common\String as S;
 use InvalidArgumentException;
+use Webforge\Types\PersistentCollectionType;
+use Webforge\Types\TypeException;
 
 class EntityGenerator {
 
@@ -18,13 +20,15 @@ class EntityGenerator {
   protected $gClass;
   protected $inflector;
   protected $mappingGenerator;
+  protected $model;
 
   public function __construct(Inflector $inflector, EntityMappingGenerator $mappingGenerator) {
     $this->inflector = $inflector;
     $this->mappingGenerator = $mappingGenerator;
   }
 
-  public function generate(stdClass $entity, $fqn) {
+  public function generate(stdClass $entity, $fqn, Model $model) {
+    $this->model = $model;
     $this->entity = $entity;
     $this->gClass = new GClass($fqn);
 
@@ -98,6 +102,24 @@ class EntityGenerator {
       $typeName = 'Id';
     }
 
-    return Type::create($typeName);
+    if ($this->isEntityShortName($typeName)) {
+      $referenceEntityName = $typeName;
+      $type = new PersistentCollectionType(new GClass($this->model->getEntity($referenceEntityName)->fqn));
+      return $type;
+    }
+
+    if (S::startsWith('Collection', $typeName)) {
+      $referenceEntityName = $typeName;
+    }
+
+    try {
+      return Type::create($typeName);
+    } catch (TypeException $e) {
+      throw new InvalidModelException(sprintf("The type: '%s' cannot be parsed for entity '%s'.", $typeName, $this->entity->fqn), 0, $e);
+    }
+  }
+
+  protected function isEntityShortName($shortName) {
+    return $this->model->hasEntity($shortName);
   }
 }

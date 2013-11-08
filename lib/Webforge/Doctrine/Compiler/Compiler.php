@@ -6,6 +6,8 @@ use stdClass;
 use Webforge\Common\System\Dir;
 use Webforge\Common\ClassUtil;
 use Webforge\Code\Generator\ClassWriter;
+use Webforge\Code\Generator\DocBlock;
+use Webforge\Code\Generator\GClass;
 
 class Compiler {
 
@@ -30,22 +32,52 @@ class Compiler {
     $this->dir = $target;
     $this->model = $this->validator->validateModel($model);
 
-    foreach ($this->model->entities as $entity) {
+    foreach ($this->model->getEntities() as $entity) {
       list($gClass, $entityFile) = $this->compileEntity($entity);
+      //print "compiled entity ".$entity->name.' to '.$entityFile."\n";
     }
   }
 
   protected function compileEntity(stdClass $entity) {
-    $writeFQN = $this->getWriteFQN($entity);
+    $entityFQN = ClassUtil::expandNamespace($entity->name, $this->model->getNamespace());
+    $compiledEntityFile = NULL;
 
-    $gClass = $this->entityGenerator->generate($entity, $writeFQN);
+    $gClass = $this->entityGenerator->generate($entity, $entityFQN, $this->model);
 
-    $entityFile = $this->mapToFile($writeFQN);
+    if ($this->flags & self::COMPILED_ENTITIES) {
+      // we split up the gclass into Compiled$entityName and $entityName class
+      // the $entityName class needs the docblock from the "real" class because this is what doctrine sees
+      $compiledClass = $gClass;
+      $entityClass = clone $gClass;
+
+      $compiledClass->setName('Compiled'.$entityClass->getName());
+      $compiledClass->setAbstract(TRUE);
+
+      // entity extends Generation-Gap Entity
+      $entityClass->setParent($compiledClass);
+      
+      // move docblock
+      $entityClass->setDocBlock(clone $compiledClass->getDocBlock());
+      $compiledClass->setDocBlock(new DocBlock('Compiled Entity for '.$entityClass->getFQN()."\n\nTo change table name or entity repository edit the ".$entityClass->getFQN().' class.'));
+
+      // write both
+      $entityFile = $this->write($entityClass);
+      $compiledEntityFile = $this->write($compiledClass);
+
+    } else {
+      $entityFile = $this->write($gClass);
+    }
+
+    return array($gClass, $entityFile, $compiledEntityFile);
+  }
+
+  protected function write(GClass $gClass) {
+    $entityFile = $this->mapToFile($gClass->getFQN());
     $entityFile->getDirectory()->create();
 
     $this->classWriter->write($gClass, $entityFile);
 
-    return array($gClass, $entityFile);
+    return $entityFile;
   }
 
   /**
@@ -55,9 +87,5 @@ class Compiler {
     $url = str_replace('\\', '/', $fqn).'.php';
 
     return $this->dir->getFile($url);
-  }
-
-  protected function getWriteFQN(stdClass $entity) {
-    return ClassUtil::expandNamespace($entity->name, $this->model->namespace);
   }
 }
