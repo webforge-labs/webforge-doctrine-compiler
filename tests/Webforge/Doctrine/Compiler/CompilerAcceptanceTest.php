@@ -5,7 +5,7 @@ namespace Webforge\Doctrine\Compiler;
 use Webforge\Common\System\Dir;
 use Doctrine\Common\Cache\ArrayCache;
 
-class CompilerTest extends \Webforge\Doctrine\Compiler\Test\Base {
+class CompilerAcceptanceTest extends \Webforge\Doctrine\Compiler\Test\Base {
   
   public function setUp() {
     $this->chainClass = __NAMESPACE__ . '\\Compiler';
