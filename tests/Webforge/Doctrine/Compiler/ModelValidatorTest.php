@@ -44,12 +44,10 @@ class ModelValidatorTest extends \Webforge\Doctrine\Compiler\Test\Base {
 }    
 JSON;
 
-    $jsonModel = $this->assertValid($this->json($jsonModel));
+    $model = $this->assertValid($this->json($jsonModel));
 
-    $this->assertObjectHasAttribute('entities', $jsonModel);
-    $this->assertArrayHasKey(0, $jsonModel->entities);
-
-    $user = $jsonModel->entities[0];
+    $this->assertCount(1, $model->getEntities());
+    $user = $model->getEntity('User');
 
     $this->assertEquals('String', $user->properties->email->type, 'Type should be expanded to string for empty member');
     $this->assertFalse($user->properties->id->nullable, 'nullable should be expanded to FALSE for not empty property');
@@ -58,6 +56,28 @@ JSON;
 
   public function testDoesNotLikeEmptyModels() {
     $this->assertInvalid(new stdClass());
+  }
+
+  public function testLikesShortPropertiesWithOnlyTypeAndName() {
+    $jsonModel = <<<'JSON'
+    {
+      "namespace": "ACME\\Blog\\Entities",
+
+      "entities": [
+        {
+          "name": "Category",
+          "plural": "categories",
+
+          "properties": {
+            "id": "DefaultId",
+            "posts": { "type": "Collection<Post>" }
+          }
+        }
+      ]
+    }
+JSON;
+
+    $this->assertValid($this->json($jsonModel));
   }
 
   public function testDoesNotLikeModelsWithoutNamespace() {
@@ -84,7 +104,11 @@ JSON;
     $this->validator->validateModel($jsonModel);
   }
 
+  /**
+   * @return Webforge\Doctrine\Compiler\Model
+   */
   protected function assertValid(stdClass $jsonModel) {
-    return $this->validator->validateModel($jsonModel);
+    $this->assertInstanceOf(__NAMESPACE__.'\\Model', $model = $this->validator->validateModel($jsonModel));
+    return $model;
   }
 }
