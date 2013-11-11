@@ -22,7 +22,9 @@
         "categories": { "type": "Collection<Category>", "isOwning": true },
         "created": { "type": "DateTime" },
         "modified": { "type": "DateTime", "nullable": true }
-      }
+      },
+
+      "constructor": ["author", "revisor"]
     },
 
     {
