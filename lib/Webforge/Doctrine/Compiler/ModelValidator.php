@@ -121,7 +121,6 @@ class ModelValidator {
       $typeName = 'Id';
     }
 
-    // single entity reference
     if ($model->hasEntity($typeName)) {
       $referenceEntityName = $typeName;
       $type = new EntityReference($this->model->getEntity($referenceEntityName));
@@ -133,7 +132,6 @@ class ModelValidator {
         throw new InvalidModelException(sprintf("The type: '%s' cannot be parsed for entity '%s'.", $typeName, $entity->fqn), 0, $e);
       }
 
-      // collection entity reference
       if ($type instanceof CollectionType && $type->getType() instanceof ObjectType && $model->hasEntity($referenceEntityName = $type->getType()->getClass()->getName())) {
         $type = new EntityCollectionReference($model->getEntity($referenceEntityName));
       }

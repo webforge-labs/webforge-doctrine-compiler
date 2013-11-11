@@ -36,48 +36,49 @@ class Compiler implements GClassBroker {
     $this->flags = $flags;
     $this->dir = $target;
     $this->model = $this->validator->validateModel($model);
-    $this->generatedEntities = array();
 
-    foreach ($this->model->getEntities() as $entity) {
-      list($entityClass, $entityFile, $compiledEntityFile) = $this->compileEntity($entity);
-      $this->generatedEntities[$entityClass->getFQN()] = $entityClass;
+    $this->entityGenerator->generate($this->model, $this);
+
+    foreach ($this->entityGenerator->getEntities() as $entity) {
+      list($entityFile, $compiledEntityFile) = $this->compileEntity($entity);
+      $this->generatedEntities[$entity->getFQN()] = $entity;
       //print "compiled entity ".$entity->name.' to '.$entityFile."\n";
     }
   }
 
-  protected function compileEntity(stdClass $entity) {
-    $entityFQN = ClassUtil::expandNamespace($entity->name, $this->model->getNamespace());
+  protected function compileEntity(GeneratedEntity $entity) {
     $compiledEntityFile = $compiledClass = NULL;
-
-    $gClass = $this->entityGenerator->generate($entity, $entityFQN, $this->model, $this); // $this as GClassBroker
 
     if ($this->flags & self::COMPILED_ENTITIES) {
       // we split up the gclass into Compiled$entityName and $entityName class
       // the $entityName class needs the docblock from the "real" class because this is what doctrine sees
-      $compiledClass = $gClass;
-      $entityClass = new GClass($gClass->getFQN());
+      $entityClass = $entity->gClass;
 
+      $compiledClass = clone $entityClass;
       $compiledClass->setName('Compiled'.$entityClass->getName());
       $compiledClass->setAbstract(TRUE);
+      $compiledClass->setDocBlock(new DocBlock('Compiled Entity for '.$entityClass->getFQN()."\n\nTo change table name or entity repository edit the ".$entityClass->getFQN().' class.'));
 
       // entity extends Generation-Gap Entity
       $entityClass->setParent($compiledClass);
-      
-      // move docblock
-      $entityClass->setDocBlock(clone $compiledClass->getDocBlock());
-      $compiledClass->setDocBlock(new DocBlock('Compiled Entity for '.$entityClass->getFQN()."\n\nTo change table name or entity repository edit the ".$entityClass->getFQN().' class.'));
-      
+
+      foreach ($entityClass->getMethods() as $method) {
+        $entityClass->removeMethod($method);
+      }
+
+      foreach ($entityClass->getProperties() as $property) {
+        $entityClass->removeProperty($property);
+      }
 
       // write both
       $entityFile = $this->write($entityClass);
       $compiledEntityFile = $this->write($compiledClass);
 
     } else {
-      $entityClass = $gClass;
-      $entityFile = $this->write($gClass);
+      $entityFile = $this->write($entity->gClass);
     }
 
-    return array($entityClass, $entityFile, $compiledClass, $compiledEntityFile);
+    return array($entityFile, $compiledEntityFile);
   }
 
   protected function write(GClass $gClass) {

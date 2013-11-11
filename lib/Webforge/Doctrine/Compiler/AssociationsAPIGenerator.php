@@ -9,69 +9,69 @@ use Webforge\Code\Generator\GFunctionBody;
 use Webforge\Code\Generator\GMethod;
 use stdClass;
 use Webforge\Types\PersistentCollectionType;
+use Webforge\Types\EntityType;
 
 class AssociationsAPIGenerator {
 
-  protected $gClass, $owningEntity;
+  protected $owningEntity;
   protected $inflector;
 
-  public function __construct(Inflector $inflector, GClass $gClass, stdClass $owningEntity, stdClass $subjectEntity) {
+  public function __construct(Inflector $inflector, GeneratedEntity $entity) {
     $this->inflector = $inflector;
-    $this->gClass = $gClass;
-    $this->owningEntity = $owningEntity;
-    $this->subjectEntity = $subjectEntity;
+    $this->owningEntity = $entity;
   }
 
-  public function generateFor(GProperty $property, stdClass $definition) {
+  public function generateFor(GeneratedProperty $property) {
     // we are the one side of a relation
-    if ($property->getType() instanceof PersistentCollectionType) {
-      $this->generateDoer('add', $property, $definition);
-      $this->generateDoer('remove', $property, $definition);
-      $this->generateDoer('has', $property, $definition);
+    if ($property->isEntityCollection()) {
+      $this->generateDoer('add', $property);
+      $this->generateDoer('remove', $property);
+      $this->generateDoer('has', $property);
     }
   }
 
-  protected function generateDoer($type, GProperty $property, $definition) {
+  protected function generateDoer($type, GeneratedProperty $property) {
     $collectionName = $property->getName();
-    $subjectName = $this->inflector->getItemNameFromCollectionName($collectionName, $definition);
-    $subjectDefinition = $this->owningEntity->properties->$subjectName;
-    $subject = $this->gClass->getProperty($subjectDefinition->name);
+    
+    // writtenPosts => writtenPost
+    $subjectName = $this->inflector->getItemNameFromCollectionName($collectionName, $property->getDefinition());
+    $referencedEntity = $property->getReferencedEntity();
+
+    $parameter = new GParameter(
+      $subjectName,
+      new EntityType($referencedEntity->getGClass()),
+      $property->getDefinition()->nullable ? NULL : GParameter::UNDEFINED
+    );
 
     switch ($type) {
       case 'add':
-        $methodName = $this->inflector->getCollectionAdderName($property, $definition);
         $body = array(
-          sprintf('if (!$this->%s->contains($%s)) {', $collectionName, $subject->getName()),
-          sprintf('  $this->%s->add($%s);', $collectionName, $subject->getName()),
+          sprintf('if (!$this->%s->contains($%s)) {', $collectionName, $parameter->getName()),
+          sprintf('  $this->%s->add($%s);', $collectionName, $parameter->getName()),
           '}',
           'return $this;',
         );
         break;
       case 'remove':
-        $methodName = $this->inflector->getCollectionRemoverName($property, $definition);
         $body = array(
-          sprintf('if ($this->%s->contains($%s)) {', $collectionName, $subject->getName()),
-          sprintf('  $this->%s->remove($%s);', $collectionName, $subject->getName()),
+          sprintf('if ($this->%s->contains($%s)) {', $collectionName, $parameter->getName()),
+          sprintf('  $this->%s->remove($%s);', $collectionName, $parameter->getName()),
           '}',
           'return $this;',
         );
         break;
       case 'has':
-        $methodName = $this->inflector->getCollectionCheckerName($property, $definition);
         $body = array(
-          sprintf('return $this->%s->contains($%s);', $collectionName, $subject->getName()),
+          sprintf('return $this->%s->contains($%s);', $collectionName, $parameter->getName()),
         );
         break;
     }
 
-    $this->gClass->createMethod(
-      $methodName,
+
+    $this->owningEntity->gClass->createMethod(
+      $property->getCollectionDoerName($type),
       array(
-        $parameter = new GParameter(
-          $subject->getName(),
-          $subject->getType(),
-          $definition->nullable ? NULL : GParameter::UNDEFINED
-        )
+        $parameter
       ),
       GFunctionBody::create($body),
       GMethod::MODIFIER_PUBLIC

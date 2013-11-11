@@ -25,19 +25,19 @@ class EntityMappingGenerator {
     $this->inflector = $inflector;
   }
 
-  public function init(stdClass $entity) {
+  public function init(GeneratedEntity $entity) {
     $this->entity = $entity;
   }
 
-  public function annotate(GClass $gClass) {
+  public function annotate() {
     if (!isset($this->entity)) {
       throw new LogicException('Call init() before annotate');
     }
 
-    $this->annotateClass($gClass, $this->entity);
+    $this->annotateClass($this->entity->gClass, $this->entity);
 
-    foreach ($gClass->getProperties() as $property) {
-      $this->annotateProperty($property, $gClass, $this->entity);
+    foreach ($this->entity->getProperties() as $property) {
+      $this->annotateProperty($property, $this->entity);
     }
   }
 
@@ -54,19 +54,16 @@ class EntityMappingGenerator {
     );
   }
 
-  protected function annotateProperty(GProperty $property, GClass $gClass, stdClass $entity) {
-    // run over properties or entity->properties?
-    $definition = $entity->properties->{$property->getName()};
-
+  protected function annotateProperty(GeneratedProperty $property, GeneratedEntity $entity) {
     $property->setDocBlock(
       $this->createDocBlock(
         isset($definition->description) ? $definition->description : $property->getName(),
-        $this->generatePropertyAnnotations($property, $definition, $gClass)
+        $this->generatePropertyAnnotations($property, $entity)
       )
     );
   }
 
-  protected function generatePropertyAnnotations(GProperty $property, stdClass $definition, GClass $gClass) {
+  protected function generatePropertyAnnotations(GeneratedProperty $property, GeneratedEntity $entity) {
     $annotations = array();
     $type = $property->getType();
 
@@ -88,13 +85,14 @@ class EntityMappingGenerator {
     return $annotations;
   }
 
-  protected function generateEntityAnnotation(stdClass $entity) {
+  protected function generateEntityAnnotation(GeneratedEntity $entity) {
     return new ORM\Entity();
   }
 
-  protected function generateTableAnnotation(stdClass $entity) {
+  protected function generateTableAnnotation(GeneratedEntity $entity) {
     $table = new ORM\Table();
-    $table->name = $this->inflector->tableName($entity);
+    // @TODO implement inflect() in Entity and create a getter
+    $table->name = $this->inflector->tableName($entity->definition);
 
     return $table;
   }
