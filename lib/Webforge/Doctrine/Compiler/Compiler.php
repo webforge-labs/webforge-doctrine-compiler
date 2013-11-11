@@ -8,47 +8,54 @@ use Webforge\Common\ClassUtil;
 use Webforge\Code\Generator\ClassWriter;
 use Webforge\Code\Generator\DocBlock;
 use Webforge\Code\Generator\GClass;
+use Webforge\Code\Generator\ClassElevator;
 
-class Compiler {
+class Compiler implements GClassBroker {
 
   protected $flags;
   protected $model;
   protected $validator;
+  protected $classElevator;
 
   protected $dir;
   protected $classWriter;
 
+  protected $generatedEntities;
+
   const PLAIN_ENTITIES = 0x000001;
   const COMPILED_ENTITIES = 0x000002;
 
-  public function __construct(ClassWriter $classWriter, EntityGenerator $entityGenerator, ModelValidator $validator) {
+  public function __construct(ClassWriter $classWriter, EntityGenerator $entityGenerator, ModelValidator $validator, ClassElevator $classElevator) {
     $this->classWriter = $classWriter;
     $this->validator = $validator;
     $this->entityGenerator = $entityGenerator;
+    $this->classElevator = $classElevator;
   }
 
   public function compileModel(stdClass $model, Dir $target, $flags) {
     $this->flags = $flags;
     $this->dir = $target;
     $this->model = $this->validator->validateModel($model);
+    $this->generatedEntities = array();
 
     foreach ($this->model->getEntities() as $entity) {
-      list($gClass, $entityFile) = $this->compileEntity($entity);
+      list($entityClass, $entityFile, $compiledEntityFile) = $this->compileEntity($entity);
+      $this->generatedEntities[$entityClass->getFQN()] = $entityClass;
       //print "compiled entity ".$entity->name.' to '.$entityFile."\n";
     }
   }
 
   protected function compileEntity(stdClass $entity) {
     $entityFQN = ClassUtil::expandNamespace($entity->name, $this->model->getNamespace());
-    $compiledEntityFile = NULL;
+    $compiledEntityFile = $compiledClass = NULL;
 
-    $gClass = $this->entityGenerator->generate($entity, $entityFQN, $this->model);
+    $gClass = $this->entityGenerator->generate($entity, $entityFQN, $this->model, $this); // $this as GClassBroker
 
     if ($this->flags & self::COMPILED_ENTITIES) {
       // we split up the gclass into Compiled$entityName and $entityName class
       // the $entityName class needs the docblock from the "real" class because this is what doctrine sees
       $compiledClass = $gClass;
-      $entityClass = clone $gClass;
+      $entityClass = new GClass($gClass->getFQN());
 
       $compiledClass->setName('Compiled'.$entityClass->getName());
       $compiledClass->setAbstract(TRUE);
@@ -59,16 +66,18 @@ class Compiler {
       // move docblock
       $entityClass->setDocBlock(clone $compiledClass->getDocBlock());
       $compiledClass->setDocBlock(new DocBlock('Compiled Entity for '.$entityClass->getFQN()."\n\nTo change table name or entity repository edit the ".$entityClass->getFQN().' class.'));
+      
 
       // write both
       $entityFile = $this->write($entityClass);
       $compiledEntityFile = $this->write($compiledClass);
 
     } else {
+      $entityClass = $gClass;
       $entityFile = $this->write($gClass);
     }
 
-    return array($gClass, $entityFile, $compiledEntityFile);
+    return array($entityClass, $entityFile, $compiledClass, $compiledEntityFile);
   }
 
   protected function write(GClass $gClass) {
@@ -87,5 +96,30 @@ class Compiler {
     $url = str_replace('\\', '/', $fqn).'.php';
 
     return $this->dir->getFile($url);
+  }
+
+  public function getElevated($fqn, $debugEntity) {
+    if (array_key_exists($fqn, $this->generatedEntities)) {
+      return $this->generatedEntities[$fqn];
+    }
+
+    $searchClass = new GClass($fqn);
+
+    // @FIXME: this will fail for sub-namespaces (getName is not the subnamespace + name)
+    if ($searchClass->isInNamespace($this->model->getNamespace()) && $this->model->hasEntity($searchClass->getName())) {
+      throw new ModelCompilerException(
+        sprintf (
+          'You tried to reference the entity "%1$s" that is in the model but is not generated yet. Cannot generate "%2$s" before generating "%1$s". Change the order in the model.',
+          $fqn, $debugEntity
+        )
+      );
+    }
+
+    // its another class that will be elevated
+    $gClass = $this->classElevator->getGClass($fqn);
+    $this->classElevator->elevateParent($gClass);
+    $this->classElevator->elevateInterfaces($gClass);
+
+    return $gClass;
   }
 }
