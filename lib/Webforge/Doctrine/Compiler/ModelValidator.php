@@ -62,6 +62,25 @@ class ModelValidator {
       $entity->properties->$name = $this->validateProperty($propertyDefinition, $name, $entity->name);
     }
 
+    if (!isset($entity->constructor)) {
+      $entity->constructor = array();
+    }
+
+    $constructor = new stdClass;
+    foreach ($entity->constructor as $key=>$value) {
+      if (is_string($value)) {
+        $propertyName = $value;
+        if (!isset($entity->properties->$propertyName)) {
+          throw new InvalidModelException(
+            sprintf("Undefined property '%s' in the constructor from entity %s. Only property-names can be used", $propertyName, $entity->name)
+          );
+        }
+
+        $constructor->$propertyName = (object) array('name'=>$propertyName);
+      } // @TODO else: validate constructor parameter-object
+    }
+    $entity->constructor = $constructor;
+
     return $entity;
   }
 
@@ -80,7 +99,7 @@ class ModelValidator {
       $definition->type = 'String';
     }
 
-    if (!isset($entity->nullable)) {
+    if (!isset($definition->nullable)) {
       $definition->nullable = FALSE;
     }
 

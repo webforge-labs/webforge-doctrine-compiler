@@ -33,7 +33,7 @@ class Model {
   protected function indexEntities(Array $entities) {
     $this->entities = array();
     foreach($entities as $entity) {
-      $entity->fqn = ClassUtil::expandNamespace($this->getNamespace(), $entity->name);
+      $entity->fqn = ClassUtil::expandNamespace($entity->name, $this->getNamespace());
       $this->entities[$entity->name] = $entity;
     }
   }

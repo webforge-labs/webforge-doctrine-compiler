@@ -1,0 +1,48 @@
+{
+  "namespace": "ACME\\Blog\\Entities",
+
+  "entities": [
+
+    {
+      "name": "Author",
+      "extends": "User",
+  
+      "properties": {    
+        "writtenPosts": { "type": "Collection<Post>"},
+        "revisionedPosts": { "type": "Collection<Post>", "relation": "revisor" }
+      }
+    },
+
+    {
+      "name": "User",
+  
+      "properties": {
+        "id": { "type": "DefaultId" },
+        "email": { "type": "String" }
+      }
+    },
+
+    {
+      "name": "Post",
+  
+      "properties": {
+        "id": { "type": "DefaultId" },
+        "author": { "type": "Author" },
+        "revisor": { "type": "Author", "nullable": true },
+        "categories": { "type": "Collection<Category>", "isOwning": true },
+        "created": { "type": "DateTime" },
+        "modified": { "type": "DateTime", "nullable": true }
+      }
+    },
+
+    {
+      "name": "Category",
+      "plural": "categories",
+
+      "properties": {
+        "id": "DefaultId",
+        "posts": { "type": "Collection<Post>" }
+      }
+    }
+  ]
+}
