@@ -155,32 +155,6 @@ class EntityGenerator {
     }
   }
 
-  protected function parseType($typeDefinition) {
-    $typeName = $typeDefinition;
-    if ($typeDefinition === 'DefaultId') {
-      $typeName = 'Id';
-    }
-
-    // single entity reference
-    if ($this->isEntityShortName($typeName)) {
-      $referenceEntityName = $typeName;
-      $type = new EntityType(new GClass($this->model->getEntity($referenceEntityName)->fqn));
-      return $type;
-    }
-
-    try {
-      $type = Type::create($typeName);
-    } catch (TypeException $e) {
-      throw new InvalidModelException(sprintf("The type: '%s' cannot be parsed for entity '%s'.", $typeName, $this->entity->fqn), 0, $e);
-    }
-
-    // collection entity reference
-    if ($type instanceof CollectionType && $type->getType() instanceof ObjectType && $this->isEntityShortName($referenceEntityName = $type->getType()->getClass()->getName())) {
-      $type = new PersistentCollectionType(new GClass($this->model->getEntity($referenceEntityName)->fqn));
-    }
-
-    return $type;
-  }
 
   protected function isEntityShortName($shortName) {
     return $this->model->hasEntity($shortName);

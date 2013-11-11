@@ -3,6 +3,10 @@
 namespace Webforge\Doctrine\Compiler;
 
 use stdClass;
+use Webforge\Types\Type;
+use Webforge\Types\TypeException;
+use Webforge\Types\CollectionType;
+use Webforge\Types\ObjectType;
 
 class ModelValidator {
 
@@ -24,7 +28,7 @@ class ModelValidator {
 
     $this->model = new Model($model->namespace, $entities);
 
-    // snd pass: check names
+    // snd pass: check names, check entity property references
     foreach ($this->model->getEntities() as $entity) {
       if (isset($entity->extends)) {
 
@@ -39,6 +43,11 @@ class ModelValidator {
         $entity->extends = $this->model->getEntity($entity->extends);
       } else {
         $entity->extends = NULL;
+      }
+
+      // check entity property references
+      foreach ($entity->properties as $name=>$property) {
+        $this->validateType($property, $entity, $this->model);
       }
     }
 
@@ -104,5 +113,32 @@ class ModelValidator {
     }
 
     return $definition;
+  }
+
+  protected function validateType(stdClass $property, stdClass $entity, Model $model) {
+    $typeName = $property->type;
+    if ($property->type === 'DefaultId') {
+      $typeName = 'Id';
+    }
+
+    // single entity reference
+    if ($model->hasEntity($typeName)) {
+      $referenceEntityName = $typeName;
+      $type = new EntityReference($this->model->getEntity($referenceEntityName));
+    } else {
+
+      try {
+        $type = Type::create($typeName);
+      } catch (TypeException $e) {
+        throw new InvalidModelException(sprintf("The type: '%s' cannot be parsed for entity '%s'.", $typeName, $entity->fqn), 0, $e);
+      }
+
+      // collection entity reference
+      if ($type instanceof CollectionType && $type->getType() instanceof ObjectType && $model->hasEntity($referenceEntityName = $type->getType()->getClass()->getName())) {
+        $type = new EntityCollectionReference($model->getEntity($referenceEntityName));
+      }
+    }
+
+    $property->type = $type;
   }
 }

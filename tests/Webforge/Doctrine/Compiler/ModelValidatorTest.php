@@ -3,6 +3,7 @@
 namespace Webforge\Doctrine\Compiler;
 
 use stdClass;
+use Webforge\Common\JS\JSONConverter;
 
 class ModelValidatorTest extends \Webforge\Doctrine\Compiler\Test\Base {
 
@@ -49,7 +50,7 @@ JSON;
     $this->assertCount(1, $model->getEntities());
     $user = $model->getEntity('User');
 
-    $this->assertEquals('String', $user->properties->email->type, 'Type should be expanded to string for empty member');
+    $this->assertEquals('String', $user->properties->email->type->getName(), 'Type should be expanded to stringType for empty member');
     $this->assertFalse($user->properties->id->nullable, 'nullable should be expanded to FALSE for not empty property');
     $this->assertFalse($user->properties->email->nullable, 'nullable should be expanded to FALSE for empty property');
   }
@@ -222,24 +223,20 @@ JSON;
   }
 
   public function testRegressionNullableIsSettable() {
-    $model = $this->assertValid($this->wrapEntity($this->json('
-    {
-      "name": "Post",
-  
-      "properties": {
-        "id": { "type": "DefaultId" },
-        "author": { "type": "Author" },
-        "revisor": { "type": "Author", "nullable": true },
-        "categories": { "type": "Collection<Category>", "isOwning": true },
-        "created": { "type": "DateTime" },
-        "modified": { "type": "DateTime", "nullable": true }
-      },
-
-      "constructor": ["author", "revisor"]
-    }')));
+    $model = $this->validateAcceptanceModel();
 
     $post = $model->getEntity('Post');
     $this->assertTrue($post->properties->revisor->nullable, 'nullable for revisor does not match');
+  }
+
+  public function testCreatesEntityReferencesForTheParsedModel() {
+    $model = $this->validateAcceptanceModel();
+
+    $post = $model->getEntity('Post');
+    $this->assertIsReference($post->properties->author->type, 'post::author type does not match');
+
+    $author = $model->getEntity('Author');
+    $this->assertIsCollectionReference($author->properties->writtenPosts->type, 'author::writtenPosts type does not match');
   }
 
   protected function assertInvalid(stdClass $jsonModel) {
@@ -267,5 +264,19 @@ JSON;
   protected function assertValid(stdClass $jsonModel) {
     $this->assertInstanceOf(__NAMESPACE__.'\\Model', $model = $this->validator->validateModel($jsonModel));
     return $model;
+  }
+
+  protected function validateAcceptanceModel() {
+    $jsonModel = JSONConverter::create()->parseFile($this->getTestDirectory('acme-blog/etc/doctrine')->getFile('model.json'));
+
+    return $this->assertValid($jsonModel);
+  }
+
+  protected function assertIsReference($object, $msg = '') {
+    $this->assertInstanceOf(__NAMESPACE__.'\EntityReference', $object, $msg);
+  }
+
+  protected function assertIsCollectionReference($object, $msg = '') {
+    $this->assertInstanceOf(__NAMESPACE__.'\EntityCollectionReference', $object, $msg);
   }
 }
