@@ -13,6 +13,9 @@ use Webforge\Common\String as S;
 use InvalidArgumentException;
 use Webforge\Types\PersistentCollectionType;
 use Webforge\Types\TypeException;
+use Webforge\Types\CollectionType;
+use Webforge\Types\ObjectType;
+use Webforge\Types\EntityType;
 
 class EntityGenerator {
 
@@ -21,18 +24,26 @@ class EntityGenerator {
   protected $inflector;
   protected $mappingGenerator;
   protected $model;
+  protected $gClassBroker;
 
   public function __construct(Inflector $inflector, EntityMappingGenerator $mappingGenerator) {
     $this->inflector = $inflector;
     $this->mappingGenerator = $mappingGenerator;
   }
 
-  public function generate(stdClass $entity, $fqn, Model $model) {
+  public function generate(stdClass $entity, $fqn, Model $model, GClassBroker $broker) {
     $this->model = $model;
     $this->entity = $entity;
     $this->gClass = new GClass($fqn);
+    $this->gClassBroker = $broker;
+
+    if ($entity->extends) {
+      $this->gClass->setParent($broker->getElevated($entity->extends->fqn, $fqn));
+    }
 
     $this->generateProperties($this->entity->properties);
+    $this->generateAssociationsAPI($this->gClass);
+    $this->generateConstructor($this->gClass, $this->entity);
 
     $this->mappingGenerator->init($entity);
     $this->mappingGenerator->annotate($this->gClass);
@@ -74,7 +85,9 @@ class EntityGenerator {
       ),
       GMethod::MODIFIER_PUBLIC
     );
-    // $gMethod->createDocBlock()->addSimpleAnnotation('param '.($property->getDocType() ?: 'undefined').' $'.$property->getName());
+    
+    $gMethod->createDocBlock()
+      ->append(sprintf('@param %s $%s', $property->getType()->getDocType() ?: 'mixed', $property->getName()));
 
     return $gMethod;
   }
@@ -93,7 +106,53 @@ class EntityGenerator {
       GMethod::MODIFIER_PUBLIC
     );
 
+    $gMethod->createDocBlock()
+      ->append(sprintf('@return %s', $property->getType()->getDocType() ?: 'mixed'));
+
     return $gMethod;
+  }
+
+  protected function generateConstructor(GClass $gClass, stdClass $entity) {
+    // @TODO: add a test to use the parent constructor if avaible (user author?)
+    $code = array();
+    $parameters = array();
+
+    foreach ($entity->constructor as $propertyName => $parameter) {
+      $propertyDefinition = $entity->properties->$propertyName;
+      $property = $this->gClass->getProperty($propertyName);
+
+      $code[] = sprintf('$this->%s = $%s;', $propertyName, $parameter->name);
+      $parameters[] = new GParameter(
+        $parameter->name,
+        $property->getType(),
+        $propertyDefinition->nullable ? NULL : GParameter::UNDEFINED
+      );
+    }
+
+    $gClass->createMethod('__construct', $parameters, GFunctionBody::create($code));
+  }
+
+  protected function generateAssociationsAPI() {
+    foreach ($this->gClass->getProperties() as $property) {
+      if ($property->getType() instanceof PersistentCollectionType) {
+        $propertyDefinition = $this->entity->properties->{$property->getName()};
+        // eg author::posts, $subjectName = 'post' => $subjectEntity = 'Post'
+        $subjectName = $this->inflector->getItemNameFromCollectionName($property->getName(), $propertyDefinition);
+        $subjectEntity = $this->model->getEntity(ucfirst($subjectName));
+        $subjectGClass = $this->gClassBroker->getElevated($subjectEntity->fqn, $this->entity->name);
+        $subjectPropertyDefinition = $subjectEntity->properties->$subjectName;
+        $subjectProperty = $subjectGClass->getPropery($subjectName);
+
+        $generator = new AssociationsAPIGenerator(
+          $this->inflector,
+          $this->gClass,
+          $this->entity,
+          $subjectEntity
+        );
+
+        $generator->generateFor($property, $propertyDefinition);
+      }
+    }
   }
 
   protected function parseType($typeDefinition) {
@@ -102,21 +161,25 @@ class EntityGenerator {
       $typeName = 'Id';
     }
 
+    // single entity reference
     if ($this->isEntityShortName($typeName)) {
       $referenceEntityName = $typeName;
-      $type = new PersistentCollectionType(new GClass($this->model->getEntity($referenceEntityName)->fqn));
+      $type = new EntityType(new GClass($this->model->getEntity($referenceEntityName)->fqn));
       return $type;
     }
 
-    if (S::startsWith('Collection', $typeName)) {
-      $referenceEntityName = $typeName;
-    }
-
     try {
-      return Type::create($typeName);
+      $type = Type::create($typeName);
     } catch (TypeException $e) {
       throw new InvalidModelException(sprintf("The type: '%s' cannot be parsed for entity '%s'.", $typeName, $this->entity->fqn), 0, $e);
     }
+
+    // collection entity reference
+    if ($type instanceof CollectionType && $type->getType() instanceof ObjectType && $this->isEntityShortName($referenceEntityName = $type->getType()->getClass()->getName())) {
+      $type = new PersistentCollectionType(new GClass($this->model->getEntity($referenceEntityName)->fqn));
+    }
+
+    return $type;
   }
 
   protected function isEntityShortName($shortName) {

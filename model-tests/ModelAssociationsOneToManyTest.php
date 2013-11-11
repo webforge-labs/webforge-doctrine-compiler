@@ -6,6 +6,9 @@ use Webforge\Common\System\Dir;
 use Doctrine\Common\Cache\ArrayCache;
 use Webforge\Code\Generator\GClass;
 use Webforge\Common\JS\JSONConverter;
+use ACME\Blog\Entities\Author;
+use ACME\Blog\Entities\Post;
+use ACME\Blog\Entities\User;
 
 class ModelAssociationsOneToManyTest extends \Webforge\Doctrine\Compiler\Test\Base {
 
@@ -91,10 +94,10 @@ class ModelAssociationsOneToManyTest extends \Webforge\Doctrine\Compiler\Test\Ba
 
   public function testSettingTheEntityOnTheManySide_AddsTheEntityOnTheOneSide() {
     $author = new Author();
-    $post1 = new Post();
+    $post1 = new Post($author);
 
-    $post1->setAuthor($author);
-    $this->assertTrue($author->hasPost($post1));
+    $this->assertSame($author, $post1->getAuthor($post1));
+    $this->assertTrue($author->hasWrittenPost($post1));
   }
 
  /* public function testSettingTheEntityOnTheManySide_RemovesTheEntityOnTheOneSide() {
