@@ -19,8 +19,11 @@ use Webforge\Types\EntityType;
 
 class EntityGenerator {
 
-  protected $entity;
-  protected $gClass;
+  /**
+   * @var GeneratedEntity[]
+   */
+  protected $generated;
+
   protected $inflector;
   protected $mappingGenerator;
   protected $model;
@@ -31,51 +34,77 @@ class EntityGenerator {
     $this->mappingGenerator = $mappingGenerator;
   }
 
-  public function generate(stdClass $entity, $fqn, Model $model, GClassBroker $broker) {
+  public function generate(Model $model, GClassBroker $broker) {
     $this->model = $model;
-    $this->entity = $entity;
-    $this->gClass = new GClass($fqn);
-    $this->gClassBroker = $broker;
 
-    if ($entity->extends) {
-      $this->gClass->setParent($broker->getElevated($entity->extends->fqn, $fqn));
+    $this->generated = array();
+
+    foreach ($model->getEntities() as $entityDefinition) {
+      $this->generated[$entityDefinition->fqn] = new GeneratedEntity($entityDefinition, new GClass($entityDefinition->fqn));
     }
 
-    $this->generateProperties($this->entity->properties);
-    $this->generateAssociationsAPI($this->gClass);
-    $this->generateConstructor($this->gClass, $this->entity);
-
-    $this->mappingGenerator->init($entity);
-    $this->mappingGenerator->annotate($this->gClass);
-
-    return $this->gClass;
+    foreach ($this->generated as $entity) {
+      $this->completeEntity($entity, $broker);
+    }
   }
 
-  protected function generateProperties($propertyDefinitions) {
-    foreach ($propertyDefinitions as $name => $propertyDefinition) {
-      $property = $this->gClass->createProperty(
-        $name, 
-        $this->parseType($propertyDefinition->type),
+  protected function completeEntity(GeneratedEntity $entity, GClassBroker $broker) {
+    if ($entity->definition->extends) {
+      $fqn = $entity->definition->extends->fqn;
+
+      if ($this->isEntity($fqn)) {
+        $entity->setParent($this->getEntity($fqn));
+      } else {
+        $entity->setParent($broker->getElevated($fqn));
+      }
+    }
+
+    $this->generateProperties($entity);
+    $this->generateAssociationsAPI($entity);
+    $this->generateConstructor($entity);
+
+    $this->mappingGenerator->init($entity);
+    $this->mappingGenerator->annotate($entity->gClass);
+  }
+
+  protected function generateProperties(GeneratedEntity $entity) {
+    foreach ($entity->definition->properties as $name => $propertyDefinition) {
+      $this->generatePropertyType($propertyDefinition);
+
+      $gProperty = $entity->gClass->createProperty(
+        $name,
+        $propertyDefinition->type,
         $default = GClass::UNDEFINED,
         $modifiers = GProperty::MODIFIER_PROTECTED
       );
 
-      $this->generateSetter($property, $propertyDefinition);
-      $this->generateGetter($property, $propertyDefinition);
+      $property = new GeneratedProperty($propertyDefinition, $gProperty);
+      $property->inflect($this->inflector);
+      $entity->addProperty($property);
+
+      $this->generateSetter($property, $entity);
+      $this->generateGetter($property, $entity);
     }
   }
 
-  protected function generateSetter(GProperty $property, stdClass $propertyDefinition) {
-    $setterName = $this->inflector->getPropertySetterName($property, $propertyDefinition);
+  protected function generatePropertyType(stdClass $def) {
+    if ($def->type instanceof EntityReference) {
+      $def->reference = $def->type;
+      $def->referencedEntity = $this->getEntity($def->reference->getFQN());
     
-    $gMethod = $this->gClass->createMethod(
-      $setterName,
+      if ($def->reference instanceof EntityCollectionReference) {
+        $def->type = new PersistentCollectionType($def->referencedEntity->getGClass());
+      } else {
+        $def->type = new EntityType($def->referencedEntity->getGClass());
+      }
+    }
+  }
+
+  protected function generateSetter(GeneratedProperty $property, GeneratedEntity $entity) {
+    $gMethod = $entity->gClass->createMethod(
+      $property->getSetterName(),
       array(
-        $parameter = new GParameter(
-          $property->getName(),
-          $property->getType(),
-          $propertyDefinition->nullable ? NULL : GParameter::UNDEFINED
-        )
+        $parameter = $property->getParameter()
       ),
       GFunctionBody::create(
         array(
@@ -87,16 +116,14 @@ class EntityGenerator {
     );
     
     $gMethod->createDocBlock()
-      ->append(sprintf('@param %s $%s', $property->getType()->getDocType() ?: 'mixed', $property->getName()));
+      ->append(sprintf('@param %s $%s', $property->getDocType(), $property->getName()));
 
     return $gMethod;
   }
 
-  protected function generateGetter(GProperty $property, $propertyDefinition) {
-    $getterName = $this->inflector->getPropertyGetterName($property, $propertyDefinition);
-    
-    $gMethod = $this->gClass->createMethod(
-      $getterName,
+  protected function generateGetter(GeneratedProperty $property, GeneratedEntity $entity) {
+    $gMethod = $entity->gClass->createMethod(
+      $property->getGetterName(),
       array(),
       GFunctionBody::create(
         array(
@@ -107,56 +134,63 @@ class EntityGenerator {
     );
 
     $gMethod->createDocBlock()
-      ->append(sprintf('@return %s', $property->getType()->getDocType() ?: 'mixed'));
+      ->append(sprintf('@return %s', $property->getDocType()));
 
     return $gMethod;
   }
 
-  protected function generateConstructor(GClass $gClass, stdClass $entity) {
+  protected function generateConstructor(GeneratedEntity $entity) {
     // @TODO: add a test to use the parent constructor if avaible (user author?)
     $code = array();
     $parameters = array();
 
-    foreach ($entity->constructor as $propertyName => $parameter) {
-      $propertyDefinition = $entity->properties->$propertyName;
-      $property = $this->gClass->getProperty($propertyName);
+    $constructed = array();
+    foreach ($entity->definition->constructor as $propertyName => $parameter) {
+      $property = $entity->getProperty($propertyName);
+      $parameter = $property->getParameter();
+      $constructed[$property->getName()] = $property;
 
-      $code[] = sprintf('$this->%s = $%s;', $propertyName, $parameter->name);
-      $parameters[] = new GParameter(
-        $parameter->name,
-        $property->getType(),
-        $propertyDefinition->nullable ? NULL : GParameter::UNDEFINED
-      );
+      $code[] = sprintf('$this->%s = $%s;', $property->getName(), $parameter->getName());
+      $parameters[] = $parameter;
     }
 
-    $gClass->createMethod('__construct', $parameters, GFunctionBody::create($code));
+    foreach ($entity->getProperties() as $property) {
+      if ($property->isEntityCollection() && !array_key_exists($property->getName(), $constructed)) {
+        $entity->gClass->addImport($property->getType()->getGClass(), 'ArrayCollection');
+
+        $code[] = sprintf('$this->%s = new ArrayCollection();', $property->getName());
+      }
+    }
+
+    $entity->gClass->createMethod('__construct', $parameters, GFunctionBody::create($code));
   }
 
-  protected function generateAssociationsAPI() {
-    foreach ($this->gClass->getProperties() as $property) {
-      if ($property->getType() instanceof PersistentCollectionType) {
-        $propertyDefinition = $this->entity->properties->{$property->getName()};
-        // eg author::posts, $subjectName = 'post' => $subjectEntity = 'Post'
-        $subjectName = $this->inflector->getItemNameFromCollectionName($property->getName(), $propertyDefinition);
-        $subjectEntity = $this->model->getEntity(ucfirst($subjectName));
-        $subjectGClass = $this->gClassBroker->getElevated($subjectEntity->fqn, $this->entity->name);
-        $subjectPropertyDefinition = $subjectEntity->properties->$subjectName;
-        $subjectProperty = $subjectGClass->getPropery($subjectName);
-
+  protected function generateAssociationsAPI(GeneratedEntity $entity) {
+    foreach ($entity->getProperties() as $property) {
+      if ($property->isEntityCollection()) {
         $generator = new AssociationsAPIGenerator(
           $this->inflector,
-          $this->gClass,
-          $this->entity,
-          $subjectEntity
+          $entity
         );
 
-        $generator->generateFor($property, $propertyDefinition);
+        $generator->generateFor($property);
       }
     }
   }
 
-
   protected function isEntityShortName($shortName) {
     return $this->model->hasEntity($shortName);
+  }
+
+  public function getEntities() {
+    return $this->generated;
+  }
+
+  protected function getEntity($fqn) {
+    return $this->generated[$fqn];
+  }
+
+  protected function isEntity($fqn) {
+    return array_key_exists($fqn, $this->generated);
   }
 }
