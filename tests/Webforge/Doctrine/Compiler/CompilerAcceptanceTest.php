@@ -99,8 +99,7 @@ JSON;
        $this->compiler->compileModel($this->json($jsonModel), $this->psr0Directory, Compiler::PLAIN_ENTITIES);
      } catch (InvalidModelException $e) {
        $this->assertContains('You have an ambigous definition for the association ACME\Blog\Entities\Post => ACME\Blog\Entities\Author', $e->getMessage());
-       $this->assertContains('The properties: Author::writtenPosts, Author::revisionedPosts are both pointing to Author', $e->getMessage());
-       print $e->getMessage();
+       $this->assertContains('The properties: Author::writtenPosts, Author::revisionedPosts are both pointing to Post', $e->getMessage());
        throw $e;
      }
   }

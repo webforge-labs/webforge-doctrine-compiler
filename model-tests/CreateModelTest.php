@@ -21,11 +21,16 @@ class CreateModelTest extends \Webforge\Doctrine\Compiler\Test\Base {
   }
 
   public function testdoCompileFixtureModel() {
+    // replace current webforge called from unit tests (if)
+    $autoLoader = $GLOBALS['env']['container']->getAutoLoader();
+    $boot = $GLOBALS['env']['container'] = new \Webforge\Setup\BootContainer($GLOBALS['env']['root'], NULL);
+    $boot->setAutoLoader($autoLoader);
+    $this->webforge = $boot->getWebforge();
+
     $dir = $this->getPackageDir('build/package/');
     $dir->create()->wipe();
     $this->getTestDirectory('acme-blog/')->copy($dir, NULL, NULL, $recursive = TRUE);
 
-    // please note that webforge is a non-resetted class instance in the bootcontainer which is created in bootstrap.php
     self::$package = $this->webforge->getPackageRegistry()->addComposerPackageFromDirectory(
       $dir
     );
