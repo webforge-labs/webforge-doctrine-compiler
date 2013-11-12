@@ -12,6 +12,10 @@ before_install:
   - composer self-update
   - COMPOSER_ROOT_VERSION=dev-master composer install --dev --prefer-source --no-interaction
 
+before_script:
+  - mysql -e 'create database IF NOT EXISTS `doctrine`;'
+  - mysql -e 'create database IF NOT EXISTS `doctrine_tests`;'
+
 script: phpunit --coverage-clover build/logs/clover.xml
 
 after_script:
