@@ -1,6 +1,9 @@
 # webforge-doctrine-compiler
 
 Generate your doctrine entities metadata from a simple json file, including the php code for the entity
+[![Build Status](https://travis-ci.org/webforge-labs/webforge-doctrine-compiler.png)](https://travis-ci.org/webforge-labs/webforge-doctrine-compiler)  
+[![Coverage Status](https://coveralls.io/repos/webforge-labs/webforge-doctrine-compiler/badge.png?branch=master)](https://coveralls.io/r/webforge-labs/webforge-doctrine-compiler?branch=master)  
+[![Latest Stable Version](https://poser.pugx.org/webforge/doctrine-compiler/version.png)](https://packagist.org/packages/webforge/doctrine-compiler)
 
 ## usage
 
