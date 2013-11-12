@@ -59,6 +59,12 @@ JSON;
     $this->assertInvalid(new stdClass());
   }
 
+  public function testDoesNotLikeEmptyModelsWithoutEntities() {
+    $this->assertInvalid((object) array(
+      'namespace'=>'ACME\Blog\Enttities'
+    ));
+  }
+
   public function testLikesShortPropertiesWithOnlyTypeAndName() {
     $jsonModel = <<<'JSON'
     {
@@ -94,6 +100,71 @@ JSON;
       (object) array(
         'name'=>'User',
         'extends'=>''
+      )
+    ));
+  }
+
+  public function testDoesNotLikeEntityWithEmptyName() {
+    $this->assertInvalid($this->wrapEntity(
+      (object) array(
+        'name'=>'',
+        'extends'=>''
+      )
+    ));
+  }
+
+  public function testDoesNotLikeEntityWithoutName() {
+    $this->assertInvalid($this->wrapEntity(
+      (object) array(
+        "properties"=>(object) array(
+        )
+      )
+    ));
+  }
+
+  public function testDoesNotLikeEntityAsArray() {
+    $this->assertInvalid($this->wrapEntity(
+      array(
+        "name"=>"User",
+        "properties"=>(object) array(
+        )
+      )
+    ));
+  }
+
+  public function testDoesNotLikeNonObjectProperties() {
+    $this->assertInvalid($this->wrapEntity(
+      (object) array(
+        "name"=>"User",
+        "properties"=>(object) array(
+          "email"=>true
+        )
+      )
+    ));
+  }
+
+  public function testDoesNotLikeNonExistingTypes() {
+    $this->assertInvalid($this->wrapEntity(
+      (object) array(
+        "name"=>"User",
+        "properties"=>(object) array(
+          "email"=>(object) array(
+            'type'=>'nonsense'
+          )
+        )
+      )
+    ));
+  }
+
+  public function testDoesNotLikeMalFormedTypes() {
+    $this->assertInvalid($this->wrapEntity(
+      (object) array(
+        "name"=>"User",
+        "properties"=>(object) array(
+          "email"=>(object) array(
+            'type'=>'Collection<wrong'
+          )
+        )
       )
     ));
   }
@@ -244,7 +315,7 @@ JSON;
     $this->validator->validateModel($jsonModel);
   }
 
-  protected function wrapEntity(stdClass $entity) {
+  protected function wrapEntity($entity) {
     return (object) array(
       'namespace'=>__NAMESPACE__,
       'entities'=>array($entity)

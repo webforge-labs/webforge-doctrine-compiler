@@ -129,7 +129,7 @@ class ModelValidator {
 
       try {
         $type = Type::create($typeName);
-      } catch (TypeException $e) {
+      } catch (\ReflectionException $e) {
         throw new InvalidModelException(sprintf("The type: '%s' cannot be parsed for entity '%s'.", $typeName, $entity->fqn), 0, $e);
       }
 

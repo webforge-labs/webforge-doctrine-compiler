@@ -154,6 +154,7 @@ class Model {
     }
   }
 
+  // @codeCoverageIgnoreStart
   public function debugAssociations() {
     $debug = sprintf("Model has %d unique associations: \n", count($this->associations));
     foreach ($this->associations as $associationPair) {
@@ -165,6 +166,7 @@ class Model {
 
     print $debug;
   }
+  // @codeCoverageIgnoreEnd
 
   public function getEntities() {
     return $this->entities;
