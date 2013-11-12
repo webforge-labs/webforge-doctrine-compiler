@@ -19,7 +19,7 @@ A very basic model (with one entity) could look like this:
     {
       "name": "User",
   
-      "members": {
+      "properties": {
         "id": { "type": "DefaultId" },
         "email": { "type": "String" }
       }
