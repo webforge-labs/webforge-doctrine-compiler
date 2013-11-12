@@ -59,4 +59,49 @@ JSON;
       throw $e;
     }
   }
+
+  public function testThrowsModelException_WhenAssociationsAreAmbigous() {
+    $jsonModel = <<<'JSON'
+    {
+      "namespace": "ACME\\Blog\\Entities",
+
+      "entities": [
+        {
+          "name": "Post",
+      
+          "properties": {
+            "id": { "type": "DefaultId" },
+            "author": { "type": "Author" },
+            "revisor": { "type": "Author", "nullable": true },
+            "categories": { "type": "Collection<Category>", "isOwning": true },
+            "created": { "type": "DateTime" },
+            "modified": { "type": "DateTime", "nullable": true }
+          },
+
+          "constructor": ["author", "revisor"]
+        },
+
+        {
+          "name": "Author",
+      
+          "properties": {    
+            "writtenPosts": { "type": "Collection<Post>" },
+            "revisionedPosts": { "type": "Collection<Post>" }
+          }
+        }
+      ]
+    }
+JSON;
+
+     $this->setExpectedException(__NAMESPACE__.'\InvalidModelException');
+
+     try {
+       $this->compiler->compileModel($this->json($jsonModel), $this->psr0Directory, Compiler::PLAIN_ENTITIES);
+     } catch (InvalidModelException $e) {
+       $this->assertContains('You have an ambigous definition for the association ACME\Blog\Entities\Post => ACME\Blog\Entities\Author', $e->getMessage());
+       $this->assertContains('The properties: Author::writtenPosts, Author::revisionedPosts are both pointing to Author', $e->getMessage());
+       print $e->getMessage();
+       throw $e;
+     }
+  }
 }

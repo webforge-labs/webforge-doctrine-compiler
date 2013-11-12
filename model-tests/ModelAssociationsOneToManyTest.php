@@ -92,7 +92,7 @@ class ModelAssociationsOneToManyTest extends \Webforge\Doctrine\Compiler\Test\Ba
     $this->assertFalse($authorParam->hasDefault(), 'author shouldnt be optional');
   }
 
-  public function testSettingTheEntityOnTheManySide_AddsTheEntityOnTheOneSide() {
+  public function testProvidingTheEntityOnTheManySideToConstructor_AddsTheEntityOnTheOneSide() {
     $author = new Author();
     $post1 = new Post($author);
 

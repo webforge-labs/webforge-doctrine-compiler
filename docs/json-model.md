@@ -36,7 +36,7 @@ Therefore a JSON format for creating entities should be used. This is a rough dr
       "extends": "User",
   
       "properties": {    
-        "writtenPosts": { "type": "Collection<Post>"},
+        "writtenPosts": { "type": "Collection<Post>", "relation": "author" },
         "revisionedPosts": { "type": "Collection<Post>", "relation": "revisor" }
       }
     },

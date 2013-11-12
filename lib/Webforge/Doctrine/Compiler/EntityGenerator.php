@@ -46,6 +46,19 @@ class EntityGenerator {
     foreach ($this->generated as $entity) {
       $this->completeEntity($entity, $broker);
     }
+
+    foreach ($this->generated as $entity) {
+      $this->model->indexAssociations($entity);
+    }
+    $this->model->completeAssociations();
+
+    foreach ($this->generated as $entity) {
+      $this->generateAssociationsAPI($entity);
+      $this->generateConstructor($entity);
+
+      $this->mappingGenerator->init($entity);
+      $this->mappingGenerator->annotate($entity->gClass);
+    }
   }
 
   protected function completeEntity(GeneratedEntity $entity, GClassBroker $broker) {
@@ -60,11 +73,6 @@ class EntityGenerator {
     }
 
     $this->generateProperties($entity);
-    $this->generateAssociationsAPI($entity);
-    $this->generateConstructor($entity);
-
-    $this->mappingGenerator->init($entity);
-    $this->mappingGenerator->annotate($entity->gClass);
   }
 
   protected function generateProperties(GeneratedEntity $entity) {
@@ -150,7 +158,14 @@ class EntityGenerator {
       $parameter = $property->getParameter();
       $constructed[$property->getName()] = $property;
 
-      $code[] = sprintf('$this->%s = $%s;', $property->getName(), $parameter->getName());
+      if ($property->isEntity()) {
+        $code[] = sprintf('if (isset($%s)) {', $parameter->getName());
+        $code[] = sprintf('  $this->%s($%s);', $property->getSetterName(), $parameter->getName());
+        $code[] = '}';
+      } else {
+        $code[] = sprintf('$this->%s = $%s;', $property->getName(), $parameter->getName());
+      }
+
       $parameters[] = $parameter;
     }
 
@@ -167,13 +182,16 @@ class EntityGenerator {
 
   protected function generateAssociationsAPI(GeneratedEntity $entity) {
     foreach ($entity->getProperties() as $property) {
-      if ($property->isEntityCollection()) {
+      if ($property->hasReference()) {
         $generator = new AssociationsAPIGenerator(
           $this->inflector,
           $entity
         );
 
-        $generator->generateFor($property);
+        $generator->generateFor(
+          $this->model->getAssociationFor($entity, $property),
+          $property
+        );
       }
     }
   }

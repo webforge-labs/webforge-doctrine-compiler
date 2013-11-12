@@ -32,7 +32,7 @@
       "extends": "User",
   
       "properties": {    
-        "writtenPosts": { "type": "Collection<Post>"},
+        "writtenPosts": { "type": "Collection<Post>" },
         "revisionedPosts": { "type": "Collection<Post>", "relation": "revisor" }
       }
     },

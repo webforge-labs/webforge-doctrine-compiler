@@ -9,6 +9,8 @@ use stdClass;
 
 class GeneratedProperty {
 
+  protected $name;
+
   protected $definition;
   protected $gProperty;
 
@@ -16,7 +18,6 @@ class GeneratedProperty {
   protected $getterName;
   protected $parameter;
   protected $collectionNames;
-  protected $name;
 
   public function __construct(stdClass $definition, GProperty $property) {
     $this->definition = $definition;
@@ -77,6 +78,14 @@ class GeneratedProperty {
 
   public function isEntity() {
     return isset($this->definition->reference) && $this->definition->reference instanceof EntityReference && !$this->definition->reference instanceof EntityCollectionReference;
+  }
+
+  public function hasReference() {
+    return isset($this->definition->reference);
+  }
+
+  public function getRelationName() {
+    return isset($this->definition->relation) ? $this->definition->relation : NULL;
   }
 
   /**

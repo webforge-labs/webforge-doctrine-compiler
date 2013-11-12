@@ -53,4 +53,12 @@ class GeneratedEntity {
   public function getFQN() {
     return $this->gClass->getFQN();
   }
+
+  public function getName() {
+    return $this->gClass->getName();
+  }
+
+  public function equals(GeneratedEntity $otherEntity) {
+    return $otherEntity->getFQN() === $this->getFQN();
+  }
 }

@@ -21,7 +21,8 @@ class CreateModelTest extends \Webforge\Doctrine\Compiler\Test\Base {
   }
 
   public function testdoCompileFixtureModel() {
-    $dir = Dir::createTemporary();
+    $dir = $this->getPackageDir('build/package/');
+    $dir->create()->wipe();
     $this->getTestDirectory('acme-blog/')->copy($dir, NULL, NULL, $recursive = TRUE);
 
     // please note that webforge is a non-resetted class instance in the bootcontainer which is created in bootstrap.php
@@ -32,7 +33,7 @@ class CreateModelTest extends \Webforge\Doctrine\Compiler\Test\Base {
     // we are the first test in the suite, so we (and only we) construct the model once
     $jsonModel = JSONConverter::create()->parseFile(self::$package->getDirectory('etc')->sub('doctrine/')->getFile('model.json'));
     
-    $this->compiler->compileModel($jsonModel, self::$package->getDirectory('lib'), Compiler::COMPILED_ENTITIES);
+    $this->compiler->compileModel($jsonModel, self::$package->getDirectory('lib'), Compiler::COMPILED_ENTITIES | Compiler::RECOMPILE);
 
     // register dynamically with autoloader from composer
     $this->frameworkHelper->getBootContainer()->getAutoLoader()->add('ACME\Blog', self::$package->getDirectory('lib')->wtsPath());

@@ -112,6 +112,8 @@ class ModelValidator {
       $definition->nullable = FALSE;
     }
 
+    $definition->name = $name;
+
     return $definition;
   }
 
@@ -122,8 +124,7 @@ class ModelValidator {
     }
 
     if ($model->hasEntity($typeName)) {
-      $referenceEntityName = $typeName;
-      $type = new EntityReference($this->model->getEntity($referenceEntityName));
+      $type = new EntityReference($this->model->getEntity($typeName));
     } else {
 
       try {

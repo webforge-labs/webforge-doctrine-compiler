@@ -24,6 +24,7 @@ class Compiler implements GClassBroker {
 
   const PLAIN_ENTITIES = 0x000001;
   const COMPILED_ENTITIES = 0x000002;
+  const RECOMPILE = 0x000004;
 
   public function __construct(ClassWriter $classWriter, EntityGenerator $entityGenerator, ModelValidator $validator, ClassElevator $classElevator) {
     $this->classWriter = $classWriter;
@@ -72,7 +73,7 @@ class Compiler implements GClassBroker {
 
       // write both
       $entityFile = $this->write($entityClass);
-      $compiledEntityFile = $this->write($compiledClass);
+      $compiledEntityFile = $this->write($compiledClass, $this->flags & self::COMPILED_ENTITIES ? ClassWriter::OVERWRITE : FALSE);
 
     } else {
       $entityFile = $this->write($entity->gClass);
