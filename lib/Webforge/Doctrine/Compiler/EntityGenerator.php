@@ -196,10 +196,6 @@ class EntityGenerator {
     }
   }
 
-  protected function isEntityShortName($shortName) {
-    return $this->model->hasEntity($shortName);
-  }
-
   public function getEntities() {
     return $this->generated;
   }
