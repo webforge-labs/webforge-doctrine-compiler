@@ -47,10 +47,6 @@ class ModelAssociation {
     return FALSE;
   }
 
-  public function getSlug() {
-    return sprintf("%s::%s => %s::%s", $this->entity->getName(), $this->property->getName(), $this->referencedEntity->getName(), $this->referencedProperty->getName());
-  }
-
   public function getUniqueSlug() {
     $format = '%s::%s <=> %s::%s';
 
@@ -67,12 +63,5 @@ class ModelAssociation {
 
   public function isOwning() {
     return $this->owning;
-  }
-
-  /**
-   * @return GeneratedProperty
-   */
-  public function getPropertyFor(GeneratedEntity $entity) {
-    return $this->entity->equals($entity) ? $this->property : $this->referencedProperty;
   }
 }

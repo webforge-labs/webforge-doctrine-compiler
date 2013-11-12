@@ -163,15 +163,6 @@ class Model {
       $debug .= "\n";
     }
 
-    /*
-    $debug .= "Model has the associations:\n";
-    foreach ($this->groupedAssociations as $group) {
-      foreach ($group as $association) {
-        $debug .= sprintf("  %s\n", $association->getSlug());
-      }
-    }
-    */
-
     print $debug;
   }
 
