@@ -39,11 +39,12 @@ class EntityMappingGenerator {
     }
   }
 
-  protected function annotateClass($gClass, $entity) {
+  protected function annotateClass($gClass, GeneratedEntity $entity) {
+    $desc = $entity->getDescription();
     $gClass->addImport(new GClass('Doctrine\ORM\Mapping'), 'ORM');
     $gClass->setDocBlock(
       $this->createDocBlock(
-        "\n\n".'this entity was compiled from '.__NAMESPACE__,
+        "$desc\n\n".'this entity was compiled from '.__NAMESPACE__,
         array(
           $this->generateEntityAnnotation($entity),
           $this->generateTableAnnotation($entity)

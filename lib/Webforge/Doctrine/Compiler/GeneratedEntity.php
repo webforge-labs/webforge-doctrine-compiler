@@ -75,4 +75,8 @@ class GeneratedEntity {
   public function getIdentifierColumn() {
     return 'id';
   }
+
+  public function getDescription() {
+    return isset($this->definition->description) ? $this->definition->description : NULL;
+  }
 }

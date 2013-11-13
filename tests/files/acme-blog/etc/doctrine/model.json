@@ -5,6 +5,7 @@
 
     {
       "name": "User",
+      "description": "A basic user of the blog",
   
       "properties": {
         "id": { "type": "DefaultId" },

@@ -92,4 +92,15 @@ class CreateModelTest extends \Webforge\Doctrine\Compiler\Test\Base {
 
     $this->assertNotContains('@', $compiledClass->getDocBlock()->toString(), 'The docblock from the compiled entity should not include any annotation.');
   }
+
+  public function testDescriptionIsCompiledIntoEntityClass() {
+    $userClass = $this->elevateFull('ACME\Blog\Entities\User');
+
+    $this->assertThatGClass($userClass)->hasDocBlock();
+
+    $this->assertContains(
+      'A basic user of the blog',
+      $userClass->getDocBlock()->toString()
+    );
+  }
 }
