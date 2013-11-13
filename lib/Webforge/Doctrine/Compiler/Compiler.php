@@ -81,7 +81,7 @@ class Compiler implements GClassBroker {
       $compiledEntityFile = $this->write($compiledClass, 'compiledEntityFile');
 
     } else {
-      $entityFile = $this->write($entity->gClass);
+      $entityFile = $this->write($entity->gClass, 'entityFile');
     }
 
     return array($entityFile, $compiledEntityFile);
