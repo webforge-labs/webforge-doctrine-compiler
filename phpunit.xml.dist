@@ -21,7 +21,7 @@
         <testsuite name="model">
           <file>model-tests/CreateModelTest.php</file>
           <file>model-tests/EntityPropertiesTest.php</file>
-          <file>model-tests/ModelAssociationsOneToManyTest.php</file>
+          <!--<file>model-tests/ModelAssociationsOneToManyTest.php</file>-->
           <file>model-tests/ModelAssociationsManyToManyTest.php</file>
           <file>model-tests/ModelDCValidationTest.php</file>
         </testsuite>
