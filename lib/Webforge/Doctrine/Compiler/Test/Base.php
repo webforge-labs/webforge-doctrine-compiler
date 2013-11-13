@@ -36,7 +36,7 @@ class Base extends \Webforge\Doctrine\Test\SchemaTestCase {
 
     $this->compiler = new Compiler(
       $this->webforge->getClassWriter(), 
-      new EntityGenerator($inflector = new Inflector, new EntityMappingGenerator($writer = new AnnotationsWriter, $inflector)),
+      new EntityGenerator($inflector = new Inflector, new EntityMappingGenerator($writer = new AnnotationsWriter)),
       new ModelValidator,
       $this->webforge->getClassElevator()
     );

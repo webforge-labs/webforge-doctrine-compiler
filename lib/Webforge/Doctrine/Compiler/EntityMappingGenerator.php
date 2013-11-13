@@ -14,15 +14,12 @@ use Webforge\Types\DoctrineExportableType;
 class EntityMappingGenerator {
 
   protected $entity;
-  protected $inflector;
   protected $annotationsWriter;
   protected $model;
 
-  public function __construct(AnnotationsWriter $annotationsWriter, Inflector $inflector) {
+  public function __construct(AnnotationsWriter $annotationsWriter) {
     $this->annotationsWriter = $annotationsWriter;
     $this->annotationsWriter->setAnnotationNamespaceAlias('Doctrine\ORM\Mapping', 'ORM');
-
-    $this->inflector = $inflector;
   }
 
   public function init(GeneratedEntity $entity, Model $model) {

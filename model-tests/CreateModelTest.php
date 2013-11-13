@@ -4,8 +4,10 @@ namespace Webforge\Doctrine\Compiler;
 
 use Webforge\Common\System\Dir;
 use Doctrine\Common\Cache\ArrayCache;
+use Webforge\Doctrine\Compiler\Console\CompileCommand;
 use Webforge\Code\Generator\GClass;
 use Webforge\Common\JS\JSONConverter;
+use Symfony\Component\Console\Tester\CommandTester;
 
 require_once __DIR__.DIRECTORY_SEPARATOR.'TestReflection.php';
 
@@ -36,10 +38,24 @@ class CreateModelTest extends \Webforge\Doctrine\Compiler\Test\Base {
     );
 
     // we are the first test in the suite, so we (and only we) construct the model once
-    $jsonModel = JSONConverter::create()->parseFile(self::$package->getDirectory('etc')->sub('doctrine/')->getFile('model.json'));
-    
-    $this->compiler->compileModel($jsonModel, self::$package->getDirectory('lib'), Compiler::COMPILED_ENTITIES | Compiler::RECOMPILE);
+    $compileCommand = new CompileCommand($this->dcc, $this->frameworkHelper->getSystem());
+    $compileCommand->injectWebforge($this->webforge);
 
+    $application = new \Webforge\Console\Application('test application in create model test', '0.0');
+    $application->add($compileCommand);
+
+    $application->find('orm:compile');
+    chdir(self::$package->getRootDirectory()->wtsPath());
+
+    $commandTester = new CommandTester($compileCommand);
+    $ret = $commandTester->execute(array(
+      'command'=>$compileCommand->getName(),
+      'model'=>'etc/doctrine/model.json',
+      'psr0target'=>'lib/'
+    ));
+
+    $this->assertSame(0, $ret, 'compiling with command failed: '.$commandTester->getDisplay());
+    
     // register dynamically with autoloader from composer
     $this->frameworkHelper->getBootContainer()->getAutoLoader()->add('ACME\Blog', self::$package->getDirectory('lib')->wtsPath());
   }
