@@ -6,7 +6,7 @@ use ACME\Blog\Entities\Author;
 use ACME\Blog\Entities\Post;
 use ACME\Blog\Entities\User;
 
-class ModelAssociationsOneToManyTest extends \Webforge\Doctrine\Compiler\Test\Base {
+class ModelAssociationsOneToManyTest extends \Webforge\Doctrine\Compiler\Test\ModelBase {
 
   public function setUp() {
     $this->chainClass = __NAMESPACE__ . '\\Compiler';
@@ -14,10 +14,6 @@ class ModelAssociationsOneToManyTest extends \Webforge\Doctrine\Compiler\Test\Ba
 
     $this->authorClass = $this->elevateFull('ACME\Blog\Entities\Author');
     $this->postClass = $this->elevateFull('ACME\Blog\Entities\Post');
-  }
-
-  protected function setUpPackage() {
-    $this->blogPackage = self::$package;
   }
 
   public function testEntitiesCanExtendEachOther() {

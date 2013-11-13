@@ -6,7 +6,7 @@ use ACME\Blog\Entities\Category;
 use ACME\Blog\Entities\Post;
 use ACME\Blog\Entities\Author;
 
-class ModelAssociationsManyToManyTest extends \Webforge\Doctrine\Compiler\Test\Base {
+class ModelAssociationsManyToManyTest extends \Webforge\Doctrine\Compiler\Test\ModelBase {
 
   public function setUp() {
     $this->chainClass = __NAMESPACE__ . '\\Compiler';
@@ -17,10 +17,6 @@ class ModelAssociationsManyToManyTest extends \Webforge\Doctrine\Compiler\Test\B
 
     $this->categoryClass = $this->elevateFull('ACME\Blog\Entities\Category');
     $this->postClass = $this->elevateFull('ACME\Blog\Entities\Post');
-  }
-
-  protected function setUpPackage() {
-    $this->blogPackage = self::$package;
   }
 
   public function testHasAllSettersGettersAddersRemoversAndCheckers() {
@@ -68,7 +64,7 @@ class ModelAssociationsManyToManyTest extends \Webforge\Doctrine\Compiler\Test\B
   }
 
   public function testManyToManyDoctrineMetadata_bidirectional_owningSide() {
-    $metadata = $this->em->getMetadataFactory()->getMetadataFor($this->postClass->getFQN());
+    $metadata = $this->assertDoctrineMetadata($this->postClass->getFQN());
 
     $categories = $this->assertAssociationMapping('categories', $metadata);
 
@@ -79,7 +75,7 @@ class ModelAssociationsManyToManyTest extends \Webforge\Doctrine\Compiler\Test\B
   }
 
   public function testManyToManyDoctrineMetadata_bidirectional_inverseSide() {
-    $metadata = $this->em->getMetadataFactory()->getMetadataFor($this->categoryClass->getFQN());
+    $metadata = $this->assertDoctrineMetadata($this->categoryClass->getFQN());
 
     $posts = $this->assertAssociationMapping('posts', $metadata);
 

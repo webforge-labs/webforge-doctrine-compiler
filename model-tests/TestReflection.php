@@ -13,4 +13,13 @@ class TestReflection {
     );
   }
 
+  public static function tableNames() {
+    return array(
+      array('users'),
+      array('authors'),
+      array('categories'),
+      array('posts'),
+      array('posts2categories')
+    );
+  }
 }
