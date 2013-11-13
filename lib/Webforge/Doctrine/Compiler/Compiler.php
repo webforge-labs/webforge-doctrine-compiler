@@ -72,8 +72,8 @@ class Compiler implements GClassBroker {
       }
 
       // write both
-      $entityFile = $this->write($entityClass);
-      $compiledEntityFile = $this->write($compiledClass, $this->flags & self::COMPILED_ENTITIES ? ClassWriter::OVERWRITE : FALSE);
+      $entityFile = $this->write($entityClass, 'entityFile');
+      $compiledEntityFile = $this->write($compiledClass, 'compiledEntityFile');
 
     } else {
       $entityFile = $this->write($entity->gClass);
@@ -82,11 +82,20 @@ class Compiler implements GClassBroker {
     return array($entityFile, $compiledEntityFile);
   }
 
-  protected function write(GClass $gClass) {
+  protected function write(GClass $gClass, $type) {
     $entityFile = $this->mapToFile($gClass->getFQN());
-    $entityFile->getDirectory()->create();
 
-    $this->classWriter->write($gClass, $entityFile);
+    if ($type === 'entityFile' && $entityFile->exists()) {
+      // dont write. warn?
+    } else {
+      $entityFile->getDirectory()->create();
+
+      $this->classWriter->write(
+        $gClass, 
+        $entityFile, 
+        ($type === 'compiledEntityFile' && ($this->flags & self::COMPILED_ENTITIES))
+          ? ClassWriter::OVERWRITE : FALSE);
+    }
 
     return $entityFile;
   }
