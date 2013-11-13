@@ -2,10 +2,6 @@
 
 namespace Webforge\Doctrine\Compiler;
 
-use Webforge\Common\System\Dir;
-use Doctrine\Common\Cache\ArrayCache;
-use Webforge\Code\Generator\GClass;
-use Webforge\Common\JS\JSONConverter;
 use ACME\Blog\Entities\Author;
 use ACME\Blog\Entities\Post;
 use ACME\Blog\Entities\User;
@@ -100,12 +96,21 @@ class ModelAssociationsOneToManyTest extends \Webforge\Doctrine\Compiler\Test\Ba
     $this->assertTrue($author->hasWrittenPost($post1));
   }
 
- /* public function testSettingTheEntityOnTheManySide_RemovesTheEntityOnTheOneSide() {
-    $author = new Author();
-    $post1 = new Post();
+  public function testOneToManyDoctrineMetadata() {
+    $authorMetadata = $this->em->getMetadataFactory()->getMetadataFor($this->authorClass->getFQN());
 
-    $post1->setAuthor($author);
+    $writtenPosts = $this->assertAssociationMapping('writtenPosts', $authorMetadata);
 
-    $this->assertFalse($author->hasPost($post1));
-  }*/
+    $this->assertHasTargetEntity($this->postClass, $writtenPosts);
+    $this->assertIsMappedBy('author', $writtenPosts);
+  }
+
+  public function testManyToOneDoctrineMetadata() {
+    $postMetadata = $this->em->getMetadataFactory()->getMetadataFor($this->postClass->getFQN());
+
+    $author = $this->assertAssociationMapping('author', $postMetadata);
+
+    $this->assertHasTargetEntity($this->authorClass, $author);
+    $this->assertIsInversedBy('writtenPosts', $author);
+  }
 }

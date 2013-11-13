@@ -13,10 +13,10 @@ use Webforge\Types\DoctrineExportableType;
 
 class EntityMappingGenerator {
 
-  protected $gClass;
   protected $entity;
   protected $inflector;
   protected $annotationsWriter;
+  protected $model;
 
   public function __construct(AnnotationsWriter $annotationsWriter, Inflector $inflector) {
     $this->annotationsWriter = $annotationsWriter;
@@ -25,8 +25,9 @@ class EntityMappingGenerator {
     $this->inflector = $inflector;
   }
 
-  public function init(GeneratedEntity $entity) {
+  public function init(GeneratedEntity $entity, Model $model) {
     $this->entity = $entity;
+    $this->model = $model;
   }
 
   public function annotate() {
@@ -67,6 +68,11 @@ class EntityMappingGenerator {
     $annotations = array();
     $type = $property->getType();
 
+    if ($property->hasReference()) {
+      $associationPair = $this->model->getAssociationFor($entity, $property);
+      $annotations = array_merge($annotations, $this->generateAssociationAnnotation($property, $entity, $associationPair));
+    }
+
     if ($type instanceof IdType) {
       $annotations[] = new ORM\Id();
 
@@ -77,9 +83,88 @@ class EntityMappingGenerator {
       $generatedValue = new ORM\GeneratedValue();
       $generatedValue->strategy = 'AUTO';
       $annotations[] = $generatedValue;
+
     } elseif ($type instanceof DoctrineExportableType) {
       $column = new ORM\Column();
       $column->type = $type->getDoctrineExportType();
+    }
+
+    return $annotations;
+  }
+
+  protected function generateAssociationAnnotation(GeneratedProperty $property, GeneratedEntity $entity, stdClass $associationPair) {
+    $annotations = array();
+
+    $association = $entity->equals($associationPair->owning->entity) ? $associationPair->owning : $associationPair->inverse;
+    $hasInverse = isset($associationPair->inverse);
+
+    if ($association->isOneToMany()) {
+      $annotation = new ORM\OneToMany();
+
+      $annotation->targetEntity = $association->referencedEntity->getFQN();
+      // the many side is always existing so the referencedProperty is defined
+      $annotation->mappedBy = $association->referencedProperty->getName();
+
+      // @TODO cascade
+
+      $annotations[] = $annotation;
+    } elseif ($association->isManyToOne()) {
+      // we are always the owning side
+
+      $annotation = new ORM\ManyToOne();
+      $annotation->targetEntity = $association->referencedEntity->getFQN();
+
+      if ($hasInverse) {
+        $annotation->inversedBy = $association->referencedProperty->getName();
+      }
+
+      // @TODO cascade
+
+      $annotations[] = $annotation;
+    } elseif ($association->isManyToMany()) {
+      $annotation = new ORM\ManyToMany();
+
+      $annotation->targetEntity = $association->referencedEntity->getFQN();
+
+      if (!$association->isOwning()) {
+        $annotation->mappedBy = $association->referencedProperty->getName();
+      } elseif ($hasInverse) {
+        $annotation->inversedBy = $association->referencedProperty->getName();
+      }
+
+      $annotations[] = $annotation;
+
+      // we need a table for manyToMany
+      $table = new ORM\JoinTable();
+      $table->name = sprintf('%s2%s', $associationPair->owning->entity->getTableName(), $associationPair->owning->referencedEntity->getTableName());
+
+      /*@ORM\JoinTable(
+          name="page2contentstream", 
+          joinColumns={
+            @ORM\JoinColumn(name="page_id", onDelete="cascade")
+          }, 
+          inverseJoinColumns={
+            @ORM\JoinColumn(name="contentstream_id", onDelete="cascade")
+          }
+        )
+      */
+      $joinColumn = new ORM\JoinColumn();
+      $joinColumn->name = sprintf('%s_%s', $associationPair->owning->entity->getTableName(), $associationPair->owning->entity->getIdentifierColumn());
+      $joinColumn->onDelete = 'cascade';
+
+      $table->joinColumns = array($joinColumn);
+
+      // inverse join column has to be existing no matter if associations reverse is existing
+      $inverseJoinColumn  = new ORM\JoinColumn();
+      $inverseJoinColumn->name = sprintf('%s_%s', $associationPair->owning->referencedEntity->getTableName(), $associationPair->owning->referencedEntity->getIdentifierColumn());
+      $inverseJoinColumn->onDelete = 'cascade';
+
+      $table->inverseJoinColumns = array($inverseJoinColumn);
+      
+      $annotations[] = $table;
+
+    } elseif ($association->isOneToOne()) {
+      throw new Webforge\Common\Exception\NotImplementedException('OneToOne not needed right now');
     }
 
     return $annotations;
@@ -91,8 +176,7 @@ class EntityMappingGenerator {
 
   protected function generateTableAnnotation(GeneratedEntity $entity) {
     $table = new ORM\Table();
-    // @TODO implement inflect() in Entity and create a getter
-    $table->name = $this->inflector->tableName($entity->definition);
+    $table->name = $entity->getTableName();
 
     return $table;
   }

@@ -40,7 +40,8 @@ class EntityGenerator {
     $this->generated = array();
 
     foreach ($model->getEntities() as $entityDefinition) {
-      $this->generated[$entityDefinition->fqn] = new GeneratedEntity($entityDefinition, new GClass($entityDefinition->fqn));
+      $this->generated[$entityDefinition->fqn] = $entity = new GeneratedEntity($entityDefinition, new GClass($entityDefinition->fqn));
+      $entity->inflect($this->inflector);
     }
 
     foreach ($this->generated as $entity) {
@@ -56,7 +57,7 @@ class EntityGenerator {
       $this->generateAssociationsAPI($entity);
       $this->generateConstructor($entity);
 
-      $this->mappingGenerator->init($entity);
+      $this->mappingGenerator->init($entity, $this->model);
       $this->mappingGenerator->annotate($entity->gClass);
     }
   }

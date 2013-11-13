@@ -14,9 +14,15 @@ class GeneratedEntity {
   protected $parent;
   protected $properties = array();
 
+  protected $tableName;
+
   public function __construct(stdClass $definition, GClass $gClass) {
     $this->gClass = $gClass;
     $this->definition = $definition;
+  }
+
+  public function inflect(Inflector $inflector) {
+    $this->tableName = $inflector->tableName($this->definition);
   }
 
   public function setParent($parent) {
@@ -60,5 +66,13 @@ class GeneratedEntity {
 
   public function equals(GeneratedEntity $otherEntity) {
     return $otherEntity->getFQN() === $this->getFQN();
+  }
+
+  public function getTableName() {
+    return $this->tableName;
+  }
+
+  public function getIdentifierColumn() {
+    return 'id';
   }
 }

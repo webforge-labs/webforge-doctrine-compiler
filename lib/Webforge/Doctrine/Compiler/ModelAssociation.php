@@ -64,4 +64,20 @@ class ModelAssociation {
   public function isOwning() {
     return $this->owning;
   }
+
+  public function isOneToMany() {
+    return $this->type === 'OneToMany';
+  }
+
+  public function isManyToOne() {
+    return $this->type === 'ManyToOne';
+  }
+
+  public function isManyToMany() {
+    return $this->type === 'ManyToMany';
+  }
+
+  public function isOneToOne() {
+    return $this->type === 'OneToOne';
+  }
 }
