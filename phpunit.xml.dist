@@ -23,6 +23,7 @@
           <file>model-tests/EntityPropertiesTest.php</file>
           <file>model-tests/ModelAssociationsOneToManyTest.php</file>
           <file>model-tests/ModelAssociationsManyToManyTest.php</file>
+          <file>model-tests/ModelInhertianceTest.php</file>
           <file>model-tests/ModelDCValidationTest.php</file>
         </testsuite>
     </testsuites>
