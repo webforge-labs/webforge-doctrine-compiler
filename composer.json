@@ -1,13 +1,6 @@
 {
   "name":"webforge/doctrine-compiler",
   "description":"Generate your doctrine entities metadata from a simple json file, including the php code for the entity",
-  "require":{
-    "webforge/doctrine":"1.2.*@dev",
-    "webforge/webforge":"1.8.*@dev",
-    "beberlei/assert": "1.6.*@stable",
-    "mockery/mockery": "dev-master",
-    "webforge/types": "1.0.*@dev"
-  },
   "license":"MIT",
   "authors":[
     {
@@ -20,6 +13,13 @@
     "psr-0":{
       "Webforge\\Doctrine\\Compiler":["lib/", "tests/"]
     }
+  },
+  "require":{
+    "webforge/doctrine":"1.2.*@dev",
+    "webforge/webforge":"1.8.*@dev",
+    "beberlei/assert": "1.6.*@stable",
+    "mockery/mockery": "dev-master",
+    "webforge/types": "1.0.*@dev"
   },
   "require-dev": {
     "satooshi/php-coveralls": "dev-master",
