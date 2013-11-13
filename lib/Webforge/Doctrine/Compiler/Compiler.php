@@ -58,7 +58,12 @@ class Compiler implements GClassBroker {
       $compiledClass = clone $entityClass;
       $compiledClass->setName('Compiled'.$entityClass->getName());
       $compiledClass->setAbstract(TRUE);
-      $compiledClass->setDocBlock(new DocBlock('Compiled Entity for '.$entityClass->getFQN()."\n\nTo change table name or entity repository edit the ".$entityClass->getFQN().' class.'));
+      $compiledClass->setDocBlock(
+        $docBlock = new DocBlock(
+          'Compiled Entity for '.$entityClass->getFQN()."\n\nTo change table name or entity repository edit the ".$entityClass->getFQN().' class.'."\n".
+          '@ORM\MappedSuperClass'
+        )
+      );
 
       // entity extends Generation-Gap Entity
       $entityClass->setParent($compiledClass);
