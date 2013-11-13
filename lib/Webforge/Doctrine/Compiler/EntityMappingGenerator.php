@@ -85,6 +85,12 @@ class EntityMappingGenerator {
     } elseif ($type instanceof DoctrineExportableType) {
       $column = new ORM\Column();
       $column->type = $type->getDoctrineExportType();
+
+      if (isset($property->getDefinition()->length)) {
+        $column->length = $property->getDefinition()->length;
+      }
+
+      $annotations[] = $column;
     }
 
     return $annotations;

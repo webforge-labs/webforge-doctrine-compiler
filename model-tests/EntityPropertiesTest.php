@@ -22,4 +22,24 @@ class EntityPropertiesTest extends \Webforge\Doctrine\Compiler\Test\ModelBase {
       ->hasOwnProperty('revisionedPosts')
     ;
   }
+
+  public function testSimpleColumnsAreInDoctrineMetadata() {
+    $email = $this->assertMetadataField('User', 'email');
+
+    $this->assertEquals('string', $email['type']);
+  }
+
+  public function testStringColumnsCanHaveALength() {
+    $email = $this->assertMetadataField('User', 'email');
+
+    $this->assertEquals(210, $email['length']);
+  }
+
+  protected function assertMetadataField($entityShortname, $fieldName) {
+    $metadata = $this->assertDoctrineMetadata('ACME\Blog\Entities\\'.$entityShortname);
+
+    $field = $metadata->getFieldMapping($fieldName);
+
+    return $field;
+  }
 }

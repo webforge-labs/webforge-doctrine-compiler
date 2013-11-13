@@ -9,7 +9,7 @@
   
       "properties": {
         "id": { "type": "DefaultId" },
-        "email": { "type": "String" }
+        "email": { "type": "String", "length": 210 }
       }
     },
 
