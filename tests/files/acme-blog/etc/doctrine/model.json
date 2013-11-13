@@ -21,8 +21,8 @@
         "author": { "type": "Author" },
         "revisor": { "type": "Author", "nullable": true },
         "categories": { "type": "Collection<Category>", "isOwning": true },
-        "created": { "type": "DateTime" },
-        "modified": { "type": "DateTime", "nullable": true }
+        "created": { "type": "String" },
+        "modified": { "type": "String", "nullable": true }
       },
 
       "constructor": ["author", "revisor"]
