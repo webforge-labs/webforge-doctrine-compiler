@@ -90,7 +90,7 @@ class CreateModelTest extends \Webforge\Doctrine\Compiler\Test\Base {
       ->hasDocBlock()
     ;
 
-    $this->assertNotContains('@', $compiledClass->getDocBlock()->toString(), 'The docblock from the compiled entity should not include any annotation.');
+    $this->assertContains('@ORM\MappedSuperClass', $compiledClass->getDocBlock()->toString(), 'The docblock from the compiled entity should  include the mapped superclass annotation.');
   }
 
   public function testDescriptionIsCompiledIntoEntityClass() {

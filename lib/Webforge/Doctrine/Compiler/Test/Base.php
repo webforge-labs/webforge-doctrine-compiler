@@ -68,18 +68,22 @@ class Base extends \Webforge\Doctrine\Test\SchemaTestCase {
     return new Dir(vfsStream::url($name).'/');
   }
 
-  protected function assertDoctrineMetadata($entityName) {
+  protected function assertDoctrineMetadata($entityClass) {
     $metadataFactory = $this->em->getMetadataFactory();
 
+    if ($entityClass instanceof ClassInterface) {
+      $entityClass = $entityClass->getFQN();
+    }
+
     try {
-      $info = $metadataFactory->getMetadataFor($entityName);
+      $info = $metadataFactory->getMetadataFor($entityClass);
     } catch (\Doctrine\ORM\Mapping\MappingException $e) {
-      $errorFile = $this->webforge->getClassFileMapper()->getFile($entityName);
+      $errorFile = $this->webforge->getClassFileMapper()->getFile($entityClass);
       $e = new \RuntimeException("Doctrine cannot read the file-contents:\n".$errorFile->getContents()."\nError was: ".$e->getMessage());
       throw $e;
     }
 
-    $this->assertEquals($entityName, $info->name, 'The name is expected to be other than the read one from doctrine - thats an testing error');
+    $this->assertEquals($entityClass, $info->name, 'The name is expected to be other than the read one from doctrine - thats an testing error');
 
     return $info;
   }

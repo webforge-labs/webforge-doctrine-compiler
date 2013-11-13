@@ -69,9 +69,8 @@ class EntityMappingGenerator {
     if ($property->hasReference()) {
       $associationPair = $this->model->getAssociationFor($entity, $property);
       $annotations = array_merge($annotations, $this->generateAssociationAnnotation($property, $entity, $associationPair));
-    }
 
-    if ($type instanceof IdType) {
+    } elseif ($type instanceof IdType) {
       $annotations[] = new ORM\Id();
 
       $column = new ORM\Column();

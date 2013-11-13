@@ -16,22 +16,6 @@ class ModelAssociationsOneToManyTest extends \Webforge\Doctrine\Compiler\Test\Mo
     $this->postClass = $this->elevateFull('ACME\Blog\Entities\Post');
   }
 
-  public function testEntitiesCanExtendEachOther() {
-    // the author is a user
-    $authorClass = $this->elevateFull('ACME\Blog\Entities\Author');
-    
-    $this->assertEquals(
-      'Author',
-      $authorClass->getName()
-    );
-
-    $userClass = $this->elevateFull('ACME\Blog\Entities\User');
-    $this->assertThatGClass($authorClass->getParent())
-      ->hasParent($userClass);
-
-    // @TODO assert that here is a real hierarchy used like: single class table, etc (annotations!)
-  }
-
   public function testHasAllSettersGettersAddersRemoversAndCheckers() {
     // one (written)post has one author
     // one author has many (written)posts
@@ -93,7 +77,7 @@ class ModelAssociationsOneToManyTest extends \Webforge\Doctrine\Compiler\Test\Mo
   }
 
   public function testOneToManyDoctrineMetadata() {
-    $authorMetadata = $this->em->getMetadataFactory()->getMetadataFor($this->authorClass->getFQN());
+    $authorMetadata = $this->assertDoctrineMetadata($this->authorClass);
 
     $writtenPosts = $this->assertAssociationMapping('writtenPosts', $authorMetadata);
 
