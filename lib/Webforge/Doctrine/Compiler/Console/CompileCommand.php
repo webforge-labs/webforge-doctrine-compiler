@@ -57,6 +57,8 @@ class CompileCommand extends AbstractDoctrineCommand {
     $target = $input->getDirectory('psr0target');
 
     $this->getCompiler()->compileModel($jsonModel, $target, $flags = Compiler::COMPILED_ENTITIES | Compiler::RECOMPILE);
+
+    $output->ok('The model was successful compiled.');
     return 0;
   }
 
