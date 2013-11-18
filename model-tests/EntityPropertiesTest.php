@@ -32,7 +32,7 @@ class EntityPropertiesTest extends \Webforge\Doctrine\Compiler\Test\ModelBase {
   public function testStringColumnsCanHaveALength() {
     $email = $this->assertMetadataField('User', 'email');
 
-    $this->assertEquals(210, $email['length']);
+    $this->assertEquals(210, $email['length'], 'length from email is not matched');
   }
 
   protected function assertMetadataField($entityShortname, $fieldName) {

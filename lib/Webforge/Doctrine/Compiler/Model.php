@@ -50,6 +50,7 @@ class Model {
       if ($property->hasReference()) {
         $referencedEntity = $property->getReferencedEntity();
 
+        $unidirectional = TRUE;
         foreach ($referencedEntity->getProperties() as $referencedProperty) {
           if ($referencedProperty->hasReference() && $entity->equals($referencedProperty->getReferencedEntity())) {
             $type = $owning = NULL;
@@ -75,21 +76,36 @@ class Model {
             $association = new ModelAssociation($type, $entity, $property, $referencedEntity, $referencedProperty);
             $association->setOwning($owning);
 
-            $this->associations[$association->getUniqueSlug()][$association->isOwning() ? 'owning' : 'inverse'] = $association;
-            
-            /*
-            $groupKey = $association->isOwning ? $entity->getName().'::'.$property->getName() : $referencedEntity->getName().'::'.$referencedProperty->getName();
-            $this->groupedAssociations[$groupKey][] = $association;
-            */
+            $this->indexAssociation($association);
+            $unidirectional = FALSE;
           }
+        }
+
+        if ($unidirectional) {
+          $referencedProperty = NULL;
+
+          if ($property->isEntityCollection()) {
+            $type = 'ManyToMany';
+          } elseif ($property->isEntity()) {
+            $type = 'OneToOne';
+          }
+
+          $association = new ModelAssociation($type, $entity, $property, $referencedEntity, $referencedProperty);
+          $association->setOwning(TRUE);
+          
+          $this->indexAssociation($association);
         }
       }
     }
   }
 
+  protected function indexAssociation(ModelAssociation $association) {
+    $this->associations[$association->getUniqueSlug()][$association->isOwning() ? 'owning' : 'inverse'] = $association;
+  }
+
   public function completeAssociations() {
     $grouped = array();
-    foreach ($this->associations as $associationPair) {
+    foreach ($this->associations as $key=>$associationPair) {
       $owningAssociation = $associationPair['owning'];
       $grouped[sprintf('%s::%s', $owningAssociation->entity->getName(), $owningAssociation->property->getName())][] = (object) $associationPair;
     }

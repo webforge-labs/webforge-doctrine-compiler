@@ -9,7 +9,8 @@ class TestReflection {
       array('ACME\Blog\Entities\User', 'User'),
       array('ACME\Blog\Entities\Author', 'Author'),
       array('ACME\Blog\Entities\Post', 'Post'),
-      array('ACME\Blog\Entities\Category', 'Category')
+      array('ACME\Blog\Entities\Category', 'Category'),
+      array('ACME\Blog\Entities\Tag', 'Tag')
     );
   }
 
@@ -19,7 +20,8 @@ class TestReflection {
       array('authors'),
       array('categories'),
       array('posts'),
-      array('posts2categories')
+      array('posts2categories'),
+      array('tags')
     );
   }
 }

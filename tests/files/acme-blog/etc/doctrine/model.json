@@ -21,6 +21,7 @@
         "author": { "type": "Author" },
         "revisor": { "type": "Author", "nullable": true },
         "categories": { "type": "Collection<Category>", "isOwning": true },
+        "tags": { "type": "Collection<Tag>" },
         "created": { "type": "String" },
         "modified": { "type": "String", "nullable": true }
       },
@@ -46,7 +47,17 @@
         "id": "DefaultId",
         "posts": { "type": "Collection<Post>" }
       }
-    }
+    },
 
+    {
+      "name": "Tag",
+    
+      "properties": {
+        "id": { "type": "DefaultId" },
+        "label": { "type": "String" }
+      },
+
+      "constructor": ["label"]
+    }
   ]
 }

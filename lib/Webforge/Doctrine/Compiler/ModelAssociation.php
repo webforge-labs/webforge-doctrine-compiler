@@ -32,6 +32,10 @@ class ModelAssociation {
   }
 
   public function shouldUpdateOtherSide() {
+    if ($this->isUnidirectional()) {
+      return FALSE;
+    }
+
     if ($this->type === 'ManyToOne') {
       return TRUE;
     }
@@ -47,14 +51,25 @@ class ModelAssociation {
     return FALSE;
   }
 
-  public function getUniqueSlug() {
-    $format = '%s::%s <=> %s::%s';
+  public function isUnidirectional() {
+    return !isset($this->referencedProperty);
+  }
 
-    if ($this->owning) {
-      return sprintf($format, $this->entity->getName(), $this->property->getName(), $this->referencedEntity->getName(), $this->referencedProperty->getName());
+  public function getUniqueSlug() {
+    if ($this->isUnidirectional()) {
+      // i think we're always the owning side for unidirectional associations
+      $format = '%s::%s <=> %s';
+
+      return sprintf($format, $this->entity->getName(), $this->property->getName(), $this->referencedEntity->getName());
     } else {
-      return sprintf($format, $this->referencedEntity->getName(), $this->referencedProperty->getName(), $this->entity->getName(), $this->property->getName());
-    }
+      $format = '%s::%s <=> %s::%s';
+
+      if ($this->owning) {
+        return sprintf($format, $this->entity->getName(), $this->property->getName(), $this->referencedEntity->getName(), $this->referencedProperty->getName());
+      } else {
+        return sprintf($format, $this->referencedEntity->getName(), $this->referencedProperty->getName(), $this->entity->getName(), $this->property->getName());
+      }
+    } 
   }
 
   public function setOwning($bool) {

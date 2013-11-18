@@ -92,15 +92,65 @@ JSON;
       ]
     }
 JSON;
+  
+    $this->assertCompilerThrowsModelException($jsonModel, array(
+      'You have an ambigous definition for the association ACME\Blog\Entities\Post => ACME\Blog\Entities\Author',
+      'The properties: Author::writtenPosts, Author::revisionedPosts are both pointing to Post'
+    ));
+  }
 
-     $this->setExpectedException(__NAMESPACE__.'\InvalidModelException');
+  public function testThrowsModelException_WhenUnidirectorionalAssociationsAreAmbigousInType() {
+    return 'This can be conflict-resolved to ManyToMany';
 
-     try {
-       $this->compiler->compileModel($this->json($jsonModel), $this->psr0Directory, Compiler::PLAIN_ENTITIES);
-     } catch (InvalidModelException $e) {
-       $this->assertContains('You have an ambigous definition for the association ACME\Blog\Entities\Post => ACME\Blog\Entities\Author', $e->getMessage());
-       $this->assertContains('The properties: Author::writtenPosts, Author::revisionedPosts are both pointing to Post', $e->getMessage());
-       throw $e;
-     }
+    /*
+     First i though we need a relationType in tags here because its not determinable if this is a OneToMany OneToOne or ManyToMany relationship, but:
+     OneToOne is not possible because its Collection<Tag>
+     OneToMany is not possible because Tags MUST be the owning side than (and would refer with Tag::posts to it)
+     so only ManyToMany unidirectional is possible
+    */
+
+    $jsonModel = <<<'JSON'
+    {
+      "namespace": "ACME\\Blog\\Entities",
+
+      "entities": [
+        {
+          "name": "Post",
+      
+          "properties": {
+            "id": { "type": "DefaultId" },
+            "tags": { "type": "Collection<Tag>", "isOwning": true },
+          }
+        },
+
+        {
+          "name": "Tag",
+      
+          "properties": {
+            "id": { "type": "DefaultId" },
+            "label": { "type": "String" }
+          }
+        }
+      ]
+    }
+JSON;
+
+    $this->assertCompilerThrowsModelException($jsonModel, array(
+      'You have an ambigous type definition for the association ACME\Blog\Entities\Post => ACME\Blog\Entities\Tag',
+    ));
+  }
+
+  protected function assertCompilerThrowsModelException($jsonModel, Array $containments) {
+    $this->assertNotEmpty($containments);
+    $this->setExpectedException(__NAMESPACE__.'\InvalidModelException');
+
+    try {
+      $this->compiler->compileModel($this->json($jsonModel), $this->psr0Directory, Compiler::PLAIN_ENTITIES);
+    } catch (InvalidModelException $e) {
+      foreach ($containments as $string) {
+        $this->assertContains($string, $e->getMessage());
+      }
+      throw $e;
+    }
   }
 }

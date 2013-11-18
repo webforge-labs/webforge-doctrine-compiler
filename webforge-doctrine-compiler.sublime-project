@@ -1,1 +1,1 @@
-{"folders":[{"path":".","folder_exclude_patterns":["vendor","build/coverage"]}]}
+{"folders":[{"path":".","folder_exclude_patterns":["vendor","build/coverage", "build/package/etc/doctrine"]}]}
