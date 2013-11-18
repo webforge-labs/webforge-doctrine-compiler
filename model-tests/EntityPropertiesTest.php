@@ -35,6 +35,12 @@ class EntityPropertiesTest extends \Webforge\Doctrine\Compiler\Test\ModelBase {
     $this->assertEquals(210, $email['length'], 'length from email is not matched');
   }
 
+  public function testFieldsWithSimpleTypesCanBeNullable() {
+    $updated = $this->assertMetadataField('Post', 'modified');
+
+    $this->assertTrue($updated['nullable'], 'nullable from post::modified does not match');
+  }
+
   protected function assertMetadataField($entityShortname, $fieldName) {
     $metadata = $this->assertDoctrineMetadata('ACME\Blog\Entities\\'.$entityShortname);
 

@@ -89,6 +89,8 @@ class EntityMappingGenerator {
         $column->length = $property->getDefinition()->length;
       }
 
+      $column->nullable = $property->isNullable();
+
       $annotations[] = $column;
     }
 
@@ -167,7 +169,7 @@ class EntityMappingGenerator {
       $annotations[] = $table;
 
     } elseif ($association->isOneToOne()) {
-      throw new Webforge\Common\Exception\NotImplementedException('OneToOne not needed right now');
+      throw new \Webforge\Common\Exception\NotImplementedException('OneToOne not needed right now: '.$association->getUniqueSlug());
     }
 
     return $annotations;

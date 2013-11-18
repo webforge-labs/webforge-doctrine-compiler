@@ -104,6 +104,8 @@ class Model {
   }
 
   public function completeAssociations() {
+    //var_dump(A::keys($this->associations));
+
     $grouped = array();
     foreach ($this->associations as $key=>$associationPair) {
       $owningAssociation = $associationPair['owning'];

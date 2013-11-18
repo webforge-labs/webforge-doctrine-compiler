@@ -88,6 +88,10 @@ class GeneratedProperty {
     return isset($this->definition->relation) ? $this->definition->relation : NULL;
   }
 
+  public function isNullable() {
+    return isset($this->definition->nullable) ? $this->definition->nullable : FALSE;
+  }
+
   /**
    * Returns the php Documentor type for (at)param or (at)return annotations
    * 
