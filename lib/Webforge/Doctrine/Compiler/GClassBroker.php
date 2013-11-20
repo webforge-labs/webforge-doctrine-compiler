@@ -2,11 +2,14 @@
 
 namespace Webforge\Doctrine\Compiler;
 
+use Webforge\Common\ClassInterface;
+
 interface GClassBroker {
 
   /**
-   * Returns a previous generated Entity or fully elevated Class
+   * Elevates the class with all properties and methods
+   * 
    */
-  public function getElevated($fqn, $debugEntity);
+  public function getElevated(ClassInterface $class, $debugEntityName);
 
 }

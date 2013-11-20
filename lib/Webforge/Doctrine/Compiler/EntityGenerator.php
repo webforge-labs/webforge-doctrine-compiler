@@ -16,6 +16,7 @@ use Webforge\Types\TypeException;
 use Webforge\Types\CollectionType;
 use Webforge\Types\ObjectType;
 use Webforge\Types\EntityType;
+use Webforge\Common\ClassInterface;
 
 class EntityGenerator {
 
@@ -64,12 +65,12 @@ class EntityGenerator {
 
   protected function completeEntity(GeneratedEntity $entity, GClassBroker $broker) {
     if ($entity->definition->extends) {
-      $fqn = $entity->definition->extends->fqn;
 
-      if ($this->isEntity($fqn)) {
+      if ($entity->definition->extends instanceof ClassInterface) {
+        $entity->setParent($broker->getElevated($entity->definition->extends, $entity->getName()));
+      } else{
+        $fqn = $entity->definition->extends->fqn;
         $entity->setParent($this->getEntity($fqn));
-      } else {
-        $entity->setParent($broker->getElevated($fqn));
       }
     }
 

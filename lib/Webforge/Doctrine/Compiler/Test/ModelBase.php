@@ -38,4 +38,12 @@ class ModelBase extends Base {
 
     $this->assertEquals($fqn, $association['targetEntity'], 'the target entity does not match');
   }
+
+  protected function assertMetadataField($entityShortname, $fieldName) {
+    $metadata = $this->assertDoctrineMetadata('ACME\Blog\Entities\\'.$entityShortname);
+
+    $field = $metadata->getFieldMapping($fieldName);
+
+    return $field;
+  }
 }

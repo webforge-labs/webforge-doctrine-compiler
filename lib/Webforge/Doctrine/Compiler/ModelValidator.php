@@ -7,6 +7,7 @@ use Webforge\Types\Type;
 use Webforge\Types\TypeException;
 use Webforge\Types\CollectionType;
 use Webforge\Types\ObjectType;
+use Webforge\Code\Generator\GClass;
 
 class ModelValidator {
 
@@ -36,11 +37,14 @@ class ModelValidator {
           throw new InvalidModelException('Entity in model with key "'.$key.'" has to have a non empty value in "extends"');
         }
 
-        if (!$this->model->hasEntity($entity->extends)) {
+        if ($this->model->hasEntity($entity->extends)) {
+          $entity->extends = $this->model->getEntity($entity->extends);
+        } elseif(class_exists($entity->extends)) {
+          $entity->extends = new GClass($entity->extends);
+        } else {
           throw new InvalidModelException('Entity '.$entity->name.' extends an unknown entity "'.$entity->extends.'".');
         }
-
-        $entity->extends = $this->model->getEntity($entity->extends);
+        
       } else {
         $entity->extends = NULL;
       }

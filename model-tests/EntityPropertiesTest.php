@@ -41,11 +41,4 @@ class EntityPropertiesTest extends \Webforge\Doctrine\Compiler\Test\ModelBase {
     $this->assertTrue($updated['nullable'], 'nullable from post::modified does not match');
   }
 
-  protected function assertMetadataField($entityShortname, $fieldName) {
-    $metadata = $this->assertDoctrineMetadata('ACME\Blog\Entities\\'.$entityShortname);
-
-    $field = $metadata->getFieldMapping($fieldName);
-
-    return $field;
-  }
 }

@@ -9,6 +9,7 @@ use Webforge\Code\Generator\ClassWriter;
 use Webforge\Code\Generator\DocBlock;
 use Webforge\Code\Generator\GClass;
 use Webforge\Code\Generator\ClassElevator;
+use Webforge\Common\ClassInterface;
 
 class Compiler implements GClassBroker {
 
@@ -39,6 +40,7 @@ class Compiler implements GClassBroker {
     $this->model = $this->validator->validateModel($model);
 
     $this->entityGenerator->generate($this->model, $this);
+    $this->generatedEntities = array();
 
     foreach ($this->entityGenerator->getEntities() as $entity) {
       list($entityFile, $compiledEntityFile) = $this->compileEntity($entity);
@@ -114,25 +116,15 @@ class Compiler implements GClassBroker {
     return $this->dir->getFile($url);
   }
 
-  public function getElevated($fqn, $debugEntity) {
-    if (array_key_exists($fqn, $this->generatedEntities)) {
-      return $this->generatedEntities[$fqn];
-    }
+  /**
+   * Returns a version of $class but elevated
+   * 
+   * its NOT $class === $returnedClass
+   * @return GClass new instance
+   */
+  public function getElevated(ClassInterface $class, $debugEntityName) {
+    $gClass = $this->classElevator->elevate($class);
 
-    $searchClass = new GClass($fqn);
-
-    // @FIXME: this will fail for sub-namespaces (getName is not the subnamespace + name)
-    if ($searchClass->isInNamespace($this->model->getNamespace()) && $this->model->hasEntity($searchClass->getName())) {
-      throw new ModelCompilerException(
-        sprintf (
-          'You tried to reference the entity "%1$s" that is in the model but is not generated yet. Cannot generate "%2$s" before generating "%1$s". Change the order in the model.',
-          $fqn, $debugEntity
-        )
-      );
-    }
-
-    // its another class that will be elevated
-    $gClass = $this->classElevator->getGClass($fqn);
     $this->classElevator->elevateParent($gClass);
     $this->classElevator->elevateInterfaces($gClass);
 

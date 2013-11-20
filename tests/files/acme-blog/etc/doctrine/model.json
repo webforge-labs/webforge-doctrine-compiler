@@ -5,6 +5,7 @@
 
     {
       "name": "User",
+      "extends": "Webforge\\Doctrine\\Compiler\\Test\\BaseUserEntity",
       "description": "A basic user of the blog",
   
       "properties": {
