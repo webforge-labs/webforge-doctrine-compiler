@@ -32,6 +32,9 @@
     <filter>
       <whitelist>
         <directory suffix=".php">lib/Webforge</directory>
+        <exclude>
+          <file>lib/Webforge/Doctrine/Compiler/Test/BaseUserEntity.php</file>
+        </exclude>
       </whitelist>
     </filter>
 

@@ -17,7 +17,7 @@ use Webforge\Doctrine\Annotations\Writer as AnnotationsWriter;
 use Webforge\Doctrine\Compiler\EntityMappingGenerator;
 use Webforge\Doctrine\Compiler\Inflector;
 
-class CompileCommand extends AbstractDoctrineCommand {
+class CompileCommand extends \Webforge\Console\Command\CommandAdapter {
 
   protected $name = 'orm:compile';
 
