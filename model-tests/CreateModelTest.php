@@ -38,7 +38,7 @@ class CreateModelTest extends \Webforge\Doctrine\Compiler\Test\Base {
     );
 
     // we are the first test in the suite, so we (and only we) construct the model once
-    $compileCommand = new CompileCommand($this->dcc, $this->frameworkHelper->getSystem());
+    $compileCommand = new CompileCommand('orm:compile', $this->frameworkHelper->getSystem());
     $compileCommand->injectWebforge($this->webforge);
 
     $application = new \Webforge\Console\Application('test application in create model test', '0.0');

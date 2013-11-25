@@ -9,6 +9,7 @@ use Webforge\Console\CommandOutput;
 use Webforge\Console\CommandInteraction;
 use Webforge\Common\System\System;
 use Webforge\Common\JS\JSONConverter;
+use Webforge\Code\Generator\ComposerClassFileMapper;
 
 use Webforge\Doctrine\Compiler\Compiler;
 use Webforge\Doctrine\Compiler\EntityGenerator;
@@ -65,6 +66,10 @@ class CompileCommand extends \Webforge\Console\Command\CommandAdapter {
   protected function getCompiler() {
     if (!isset($this->compiler)) {
       $webforge = $this->getWebforge();
+
+      $webforge->setClassFileMapper(
+        new ComposerClassFileMapper($GLOBALS['env']['container']->getAutoLoader())
+      );
 
       $this->compiler = new Compiler(
         $webforge->getClassWriter(), 
