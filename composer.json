@@ -23,7 +23,7 @@
   },
   "require-dev": {
     "satooshi/php-coveralls": "dev-master",
-    "webforge/testplate": "1.*",
+    "webforge/testplate": ">=1.5",
     "mikey179/vfsStream": "1.3.*@dev"
   },
   "extra":{
