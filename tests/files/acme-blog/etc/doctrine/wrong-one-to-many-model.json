@@ -1,0 +1,34 @@
+{
+  "namespace": "FastBill\\Mite\\Entities",
+
+  "entities": [
+    {
+      "name": "ConnectorUser",
+      "description": "The (mite)-user that uses the connector",
+
+      "properties": {
+         "id": { "type": "DefaultId" },
+         "miteApiKey": { "type": "String" },
+         "miteUser": { "type": "String", "description": "just the user name" },
+         "fastBillApiKey": { "type": "String" },
+         "fastBillEmail": { "type": "String" },
+         "invoicedTimes": { "type": "InvoicedTime" }
+      },
+
+      "constructor": ["fastBillEmail", "fastBillApiKey", "miteUser", "miteApiKey"]
+    },
+    {
+      "name": "InvoicedTime",
+      "description": "A time entry that could be marked as invoiced",
+
+      "properties": {
+         "id": { "type": "DefaultId" },
+         "miteId": { "type": "String" },
+         "user": { "type": "ConnectorUser" },
+         "invoiced": { "type": "Boolean" }
+      },
+
+      "constructor": ["miteId", "invoiced", "user"]
+    }
+  ]
+}

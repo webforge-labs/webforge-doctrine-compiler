@@ -35,6 +35,12 @@ class EntityPropertiesTest extends \Webforge\Doctrine\Compiler\Test\ModelBase {
     $this->assertEquals(210, $email['length'], 'length from email is not matched');
   }
 
+  public function testBooleanColumnsAreInDoctrineMetadata() {
+    $active = $this->assertMetadataField('Post', 'active');
+
+    $this->assertEquals('boolean', $active['type']);
+  }
+
   public function testFieldsWithSimpleTypesCanBeNullable() {
     $updated = $this->assertMetadataField('Post', 'modified');
 

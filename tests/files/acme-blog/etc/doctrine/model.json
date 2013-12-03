@@ -23,6 +23,7 @@
         "revisor": { "type": "Author", "nullable": true },
         "categories": { "type": "Collection<Category>", "isOwning": true },
         "tags": { "type": "Collection<Tag>" },
+        "active": { "type": "Boolean" },
         "created": { "type": "String" },
         "modified": { "type": "String", "nullable": true }
       },
