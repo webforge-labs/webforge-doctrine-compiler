@@ -1,3 +1,3 @@
 @echo off
 
-php -f %~dp0cli.php %*
+php -f %~dp0webforge-doctrine-compiler %*
