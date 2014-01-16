@@ -93,4 +93,14 @@ class ModelAssociationsOneToManyTest extends \Webforge\Doctrine\Compiler\Test\Mo
     $this->assertHasTargetEntity($this->authorClass, $author);
     $this->assertIsInversedBy('writtenPosts', $author);
   }
+
+  public function testManyToOneWithSubNamespacesMetadata() {
+    $paragraphClass = $this->elevateFull('ACME\Blog\Entities\ContentStream\Paragraph');
+    $streamClass = $this->elevateFull('ACME\Blog\Entities\ContentStream\Stream');
+    $metadata = $this->assertDoctrineMetadata($streamClass);
+
+    $paragraphs = $this->assertAssociationMapping('paragraphs', $metadata);
+
+    $this->assertHasTargetEntity($paragraphClass, $paragraphs);
+  }
 }

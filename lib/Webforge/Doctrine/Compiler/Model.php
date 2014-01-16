@@ -37,7 +37,7 @@ class Model {
     foreach ($this->associations as $associationsPair) {
       if (
         $associationsPair->owning->property === $property && $entity->equals($associationsPair->owning->entity) ||
-        $associationsPair->inverse->property === $property && $entity->equals($associationsPair->inverse->entity)
+        isset($associationsPair->inverse) && $associationsPair->inverse->property === $property && $entity->equals($associationsPair->inverse->entity)
         ) {
         return $associationsPair;
       }

@@ -36,7 +36,7 @@ class ModelBase extends Base {
   }
 
   protected function assertIsInversedBy($mappedBy, Array $association) {
-    $this->assertEquals($mappedBy, $association['inversedBy'], 'is invseredBy does not match');
+    $this->assertEquals($mappedBy, $association['inversedBy'], 'is inversedBy does not match');
   }
 
   protected function assertHasTargetENtity($fqn, Array $association) {

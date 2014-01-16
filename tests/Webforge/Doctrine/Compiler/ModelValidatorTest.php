@@ -77,7 +77,7 @@ JSON;
 
           "properties": {
             "id": "DefaultId",
-            "posts": { "type": "Collection<Post>" }
+            "label": { "type": "String" }
           }
         }
       ]
@@ -163,6 +163,19 @@ JSON;
         "properties"=>(object) array(
           "email"=>(object) array(
             'type'=>'Collection<wrong'
+          )
+        )
+      )
+    ));
+  }
+
+  public function testDoesNotLikeCollectionTypesWithWrongEntityName() {
+    $this->assertInvalid($this->wrapEntity(
+      (object) array(
+        "name"=>"User",
+        "properties"=>(object) array(
+          "email"=>(object) array(
+            'type'=>'Collection<NonExistingEntity>'
           )
         )
       )

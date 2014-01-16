@@ -73,7 +73,6 @@ JSON;
             "id": { "type": "DefaultId" },
             "author": { "type": "Author" },
             "revisor": { "type": "Author", "nullable": true },
-            "categories": { "type": "Collection<Category>", "isOwning": true },
             "created": { "type": "DateTime" },
             "modified": { "type": "DateTime", "nullable": true }
           },

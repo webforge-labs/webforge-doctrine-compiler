@@ -145,8 +145,14 @@ class ModelValidator {
         throw new InvalidModelException(sprintf("The type: '%s' cannot be parsed for entity '%s'.", $typeName, $entity->fqn), 0, $e);
       }
 
-      if ($type instanceof CollectionType && $type->getType() instanceof ObjectType && $model->hasEntity($referenceEntityName = $type->getType()->getClass()->getName())) {
-        $type = new EntityCollectionReference($model->getEntity($referenceEntityName));
+      if ($type instanceof CollectionType && $type->getType() instanceof ObjectType) {
+        if ($model->hasEntity($referenceEntityName = $type->getType()->getClass()->getFQN())) { // FQN is here subnamespace + name
+          $type = new EntityCollectionReference($model->getEntity($referenceEntityName));
+        } else {
+          throw new InvalidModelException(
+            sprintf("The entityName '%s' in type from property %s::%s cannot be found in model. Did you misspelled the name of the entity?", $referenceEntityName, $entity->fqn, $property->name)
+          );
+        }
       }
     }
 
