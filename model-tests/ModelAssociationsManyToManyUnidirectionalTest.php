@@ -45,7 +45,7 @@ class ModelAssociationsManyToManyUnidirectionalTest extends \Webforge\Doctrine\C
   public function testAddingTheEntityOnTheOwningSide_AddsTheEntityOnTheOtherSide() {
     $hot = new Tag('hot');
     $controversal = new Tag('controversal');
-    $post = new Post(new Author());
+    $post = new Post(new Author('p.scheit@ps-webforge.com'));
 
     $post->addTag($hot);
     $this->assertTrue($post->hasTag($hot));

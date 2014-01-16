@@ -35,6 +35,13 @@ class GeneratedEntity {
     return $this->parent;
   }
 
+  /**
+   * @return Webforge\Common\ClassInterface
+   */
+  public function getParentClass() {
+    return $this->gClass->getParent();
+  }
+
   public function getProperty($name) {
     return $this->properties[$name];
   }

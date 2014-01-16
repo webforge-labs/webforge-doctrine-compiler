@@ -47,4 +47,9 @@ class EntityPropertiesTest extends \Webforge\Doctrine\Compiler\Test\ModelBase {
     $this->assertTrue($updated['nullable'], 'nullable from post::modified does not match');
   }
 
+  public function testFieldCanHaveDateTimeAsBasicType() {
+    $created = $this->assertMetadataField('Post', 'created');
+
+    $this->assertEquals('WebforgeDateTime', $created['type']);
+  }
 }

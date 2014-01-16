@@ -69,7 +69,7 @@ class ModelAssociationsOneToManyTest extends \Webforge\Doctrine\Compiler\Test\Mo
   }
 
   public function testProvidingTheEntityOnTheManySideToConstructor_AddsTheEntityOnTheOneSide() {
-    $author = new Author();
+    $author = new Author('p.scheit@ps-webforge.com');
     $post1 = new Post($author);
 
     $this->assertSame($author, $post1->getAuthor($post1));

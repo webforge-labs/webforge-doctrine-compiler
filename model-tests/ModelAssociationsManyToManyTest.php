@@ -50,7 +50,7 @@ class ModelAssociationsManyToManyTest extends \Webforge\Doctrine\Compiler\Test\M
   public function testAddingTheEntityOnTheOwningSide_AddsTheEntityOnTheOtherSide() {
     $science = new Category('Science');
     $politics = new Category('Politics');
-    $post = new Post(new Author());
+    $post = new Post(new Author('p.scheit@ps-webforge.com'));
 
     $post->addCategory($science);
     $this->assertTrue($post->hasCategory($science));

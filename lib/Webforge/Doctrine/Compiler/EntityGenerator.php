@@ -152,7 +152,19 @@ class EntityGenerator {
   protected function generateConstructor(GeneratedEntity $entity) {
     // @TODO: add a test to use the parent constructor if avaible (user author?)
     $code = array();
+
     $parameters = array();
+
+    // parent can either be a "normal" class or an entity
+    if (($parent = $entity->getParentClass()) && $parent->hasMethod('__construct')) {
+      $parentParameters = array();
+      foreach ($parent->getMethod('__construct')->getParameters() as $parameter) {
+        $parentParameters[] = '$'.$parameter->getName();
+        $parameters[$parameter->getName()] = $parameter;
+      }
+
+      $code[] = 'parent::__construct('.implode(',', $parentParameters).');';
+    }
 
     $constructed = array();
     foreach ($entity->definition->constructor as $propertyName => $parameter) {
@@ -168,7 +180,9 @@ class EntityGenerator {
         $code[] = sprintf('$this->%s = $%s;', $property->getName(), $parameter->getName());
       }
 
-      $parameters[] = $parameter;
+      if (!array_key_exists($parameter->getName(), $parameters)) {
+        $parameters[] = $parameter;
+      }
     }
 
     foreach ($entity->getProperties() as $property) {
