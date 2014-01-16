@@ -11,7 +11,9 @@
       "properties": {
         "id": { "type": "DefaultId" },
         "email": { "type": "String", "length": 210 }
-      }
+      },
+
+      "constructor": ["email"]
     },
 
     {
@@ -24,8 +26,8 @@
         "categories": { "type": "Collection<Category>", "isOwning": true },
         "tags": { "type": "Collection<Tag>" },
         "active": { "type": "Boolean" },
-        "created": { "type": "String" },
-        "modified": { "type": "String", "nullable": true }
+        "created": { "type": "DateTime" },
+        "modified": { "type": "DateTime", "nullable": true }
       },
 
       "constructor": ["author", "revisor"]
@@ -60,6 +62,30 @@
       },
 
       "constructor": ["label"]
+    },
+
+
+    {
+      "name": "ContentStream\\Paragraph",
+    
+      "properties": {
+        "id": { "type": "DefaultId" },
+        "content": { "type": "String" }
+      },
+
+      "constructor": ["content"]
+    },
+
+    {
+      "name": "ContentStream\\Stream",
+    
+      "properties": {
+        "id": { "type": "DefaultId" },
+        
+        "paragraphs": { "type": "Collection<ContentStream\\Paragraph>" }
+      },
+
+      "constructor": []
     }
   ]
 }

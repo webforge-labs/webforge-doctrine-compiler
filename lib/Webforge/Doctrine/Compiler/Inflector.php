@@ -58,6 +58,6 @@ class Inflector {
       return $entity->tableName;
     }
 
-    return DCInflector::pluralize(DCInflector::tableize($entity->name));
+    return str_replace('\\', '_', DCInflector::pluralize(DCInflector::tableize($entity->name)));
   }
 }

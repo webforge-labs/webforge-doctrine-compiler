@@ -8,6 +8,8 @@ use Webforge\Types\TypeException;
 use Webforge\Types\CollectionType;
 use Webforge\Types\ObjectType;
 use Webforge\Code\Generator\GClass;
+use Webforge\Common\ClassUtil;
+use Webforge\Common\String as S;
 
 class ModelValidator {
 
@@ -24,7 +26,7 @@ class ModelValidator {
 
     $entities = array();
     foreach ($model->entities as $key => $entity) {
-      $entities[$key] = $this->validateEntity($entity, $key);
+      $entities[$key] = $this->validateEntity($entity, $key, $model);
     }
 
     $this->model = new Model($model->namespace, $entities);
@@ -58,13 +60,19 @@ class ModelValidator {
     return $this->model;
   }
 
-  protected function validateEntity($entity, $key) {
+  protected function validateEntity($entity, $key, stdClass $model) {
     if (!($entity instanceof stdClass)) {
       throw new InvalidModelException('Entity in model with key "'.$key.'" has to be an object');
     }
 
     if (!isset($entity->name) || empty($entity->name)) {
       throw new InvalidModelException('Entity in model with key "'.$key.'" has to have a non empty property name');
+    }
+
+    $entity->fqn = ClassUtil::expandNamespace($entity->name, $model->namespace);
+
+    if (!S::startsWith($entity->fqn, $model->namespace)) {
+      $entity->fqn = ClassUtil::setNamespace($entity->fqn, $model->namespace);
     }
 
     if (!isset($entity->properties)) {

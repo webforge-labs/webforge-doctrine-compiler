@@ -239,6 +239,29 @@ JSON;
     $this->assertSame($user, $author->extends);
   }
 
+
+  public function testExpandsEntitiesFQNsWithSubNamespaces() {
+    $jsonModel = <<<'JSON'
+    {
+      "namespace": "ACME\\Blog\\Entities",
+
+      "entities": [
+        {
+          "name": "ContentStream\\Paragraph"
+        }
+      ]
+    }
+JSON;
+    
+    $model = $this->assertValid($this->json($jsonModel));
+
+    $this->assertTrue($model->hasEntity('ContentStream\Paragraph'));
+
+    $p = $model->getEntity('ContentStream\Paragraph');
+
+    $this->assertEquals('ACME\Blog\Entities\ContentStream\Paragraph', $p->fqn);
+  }
+
   public function testDoesNotLikeEntitiesAsNonObjects() {
     $jsonModel = (object) array(
       'entities'=>array(

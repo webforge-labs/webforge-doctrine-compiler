@@ -2,7 +2,6 @@
 
 namespace Webforge\Doctrine\Compiler;
 
-use Webforge\Common\ClassUtil;
 use Webforge\Common\ArrayUtil as A;
 
 class Model {
@@ -204,8 +203,7 @@ class Model {
 
   protected function indexEntities(Array $entities) {
     $this->entities = array();
-    foreach($entities as $entity) {
-      $entity->fqn = ClassUtil::expandNamespace($entity->name, $this->getNamespace());
+    foreach($entities as $entity) {      
       $this->entities[$entity->name] = $entity;
     }
   }

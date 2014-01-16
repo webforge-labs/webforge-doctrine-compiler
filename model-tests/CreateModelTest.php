@@ -74,7 +74,7 @@ class CreateModelTest extends \Webforge\Doctrine\Compiler\Test\Base {
     $entityClass = $this->elevateFull($entityFQN);
     
     $this->assertThatGClass($entityClass)
-      ->hasNamespace($this->blogPackage->getNamespace().'\Entities') // @see composer.json extra directory locations
+      ->isInNamespace($this->blogPackage->getNamespace().'\Entities') // @see composer.json extra directory locations
       ->hasParent($this->getCompiledClass($entityClass));
   }
 
@@ -85,7 +85,7 @@ class CreateModelTest extends \Webforge\Doctrine\Compiler\Test\Base {
     $compiledClass = $this->elevateFull($this->getCompiledClass($entityFQN));
 
     $this->assertThatGClass($compiledClass)
-      ->hasNamespace($this->blogPackage->getNamespace().'\Entities')
+      ->isInNamespace($this->blogPackage->getNamespace().'\Entities')
       ->isAbstract()
       ->hasDocBlock()
     ;

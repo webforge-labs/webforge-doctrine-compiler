@@ -10,7 +10,10 @@ class TestReflection {
       array('ACME\Blog\Entities\Author', 'Author'),
       array('ACME\Blog\Entities\Post', 'Post'),
       array('ACME\Blog\Entities\Category', 'Category'),
-      array('ACME\Blog\Entities\Tag', 'Tag')
+      array('ACME\Blog\Entities\Tag', 'Tag'),
+
+      array('ACME\Blog\Entities\ContentStream\Paragraph', 'ContentStream/Paragraph'),
+      array('ACME\Blog\Entities\ContentStream\Stream', 'ContentStream/Stream')
     );
   }
 

@@ -20,6 +20,7 @@
         <!-- this test suite is manually ordered -->
         <testsuite name="model">
           <file>model-tests/CreateModelTest.php</file>
+          <file>model-tests/EntitiesTest.php</file>
           <file>model-tests/EntityPropertiesTest.php</file>
           <file>model-tests/ModelAssociationsOneToManyTest.php</file>
           <file>model-tests/ModelAssociationsManyToManyTest.php</file>

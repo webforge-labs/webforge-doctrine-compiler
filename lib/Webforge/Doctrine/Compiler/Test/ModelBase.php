@@ -25,6 +25,12 @@ class ModelBase extends Base {
     return $associations[$name];
   }
 
+  protected function assertTableName($expectedTableName, $entityShortName) {
+    $metadata = $this->assertDoctrineMetadata($fqn = 'ACME\Blog\Entities\\'.$entityShortName);
+
+    $this->assertEquals($expectedTableName, $metadata->table['name'], 'failed asserting that tablename for '.$fqn.' does match');
+  }
+
   protected function assertIsMappedBy($mappedBy, Array $association) {
     $this->assertEquals($mappedBy, $association['mappedBy'], 'is mappedBy does not match');
   }
