@@ -69,27 +69,28 @@ class CompileCommand extends \Webforge\Console\Command\CommandAdapter {
     if (!isset($this->compiler)) {
       $webforge = $this->getWebforge();
       $container = $GLOBALS['env']['container'];
+      $loader = $container->getAutoLoader();
 
       /* augment autoloader with autoloading information from the calling package */
       $package = $webforge->getPackageRegistry()->findByDirectory($target);
-
       if ($package && $package->getIdentifier() != $container->getPackage()->getIdentifier()) {
-        $dir = $package->getDirectory('vendor')->sub('composer');
-        $loader = $container->getAutoLoader();
+        $dir = $package->getDirectory('vendor')->sub('composer/');
+        
+        if ($dir->exists()) {
+          $map = require (string) $dir->getFile('autoload_namespaces.php');
+          foreach ($map as $namespace => $path) {
+            $loader->set($namespace, $path);
+          }
 
-        $map = require (string) $dir->getFile('autoload_namespaces.php');
-        foreach ($map as $namespace => $path) {
-          $loader->set($namespace, $path);
-        }
+          $map = require (string) $dir->getFile('autoload_psr4.php');
+          foreach ($map as $namespace => $path) {
+            $loader->setPsr4($namespace, $path);
+          }
 
-        $map = require (string) $dir->getFile('autoload_psr4.php');
-        foreach ($map as $namespace => $path) {
-          $loader->setPsr4($namespace, $path);
-        }
-
-        $classMap = require $dir->getFile('autoload_classmap.php');
-        if ($classMap) {
-          $loader->addClassMap($classMap);
+          $classMap = require $dir->getFile('autoload_classmap.php');
+          if ($classMap) {
+            $loader->addClassMap($classMap);
+          }
         }
       }
 
