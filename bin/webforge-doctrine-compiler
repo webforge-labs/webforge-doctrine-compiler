@@ -3,6 +3,7 @@
 
 use Webforge\Console\Application;
 use Webforge\Doctrine\Compiler\Console\CompileCommand;
+use Webforge\Common\System\Dir;
 
 $container = require __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'bootstrap.php';
 $webforge = $container->getWebforge();

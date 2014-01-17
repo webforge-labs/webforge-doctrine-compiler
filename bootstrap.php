@@ -15,4 +15,3 @@ $bootLoader->loadComposer();
 $bootLoader->registerPackageRoot();
 
 return $bootLoader->registerContainer();
-

@@ -10,6 +10,7 @@ use Webforge\Console\CommandInteraction;
 use Webforge\Common\System\System;
 use Webforge\Common\JS\JSONConverter;
 use Webforge\Code\Generator\ComposerClassFileMapper;
+use Webforge\Common\System\Dir;
 
 use Webforge\Doctrine\Compiler\Compiler;
 use Webforge\Doctrine\Compiler\EntityGenerator;
@@ -17,6 +18,7 @@ use Webforge\Doctrine\Compiler\ModelValidator;
 use Webforge\Doctrine\Annotations\Writer as AnnotationsWriter;
 use Webforge\Doctrine\Compiler\EntityMappingGenerator;
 use Webforge\Doctrine\Compiler\Inflector;
+
 
 class CompileCommand extends \Webforge\Console\Command\CommandAdapter {
 
@@ -57,18 +59,42 @@ class CompileCommand extends \Webforge\Console\Command\CommandAdapter {
 
     $target = $input->getDirectory('psr0target');
 
-    $this->getCompiler()->compileModel($jsonModel, $target, $flags = Compiler::COMPILED_ENTITIES | Compiler::RECOMPILE);
+    $this->getCompiler($target)->compileModel($jsonModel, $target, $flags = Compiler::COMPILED_ENTITIES | Compiler::RECOMPILE);
 
     $output->ok('The model was successful compiled.');
     return 0;
   }
 
-  protected function getCompiler() {
+  protected function getCompiler(Dir $target) {
     if (!isset($this->compiler)) {
       $webforge = $this->getWebforge();
+      $container = $GLOBALS['env']['container'];
+
+      /* augment autoloader with autoloading information from the calling package */
+      $package = $webforge->getPackageRegistry()->findByDirectory($target);
+
+      if ($package && $package->getIdentifier() != $container->getPackage()->getIdentifier()) {
+        $dir = $package->getDirectory('vendor')->sub('composer');
+        $loader = $container->getAutoLoader();
+
+        $map = require (string) $dir->getFile('autoload_namespaces.php');
+        foreach ($map as $namespace => $path) {
+          $loader->set($namespace, $path);
+        }
+
+        $map = require (string) $dir->getFile('autoload_psr4.php');
+        foreach ($map as $namespace => $path) {
+          $loader->setPsr4($namespace, $path);
+        }
+
+        $classMap = require $dir->getFile('autoload_classmap.php');
+        if ($classMap) {
+          $loader->addClassMap($classMap);
+        }
+      }
 
       $webforge->setClassFileMapper(
-        new ComposerClassFileMapper($GLOBALS['env']['container']->getAutoLoader())
+        new ComposerClassFileMapper($loader)
       );
 
       $this->compiler = new Compiler(
