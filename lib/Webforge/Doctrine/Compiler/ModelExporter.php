@@ -34,11 +34,16 @@ class ModelExporter {
   }
 
   protected function exportEntity(GeneratedEntity $entity, Model $model) {
-    $export = clone $entity->getDefinition();
+    $export = new stdClass;
+    $definition = $entity->getDefinition();
 
+    $export->name = $definition->name;
+    $export->fqn = $entity->getFQN();
     $export->singular = $entity->getSingular();
     $export->plural = $entity->getPlural();
     $export->tableName = $entity->getTableName();
+    $export->extends = $entity->getParent() ? $entity->getParentClass()->getFQN() : NULL;
+    $export->description = $entity->getDescription();
 
     return $export;
   }

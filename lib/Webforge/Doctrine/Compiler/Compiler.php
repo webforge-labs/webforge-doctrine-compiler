@@ -24,6 +24,7 @@ class Compiler {
   const PLAIN_ENTITIES = 0x000001;
   const COMPILED_ENTITIES = 0x000002;
   const RECOMPILE = 0x000004;
+  const EXPORT_MODEL = 0x000008;
 
   public function __construct(ClassWriter $classWriter, EntityGenerator $entityGenerator, ModelValidator $validator) {
     $this->classWriter = $classWriter;
@@ -43,6 +44,11 @@ class Compiler {
       list($entityFile, $compiledEntityFile) = $this->compileEntity($entity);
       $this->generatedEntities[$entity->getFQN()] = $entity;
       //print "compiled entity ".$entity->name.' to '.$entityFile."\n";
+    }
+
+    if ($flags & self::EXPORT_MODEL) {
+      $exporter = new ModelExporter();
+      return $exporter->exportModel($this->model, $this->entityGenerator);
     }
   }
 

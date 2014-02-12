@@ -4,8 +4,10 @@ namespace Webforge\Doctrine\Compiler;
 
 use Webforge\Common\JS\JSONConverter;
 use Webforge\Doctrine\Annotations\Writer as AnnotationsWriter;
+use Webforge\Common\System\Dir;
+use Mockery as m;
 
-class ModelExporterTest extends \Webforge\Code\Test\Base {
+class ModelExporterTest extends \Webforge\Doctrine\Compiler\Test\Base {
   
   public function setUp() {
     $this->chainClass = __NAMESPACE__ . '\\ModelExporter';
@@ -13,17 +15,22 @@ class ModelExporterTest extends \Webforge\Code\Test\Base {
 
     $this->validator = new ModelValidator();
     $this->exporter = new ModelExporter();
-    $this->generator = new EntityGenerator($inflector = new Inflector, new EntityMappingGenerator($writer = new AnnotationsWriter), new GClassBroker($this->frameworkHelper->getWebforge()->getClassElevator()));
 
     $this->originalModelJson = JSONConverter::create()->parseFile(
       $this->getTestDirectory('acme-blog/etc/doctrine')->getFile('model.json')
     );
 
     $this->originalModel = $this->validator->validateModel($this->originalModelJson);
-    
-    $this->generator->generate($this->originalModel);
 
-    $this->model = $this->exporter->exportModel($this->originalModel, $this->generator);
+    $this->mapper->shouldReceive('getFile')
+       ->with('Webforge\Doctrine\Compiler\Test\BaseUserEntity')
+      ->andReturn(
+        $this->frameworkHelper->getProject()->dir('lib')->getFile('Webforge/Doctrine/Compiler/Test/BaseUserEntity.php')
+      );
+    
+    $this->entityGenerator->generate($this->originalModel);
+
+    $this->model = $this->exporter->exportModel($this->originalModel, $this->entityGenerator);
   }
 
   public function testEntitiesArrayDoesExist() {

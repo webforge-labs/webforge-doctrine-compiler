@@ -8,6 +8,8 @@ use Webforge\Doctrine\Compiler\Inflector;
 use Webforge\Doctrine\Compiler\ModelValidator;
 use Webforge\Doctrine\Compiler\EntityMappingGenerator;
 use Webforge\Doctrine\Compiler\GClassBroker;
+use Webforge\Code\Generator\ClassReader;
+use Webforge\Code\Generator\ClassElevator;
 use Webforge\Doctrine\Annotations\Writer as AnnotationsWriter;
 use org\bovigo\vfs\vfsStream;
 use Webforge\Common\System\Dir;
@@ -21,11 +23,13 @@ class Base extends \Webforge\Doctrine\Test\SchemaTestCase {
 
   protected $webforge;
   protected $compiler;
+  protected $entityGenerator;
   protected $psr0Directory, $testPackage;
 
   public static $schemaCreated = TRUE;
 
   public static $package;
+
 
   public function setUp() {
     $this->virtualPackageDirectory = $this->getVirtualDirectory('packageroot');
@@ -35,9 +39,10 @@ class Base extends \Webforge\Doctrine\Test\SchemaTestCase {
 
     $this->setUpPackage();
 
+
     $this->compiler = new Compiler(
       $this->webforge->getClassWriter(), 
-      new EntityGenerator($inflector = new Inflector, new EntityMappingGenerator($writer = new AnnotationsWriter), new GClassBroker($this->webforge->getClassElevator())),
+      $this->entityGenerator = new EntityGenerator($inflector = new Inflector, new EntityMappingGenerator($writer = new AnnotationsWriter), new GClassBroker($this->classElevator)),
       new ModelValidator
     );
   }
@@ -49,10 +54,9 @@ class Base extends \Webforge\Doctrine\Test\SchemaTestCase {
     );
     $this->psr0Directory = $this->blogPackage->getDirectory('lib');
 
-
     // inject classmapper (see unique file hack)
     $this->mapper = m::mock('Webforge\Code\Generator\ClassFileMapper');
-    $this->webforge->setClassFileMapper($this->mapper);
+    $this->classElevator = new ClassElevator($this->mapper, new ClassReader);
   }
 
   protected function initEntitiesPaths() {

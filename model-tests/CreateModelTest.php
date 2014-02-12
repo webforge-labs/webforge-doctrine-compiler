@@ -20,6 +20,8 @@ class CreateModelTest extends \Webforge\Doctrine\Compiler\Test\Base {
 
   protected function setUpPackage() {
     $this->blogPackage = self::$package;
+
+    $this->classElevator = $this->frameworkHelper->getWebforge()->getClassElevator();
   }
 
   public function testdoCompileFixtureModel() {
@@ -55,6 +57,8 @@ class CreateModelTest extends \Webforge\Doctrine\Compiler\Test\Base {
     ));
 
     $this->assertSame(0, $ret, 'compiling with command failed: '.$commandTester->getDisplay());
+
+    $this->assertFileExists($dir->getFile('etc/doctrine/model-compiled.json'));
     
     // register dynamically with autoloader from composer
     $this->frameworkHelper->getBootContainer()->getAutoLoader()->add('ACME\Blog', self::$package->getDirectory('lib')->wtsPath());
@@ -87,7 +91,6 @@ class CreateModelTest extends \Webforge\Doctrine\Compiler\Test\Base {
     $this->assertThatGClass($compiledClass)
       ->isInNamespace($this->blogPackage->getNamespace().'\Entities')
       ->isAbstract()
-      ->hasDocBlock()
     ;
 
     $this->assertContains('@ORM\MappedSuperClass', $compiledClass->getDocBlock()->toString(), 'The docblock from the compiled entity should  include the mapped superclass annotation.');

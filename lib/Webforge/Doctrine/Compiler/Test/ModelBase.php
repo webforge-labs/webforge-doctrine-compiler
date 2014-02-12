@@ -6,6 +6,7 @@ class ModelBase extends Base {
 
   protected function setUpPackage() {
     $this->blogPackage = self::$package;
+    $this->classElevator = $this->frameworkHelper->getWebforge()->getClassElevator();
   }
 
   protected function initEntitiesPaths() {

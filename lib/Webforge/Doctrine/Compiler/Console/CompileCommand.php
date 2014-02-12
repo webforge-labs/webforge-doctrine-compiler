@@ -11,6 +11,7 @@ use Webforge\Common\System\System;
 use Webforge\Common\JS\JSONConverter;
 use Webforge\Code\Generator\ComposerClassFileMapper;
 use Webforge\Common\System\Dir;
+use Webforge\Common\System\File;
 
 use Webforge\Doctrine\Compiler\Compiler;
 use Webforge\Doctrine\Compiler\EntityGenerator;
@@ -56,11 +57,18 @@ class CompileCommand extends \Webforge\Console\Command\CommandAdapter {
   public function doExecute(CommandInput $input, CommandOutput $output, CommandInteraction $interact, System $system) {
     $model = $input->getFile('model');
 
-    $jsonModel = JSONConverter::create()->parseFile($model);
+    $jsonc = JSONConverter::create();
+
+    $jsonModel = $jsonc->parseFile($model);
 
     $target = $input->getDirectory('psr0target');
 
-    $this->getCompiler($target)->compileModel($jsonModel, $target, $flags = Compiler::COMPILED_ENTITIES | Compiler::RECOMPILE);
+    $compiler = $this->getCompiler($target);
+    $jsonModel = $compiler->compileModel($jsonModel, $target, $flags = Compiler::COMPILED_ENTITIES | Compiler::RECOMPILE | Compiler::EXPORT_MODEL);
+
+    $compiledModel = clone $model;
+    $compiledModel->setName($model->getName(File::WITHOUT_EXTENSION).'-compiled.json');
+    $compiledModel->writeContents($jsonc->stringify($jsonModel));
 
     $output->ok('The model was successful compiled.');
     return 0;
