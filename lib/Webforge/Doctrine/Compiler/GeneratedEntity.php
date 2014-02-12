@@ -15,6 +15,8 @@ class GeneratedEntity {
   protected $properties = array();
 
   protected $tableName;
+  protected $singular;
+  protected $plural;
 
   public function __construct(stdClass $definition, GClass $gClass) {
     $this->gClass = $gClass;
@@ -23,6 +25,8 @@ class GeneratedEntity {
 
   public function inflect(Inflector $inflector) {
     $this->tableName = $inflector->tableName($this->definition);
+    $this->singular = $inflector->singularSlug($this->definition);
+    $this->plural = $inflector->pluralSlug($this->definition);
   }
 
   public function setParent($parent) {
@@ -85,5 +89,29 @@ class GeneratedEntity {
 
   public function getDescription() {
     return isset($this->definition->description) ? $this->definition->description : NULL;
+  }
+
+  public function getDefinition() {
+    return $this->definition;
+  }
+
+  /**
+   * Returns a Slug for the entity name (+ subnamespace) with plural ending
+   * 
+   * is used as restful-url part for example
+   * @return string
+   */
+  public function getPlural() {
+    return $this->plural;
+  }
+
+  /**
+   * Returns a Slug for the entity name (+ subnamespace) with singular ending
+   * 
+   * is used as restful-url part for example
+   * @return string
+   */
+  public function getSingular() {
+    return $this->singular;
   }
 }

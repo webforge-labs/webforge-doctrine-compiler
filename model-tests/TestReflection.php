@@ -17,6 +17,28 @@ class TestReflection {
     );
   }
 
+  public static function entitySlugs() {
+    return array(
+      array('ACME\Blog\Entities\User', 'user', 'users'),
+      array('ACME\Blog\Entities\Author', 'author', 'authors'),
+      array('ACME\Blog\Entities\Post', 'post', 'posts'),
+      array('ACME\Blog\Entities\Category', 'category', 'categories'),
+      array('ACME\Blog\Entities\Tag', 'tag', 'tags'),
+
+      array('ACME\Blog\Entities\ContentStream\Paragraph', 'content-stream_paragraph', 'content-stream_paragraphs'),
+      array('ACME\Blog\Entities\ContentStream\Stream', 'content-stream_stream', 'content-stream_streams')
+    );
+  }
+
+  public static function flatEntityFQNs() {
+    $expectedFQNs = array();
+    foreach (TestReflection::entityNames() as $list) {
+      $expectedFQNs[] = $list[0];
+    }
+
+    return $expectedFQNs;
+  }
+
   public static function tableNames() {
     return array(
       array('users'),

@@ -5,6 +5,7 @@ namespace Webforge\Doctrine\Compiler;
 use Webforge\Code\Generator\GProperty;
 use stdClass;
 use Doctrine\Common\Inflector\Inflector as DCInflector;
+use Webforge\Common\String as S;
 
 class Inflector {
 
@@ -59,5 +60,23 @@ class Inflector {
     }
 
     return str_replace('\\', '_', DCInflector::pluralize(DCInflector::tableize($entity->name)));
+  }
+
+  public function singularSlug(stdClass $entity) {
+    $parts = explode('\\', $entity->name);
+    $parts = array_map(array('Webforge\Common\String','camelCaseToDash'), $parts);
+
+    return implode('_', $parts);
+  }
+
+  public function pluralSlug(stdClass $entity) {
+    $parts = explode('\\', $entity->name);
+    $parts = array_map(array('Webforge\Common\String','camelCaseToDash'), $parts);
+
+    $name = DCInflector::pluralize(array_pop($parts));
+
+    $parts[] = $name;
+
+    return implode('_', $parts);
   }
 }
