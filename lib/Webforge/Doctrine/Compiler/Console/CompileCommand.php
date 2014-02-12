@@ -18,6 +18,7 @@ use Webforge\Doctrine\Compiler\ModelValidator;
 use Webforge\Doctrine\Annotations\Writer as AnnotationsWriter;
 use Webforge\Doctrine\Compiler\EntityMappingGenerator;
 use Webforge\Doctrine\Compiler\Inflector;
+use Webforge\Doctrine\Compiler\GClassBroker;
 
 
 class CompileCommand extends \Webforge\Console\Command\CommandAdapter {
@@ -100,9 +101,8 @@ class CompileCommand extends \Webforge\Console\Command\CommandAdapter {
 
       $this->compiler = new Compiler(
         $webforge->getClassWriter(), 
-        new EntityGenerator(new Inflector, new EntityMappingGenerator(new AnnotationsWriter)),
-        new ModelValidator,
-        $webforge->getClassElevator()
+        new EntityGenerator(new Inflector, new EntityMappingGenerator(new AnnotationsWriter), new GClassBroker($webforge->getClassElevator())),
+        new ModelValidator
       );
     }
 

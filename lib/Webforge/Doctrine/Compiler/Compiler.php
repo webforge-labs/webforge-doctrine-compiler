@@ -8,15 +8,13 @@ use Webforge\Common\ClassUtil;
 use Webforge\Code\Generator\ClassWriter;
 use Webforge\Code\Generator\DocBlock;
 use Webforge\Code\Generator\GClass;
-use Webforge\Code\Generator\ClassElevator;
-use Webforge\Common\ClassInterface;
 
-class Compiler implements GClassBroker {
+class Compiler {
 
   protected $flags;
   protected $model;
   protected $validator;
-  protected $classElevator;
+  protected $broker;
 
   protected $dir;
   protected $classWriter;
@@ -27,11 +25,10 @@ class Compiler implements GClassBroker {
   const COMPILED_ENTITIES = 0x000002;
   const RECOMPILE = 0x000004;
 
-  public function __construct(ClassWriter $classWriter, EntityGenerator $entityGenerator, ModelValidator $validator, ClassElevator $classElevator) {
+  public function __construct(ClassWriter $classWriter, EntityGenerator $entityGenerator, ModelValidator $validator) {
     $this->classWriter = $classWriter;
     $this->validator = $validator;
     $this->entityGenerator = $entityGenerator;
-    $this->classElevator = $classElevator;
   }
 
   public function compileModel(stdClass $model, Dir $target, $flags) {
@@ -39,7 +36,7 @@ class Compiler implements GClassBroker {
     $this->dir = $target;
     $this->model = $this->validator->validateModel($model);
 
-    $this->entityGenerator->generate($this->model, $this);
+    $this->entityGenerator->generate($this->model);
     $this->generatedEntities = array();
 
     foreach ($this->entityGenerator->getEntities() as $entity) {
@@ -114,20 +111,5 @@ class Compiler implements GClassBroker {
     $url = str_replace('\\', '/', $fqn).'.php';
 
     return $this->dir->getFile($url);
-  }
-
-  /**
-   * Returns a version of $class but elevated
-   * 
-   * its NOT $class === $returnedClass
-   * @return GClass new instance
-   */
-  public function getElevated(ClassInterface $class, $debugEntityName) {
-    $gClass = $this->classElevator->elevate($class);
-
-    $this->classElevator->elevateParent($gClass);
-    $this->classElevator->elevateInterfaces($gClass);
-
-    return $gClass;
   }
 }

@@ -3,13 +3,29 @@
 namespace Webforge\Doctrine\Compiler;
 
 use Webforge\Common\ClassInterface;
+use Webforge\Code\Generator\ClassElevator;
 
-interface GClassBroker {
+class GClassBroker {
+
+  protected $classElevator;
+
+  public function __construct(ClassElevator $elevator) {
+    $this->classElevator = $elevator;
+  }
 
   /**
-   * Elevates the class with all properties and methods
+   * Returns a version of $class but elevated
    * 
+   * Elevates the class with all properties and methods
+   * its NOT $class === $returnedClass
+   * @return GClass new instance
    */
-  public function getElevated(ClassInterface $class, $debugEntityName);
+  public function getElevated(ClassInterface $class, $debugEntityName) {
+    $gClass = $this->classElevator->elevate($class);
 
+    $this->classElevator->elevateParent($gClass);
+    $this->classElevator->elevateInterfaces($gClass);
+
+    return $gClass;
+  }
 }

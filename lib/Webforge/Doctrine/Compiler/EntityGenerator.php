@@ -28,14 +28,15 @@ class EntityGenerator {
   protected $inflector;
   protected $mappingGenerator;
   protected $model;
-  protected $gClassBroker;
+  protected $broker;
 
-  public function __construct(Inflector $inflector, EntityMappingGenerator $mappingGenerator) {
+  public function __construct(Inflector $inflector, EntityMappingGenerator $mappingGenerator, GClassBroker $broker) {
     $this->inflector = $inflector;
     $this->mappingGenerator = $mappingGenerator;
+    $this->broker = $broker;
   }
 
-  public function generate(Model $model, GClassBroker $broker) {
+  public function generate(Model $model) {
     $this->model = $model;
 
     $this->generated = array();
@@ -46,7 +47,7 @@ class EntityGenerator {
     }
 
     foreach ($this->generated as $entity) {
-      $this->completeEntity($entity, $broker);
+      $this->completeEntity($entity);
     }
 
     foreach ($this->generated as $entity) {
@@ -63,11 +64,11 @@ class EntityGenerator {
     }
   }
 
-  protected function completeEntity(GeneratedEntity $entity, GClassBroker $broker) {
+  protected function completeEntity(GeneratedEntity $entity) {
     if ($entity->definition->extends) {
 
       if ($entity->definition->extends instanceof ClassInterface) {
-        $entity->setParent($broker->getElevated($entity->definition->extends, $entity->getName()));
+        $entity->setParent($this->broker->getElevated($entity->definition->extends, $entity->getName()));
       } else{
         $fqn = $entity->definition->extends->fqn;
         $entity->setParent($this->getEntity($fqn));

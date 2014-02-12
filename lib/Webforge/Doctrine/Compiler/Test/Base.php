@@ -7,6 +7,7 @@ use Webforge\Doctrine\Compiler\EntityGenerator;
 use Webforge\Doctrine\Compiler\Inflector;
 use Webforge\Doctrine\Compiler\ModelValidator;
 use Webforge\Doctrine\Compiler\EntityMappingGenerator;
+use Webforge\Doctrine\Compiler\GClassBroker;
 use Webforge\Doctrine\Annotations\Writer as AnnotationsWriter;
 use org\bovigo\vfs\vfsStream;
 use Webforge\Common\System\Dir;
@@ -36,9 +37,8 @@ class Base extends \Webforge\Doctrine\Test\SchemaTestCase {
 
     $this->compiler = new Compiler(
       $this->webforge->getClassWriter(), 
-      new EntityGenerator($inflector = new Inflector, new EntityMappingGenerator($writer = new AnnotationsWriter)),
-      new ModelValidator,
-      $this->webforge->getClassElevator()
+      new EntityGenerator($inflector = new Inflector, new EntityMappingGenerator($writer = new AnnotationsWriter), new GClassBroker($this->webforge->getClassElevator())),
+      new ModelValidator
     );
   }
 
