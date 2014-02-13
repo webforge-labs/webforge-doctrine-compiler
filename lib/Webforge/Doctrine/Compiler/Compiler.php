@@ -58,7 +58,7 @@ class Compiler {
     if ($this->flags & self::COMPILED_ENTITIES) {
       // we split up the gclass into Compiled$entityName and $entityName class
       // the $entityName class needs the docblock from the "real" class because this is what doctrine sees
-      $entityClass = $entity->gClass;
+      $entityClass = clone $entity->gClass;
 
       $compiledClass = clone $entityClass;
       $compiledClass->setName('Compiled'.$entityClass->getName());

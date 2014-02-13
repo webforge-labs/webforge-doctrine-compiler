@@ -72,4 +72,17 @@ class ModelExporterTest extends \Webforge\Doctrine\Compiler\Test\Base {
 
     $this->assertArrayEquals(TestReflection::entitySlugs(), $names);
   }
+
+  public function testEntityExtendsIsExportetCorrectly() {
+    $this->assertThatObject($this->model)->property('entities')->isArray()
+      ->key(2)
+        ->property('fqn')->is('ACME\Blog\Entities\Author')->end()
+        ->property('extends')->is('ACME\Blog\Entities\User')->end()
+      ->end()
+      ->key(1)
+        ->property('fqn')->is('ACME\Blog\Entities\Post')->end()
+        ->property('extends')->is($this->equalTo(NULL))->end()
+      ->end()
+    ;
+  }
 }

@@ -68,7 +68,7 @@ class CompileCommand extends \Webforge\Console\Command\CommandAdapter {
 
     $compiledModel = clone $model;
     $compiledModel->setName($model->getName(File::WITHOUT_EXTENSION).'-compiled.json');
-    $compiledModel->writeContents($jsonc->stringify($jsonModel));
+    $compiledModel->writeContents($jsonc->stringify($jsonModel, JSONConverter::PRETTY_PRINT));
 
     $output->ok('The model was successful compiled.');
     return 0;
