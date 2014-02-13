@@ -45,6 +45,27 @@ class ModelExporter {
     $export->extends = $entity->getParent() ? $entity->getParentClass()->getFQN() : NULL;
     $export->description = $entity->getDescription();
 
+    $export->properties = $this->exportProperties($entity, $model);
+
     return $export;
+  }
+
+  protected function exportProperties(GeneratedEntity $entity, Model $model) {
+    $properties = array();
+
+    foreach ($entity->getProperties() as $property) {
+      $export = new stdClass;
+      $export->name = $property->getName();
+
+      if ($property->hasReference()) {
+        $export->type = $property->getReferencedEntity()->getFQN();
+      } else {
+        $export->type = $property->getDefinition()->type->getName();
+      }
+
+      $properties[ $property->getName() ] = $export;
+    }
+
+    return (object) $properties;
   }
 }

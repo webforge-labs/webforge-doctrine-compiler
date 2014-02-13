@@ -85,4 +85,36 @@ class ModelExporterTest extends \Webforge\Doctrine\Compiler\Test\Base {
       ->end()
     ;
   }
+
+  public function testEntityPropertiesAreExportet() {
+    $this->assertThatObject($this->model)->property('entities')->isArray()
+      ->key(0)
+        ->property('fqn')->is('ACME\Blog\Entities\User')->end()
+        ->property('properties')->isObject()
+          ->property('id')->end()
+          ->property('email')->property('type')->is('String')->end()->end()
+        ->end()
+      ->end()
+
+      ->key(1)
+        ->property('fqn')->is('ACME\Blog\Entities\Post')->end()
+          ->property('properties')->isObject()
+            ->property('id')->end()
+            ->property('tags')->end()
+            ->property('author')->isObject()
+              ->property('type', 'ACME\Blog\Entities\Author')->end()
+            ->end()
+            ->property('active')->property('type')->is('Boolean')->end()->end()
+          ->end()
+      ->end()
+
+      ->key(2)
+        ->property('fqn')->is('ACME\Blog\Entities\Author')->end()
+        ->property('properties')->isObject()
+          ->property('writtenPosts')->end()
+          ->property('revisionedPosts')->end()
+        ->end()
+      ->end()
+    ;
+  }
 }
