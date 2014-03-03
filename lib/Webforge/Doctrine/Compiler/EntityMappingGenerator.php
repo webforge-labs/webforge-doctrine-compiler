@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Webforge\Doctrine\Annotations\Writer as AnnotationsWriter;
 use Webforge\Types\IdType;
 use Webforge\Types\DoctrineExportableType;
+use JMS\Serializer\Annotation as SA;
 
 class EntityMappingGenerator {
 
@@ -41,14 +42,27 @@ class EntityMappingGenerator {
 
   protected function annotateClass($gClass, GeneratedEntity $entity) {
     $gClass->addImport(new GClass('Doctrine\ORM\Mapping'), 'ORM');
+    $gClass->addImport(new GClass('JMS\Serializer\Annotation'), 'Serializer');
     $gClass->setDocBlock(
       $this->createDocBlock(
         $entity->getDescription()."\n\n".'this entity was compiled from '.__NAMESPACE__,
-        array(
-          $this->generateEntityAnnotation($entity),
-          $this->generateTableAnnotation($entity)
-        )
+        $this->generateClassAnnotations($entity)
       )
+    );
+  }
+
+  protected function generateClassAnnotations(GeneratedEntity $entity) {
+    $annotations = array();
+    $annotations[] = $this->generateEntityAnnotation($entity);
+    $annotations[] = $this->generateTableAnnotation($entity);
+    $annotations = array_merge($annotations, $this->generateSerializerAnnotations($entity));
+
+    return $annotations;
+  }
+
+  protected function generateSerializerAnnotations(GeneratedEntity $entity) {
+    return array(
+      '@Serializer\ExclusionPolicy("all")'
     );
   }
 
@@ -65,6 +79,8 @@ class EntityMappingGenerator {
     $annotations = array();
     $type = $property->getType();
 
+    $annotations[] = new SA\Expose();
+
     if ($property->hasReference()) {
       $associationPair = $this->model->getAssociationFor($entity, $property);
       $annotations = array_merge($annotations, $this->generateAssociationAnnotation($property, $entity, $associationPair));
@@ -80,6 +96,8 @@ class EntityMappingGenerator {
       $generatedValue->strategy = 'AUTO';
       $annotations[] = $generatedValue;
 
+      $annotations[] = sprintf('@Serializer\Type("%s")', $column->type);
+
     } elseif ($type instanceof DoctrineExportableType) {
       $column = new ORM\Column();
       $column->type = $type->getDoctrineExportType();
@@ -91,6 +109,9 @@ class EntityMappingGenerator {
       $column->nullable = $property->isNullable();
 
       $annotations[] = $column;
+
+      // http://jmsyst.com/libs/serializer/master/reference/annotations#type
+      $annotations[] = sprintf('@Serializer\Type("%s")', $column->type);
     }
 
     return $annotations;
@@ -112,6 +133,9 @@ class EntityMappingGenerator {
       // @TODO cascade
 
       $annotations[] = $annotation;
+
+      $annotations[] = sprintf('@Serializer\Type("ArrayCollection")', $association->referencedEntity->getFQN());
+
     } elseif ($association->isManyToOne()) {
       // we are always the owning side
 
@@ -123,8 +147,11 @@ class EntityMappingGenerator {
       }
 
       // @TODO cascade
-
       $annotations[] = $annotation;
+
+      // serializer
+      $annotations[] = sprintf('@Serializer\Type("%s")', $association->referencedEntity->getFQN());
+
     } elseif ($association->isManyToMany()) {
       $annotation = new ORM\ManyToMany();
 
@@ -137,6 +164,8 @@ class EntityMappingGenerator {
       }
 
       $annotations[] = $annotation;
+
+      $annotations[] = sprintf('@Serializer\Type("ArrayCollection")', $association->referencedEntity->getFQN());
 
       // we need a table for manyToMany
       $table = new ORM\JoinTable();
@@ -169,6 +198,8 @@ class EntityMappingGenerator {
 
     } elseif ($association->isOneToOne()) {
       throw new \Webforge\Common\Exception\NotImplementedException('OneToOne not needed right now: '.$association->getUniqueSlug());
+
+      $annotations[] = sprintf('@Serializer\Type("%s")', $association->referencedEntity->getFQN());
     }
 
     return $annotations;

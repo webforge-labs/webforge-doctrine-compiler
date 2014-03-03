@@ -35,6 +35,9 @@ class Base extends \Webforge\Doctrine\Test\SchemaTestCase {
     $this->virtualPackageDirectory = $this->getVirtualDirectory('packageroot');
     parent::setUp();
 
+    // enable JMS annotations per auto_loading
+    \Doctrine\Common\Annotations\AnnotationRegistry::registerLoader('class_exists');
+
     $this->webforge = $this->frameworkHelper->getWebforge();
 
     $this->setUpPackage();

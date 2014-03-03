@@ -6,6 +6,9 @@ use Webforge\Doctrine\Annotations\Writer as AnnotationsWriter;
 
 /**
  * A value object to transport a docblock with complex annotations
+ * 
+ * *1 it is possible to pass strings in the annotations array, because the jms serializer annotations are not easy to write
+ *    they break some conventions the doctrine annotations have and can therefore not be written constistently with the writer
  */
 class AnnotationsDocBlock extends \Webforge\Code\Generator\DocBlock {
 
@@ -38,7 +41,11 @@ class AnnotationsDocBlock extends \Webforge\Code\Generator\DocBlock {
     $s = '';
     if (is_array($this->annotations)) {
       foreach ($this->annotations as $annotation) {
-        $s .= ' * '.$this->writer->writeAnnotation($annotation)."\n";
+        if (is_string($annotation)) { // dirty hack to write jms serializer annotations *1
+          $s .= ' * '.$annotation."\n";
+        } else {
+          $s .= ' * '.$this->writer->writeAnnotation($annotation)."\n";
+        }
       }
     }
 

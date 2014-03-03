@@ -11,7 +11,7 @@ $webforge = $container->getWebforge();
 $console = new Application($container);
 $console->addCommands(array(
   new CompileCommand(
-    'compile-entities', $webforge->getSystemContainer()->getSystem()
+    'orm:compile', $webforge->getSystemContainer()->getSystem()
   )
 ));
 
