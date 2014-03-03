@@ -66,7 +66,7 @@ class Compiler {
       $compiledClass->setDocBlock(
         $docBlock = new DocBlock(
           'Compiled Entity for '.$entityClass->getFQN()."\n\nTo change table name or entity repository edit the ".$entityClass->getFQN().' class.'."\n".
-          '@ORM\MappedSuperClass'
+          '@ORM\MappedSuperclass'
         )
       );
 
