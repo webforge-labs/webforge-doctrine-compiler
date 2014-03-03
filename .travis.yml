@@ -16,7 +16,7 @@ before_script:
   - mysql -e 'create database IF NOT EXISTS `doctrine`;'
   - mysql -e 'create database IF NOT EXISTS `doctrine_tests`;'
 
-script: phpunit --coverage-clover build/logs/clover.xml
+script: phpunit --stop-on-failure --coverage-clover build/logs/clover.xml
 
 after_script:
   - php vendor/bin/coveralls -v

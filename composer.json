@@ -11,21 +11,20 @@
   "minimum-stability":"dev",
   "autoload":{
     "psr-0":{
-      "Webforge\\Doctrine\\Compiler":["lib/", "tests/"],
-      "Webforge\\Doctrine":["D:\\www\\webforge-doctrine\\lib"]
+      "Webforge\\Doctrine\\Compiler":["lib/", "tests/"]
     }
   },
   "require":{
     "webforge/doctrine":"1.2.*@dev",
     "webforge/webforge":"1.9.*@dev",
-    "beberlei/assert": "1.6.*@stable",
-    "mockery/mockery": "dev-master"
+    "webforge/serializer":"1.0.*@dev",
+    "beberlei/assert": "1.6.*@stable"
   },
   "require-dev": {
+    "mockery/mockery": "dev-master",
     "satooshi/php-coveralls": "dev-master",
     "webforge/testplate": ">=1.5",
-    "mikey179/vfsStream": "1.3.*@dev",
-    "jms/serializer": "0.15.*@stable"
+    "mikey179/vfsStream": "1.3.*@dev"
   },
   "bin": ["bin/webforge-doctrine-compiler"],
   "extra":{

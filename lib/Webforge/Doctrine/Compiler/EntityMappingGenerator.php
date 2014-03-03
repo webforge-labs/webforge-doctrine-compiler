@@ -79,7 +79,7 @@ class EntityMappingGenerator {
     $annotations = array();
     $type = $property->getType();
 
-    $annotations[] = new SA\Expose();
+    $annotations[] = "@Serializer\Expose";
 
     if ($property->hasReference()) {
       $associationPair = $this->model->getAssociationFor($entity, $property);

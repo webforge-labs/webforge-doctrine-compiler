@@ -11,6 +11,8 @@ class JMSSerializationTest extends \Webforge\Doctrine\Compiler\Test\ModelBase {
   public function setUp() {
     parent::setUp();
 
+    $builder = new \Webforge\Serializer\SerializerBuilder;
+    $this->serializer = $builder->getSerializer();
 
     $this->author = new Author('p.scheit@ps-webforge.com');
     $this->author->setId(7);
