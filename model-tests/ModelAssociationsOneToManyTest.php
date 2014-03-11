@@ -114,4 +114,26 @@ class ModelAssociationsOneToManyTest extends \Webforge\Doctrine\Compiler\Test\Mo
     $this->assertHasTargetEntity($paragraphClass, $p1);
     $this->assertIsUnidirectional($p1);
   }
+
+  public function testManyToOneImplicitUnidirectionalDoctrineMetadata() {
+    $blockClass = $this->elevateFull('ACME\Blog\Entities\ContentStream\TextBlock');
+    $paragraphClass = $this->elevateFull('ACME\Blog\Entities\ContentStream\Paragraph');
+    $metadata = $this->assertDoctrineMetadata($blockClass);
+
+    $p1 = $this->assertAssociationMapping('paragraph1', $metadata);
+
+    $this->assertHasTargetEntity($paragraphClass, $p1);
+    $this->assertIsUnidirectional($p1);
+  }
+
+  public function testManyToOneExplicitUnidirectionalDoctrineMetadata() {
+    $blockClass = $this->elevateFull('ACME\Blog\Entities\ContentStream\TextBlock');
+    $paragraphClass = $this->elevateFull('ACME\Blog\Entities\ContentStream\Paragraph');
+    $metadata = $this->assertDoctrineMetadata($blockClass);
+
+    $p2 = $this->assertAssociationMapping('paragraph2', $metadata);
+
+    $this->assertHasTargetEntity($paragraphClass, $p2);
+    $this->assertIsUnidirectional($p2);
+  }
 }

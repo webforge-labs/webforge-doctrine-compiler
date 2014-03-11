@@ -85,10 +85,11 @@ class Model {
 
           if ($property->isEntityCollection()) {
             $type = 'ManyToMany';
-          } elseif ($property->isEntity() && $property->getRelationName() === 'ManyToOne') {
-            $type = 'ManyToOne';
-          } elseif ($property->isEntity()) {
+          } elseif ($property->isEntity() && $property->getRelationName() === 'OneToOne') {
             $type = 'OneToOne';
+          } elseif ($property->isEntity()) {
+            // this is a more sensible default then OneToOne because OneToOne is used less often than ManyToOne in that case
+            $type = 'ManyToOne';
           }
 
           $association = new ModelAssociation($type, $entity, $property, $referencedEntity, $referencedProperty);

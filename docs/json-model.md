@@ -90,11 +90,12 @@ There is one case where the doctrine-compiler cannot guess what you really want 
       "extends": "ContentStream\\Entry",
 
       "properties": {
-        "paragraph1": { "type": "ContentStream\\Paragraph", "relation": "ManyToOne" },
-        "paragraph2": { "type": "ContentStream\\Paragraph", "relation": "ManyToOne" }
+        "paragraph1": { "type": "ContentStream\\Paragraph" },
+        "paragraph2": { "type": "ContentStream\\UniqueParagraph", "relation": "OneToOne" }
       }
-      
+
     }
 ```
 
 *Notice*: Paragraph has not relationship defined to TextBlock, otherwise the compiler could have guessed the relationship (OneToOne if it is a property, ManyToOne if it is a collection).
+Because OneToOne is less common doctrine guesses here ManyToOne per default. You **HAVE** to use `"relation": "OneToOne"` for unidirectional OneToOne relationships.

@@ -103,7 +103,7 @@
 
       "properties": {
         "paragraph1": { "type": "ContentStream\\Paragraph", "relation": "ManyToOne" },
-        "paragraph2": { "type": "ContentStream\\Paragraph", "relation": "ManyToOne" }
+        "paragraph2": { "type": "ContentStream\\Paragraph" }
       }
     }
 
