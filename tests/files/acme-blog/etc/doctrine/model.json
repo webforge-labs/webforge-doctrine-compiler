@@ -64,12 +64,33 @@
       "constructor": ["label"]
     },
 
-
     {
-      "name": "ContentStream\\Paragraph",
+      "name": "ContentStream\\Stream",
     
       "properties": {
         "id": { "type": "DefaultId" },
+        
+        "entries": { "type": "Collection<ContentStream\\Entry>" }
+      },
+
+      "constructor": []
+    },
+
+    {
+      "name": "ContentStream\\Entry",
+
+      "properties": {
+        "id": { "type": "DefaultId" },
+
+        "contentStream": { "type": "ContentStream\\Stream" }
+      }
+    },
+
+    {
+      "name": "ContentStream\\Paragraph",
+      "extends": "ContentStream\\Entry",
+    
+      "properties": {
         "content": { "type": "String" }
       },
 
@@ -77,15 +98,14 @@
     },
 
     {
-      "name": "ContentStream\\Stream",
-    
-      "properties": {
-        "id": { "type": "DefaultId" },
-        
-        "paragraphs": { "type": "Collection<ContentStream\\Paragraph>" }
-      },
+      "name": "ContentStream\\TextBlock",
+      "extends": "ContentStream\\Entry",
 
-      "constructor": []
+      "properties": {
+        "paragraph1": { "type": "ContentStream\\Paragraph", "relation": "ManyToOne" },
+        "paragraph2": { "type": "ContentStream\\Paragraph", "relation": "ManyToOne" }
+      }
     }
+
   ]
 }

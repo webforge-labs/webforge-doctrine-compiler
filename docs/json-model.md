@@ -69,3 +69,32 @@ Therefore a JSON format for creating entities should be used. This is a rough dr
     -  `"author": { "type": "Author" },` is expanded to `"author": { "type": "Author", "relation": "author" }`
        `"revisor": { "type": "Author" },` is expanded to `"revisor": { "type": "Author", "relation": "revisor" }`
     
+## Ambigous Relation Sides
+
+There is one case where the doctrine-compiler cannot guess what you really want to do. In case you have a unidirectional ManyToOne relationship (that is specified on the Many-side). It cannot determine if this should be a OneToOne or an ManyToOne relationships, so you have to give a little advice:
+
+```json
+    {
+      "name": "ContentStream\\Paragraph",
+      "extends": "ContentStream\\Entry",
+    
+      "properties": {
+        "content": { "type": "String" }
+      },
+
+      "constructor": ["content"]
+    },
+
+    {
+      "name": "ContentStream\\TextBlock",
+      "extends": "ContentStream\\Entry",
+
+      "properties": {
+        "paragraph1": { "type": "ContentStream\\Paragraph", "relation": "ManyToOne" },
+        "paragraph2": { "type": "ContentStream\\Paragraph", "relation": "ManyToOne" }
+      }
+      
+    }
+```
+
+*Notice*: Paragraph has not relationship defined to TextBlock, otherwise the compiler could have guessed the relationship (OneToOne if it is a property, ManyToOne if it is a collection).

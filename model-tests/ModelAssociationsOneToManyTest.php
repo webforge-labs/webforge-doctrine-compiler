@@ -95,12 +95,23 @@ class ModelAssociationsOneToManyTest extends \Webforge\Doctrine\Compiler\Test\Mo
   }
 
   public function testManyToOneWithSubNamespacesMetadata() {
-    $paragraphClass = $this->elevateFull('ACME\Blog\Entities\ContentStream\Paragraph');
+    $entryClass = $this->elevateFull('ACME\Blog\Entities\ContentStream\Entry');
     $streamClass = $this->elevateFull('ACME\Blog\Entities\ContentStream\Stream');
     $metadata = $this->assertDoctrineMetadata($streamClass);
 
-    $paragraphs = $this->assertAssociationMapping('paragraphs', $metadata);
+    $entries = $this->assertAssociationMapping('entries', $metadata);
 
-    $this->assertHasTargetEntity($paragraphClass, $paragraphs);
+    $this->assertHasTargetEntity($entryClass, $entries);
+  }
+
+  public function testManyToOneUnidirectionalDoctrineMetadata() {
+    $blockClass = $this->elevateFull('ACME\Blog\Entities\ContentStream\TextBlock');
+    $paragraphClass = $this->elevateFull('ACME\Blog\Entities\ContentStream\Paragraph');
+    $metadata = $this->assertDoctrineMetadata($blockClass);
+
+    $p1 = $this->assertAssociationMapping('paragraph1', $metadata);
+
+    $this->assertHasTargetEntity($paragraphClass, $p1);
+    $this->assertIsUnidirectional($p1);
   }
 }

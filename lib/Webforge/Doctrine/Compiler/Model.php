@@ -52,6 +52,7 @@ class Model {
         $unidirectional = TRUE;
         foreach ($referencedEntity->getProperties() as $referencedProperty) {
           if ($referencedProperty->hasReference() && $entity->equals($referencedProperty->getReferencedEntity())) {
+            $unidirectional = FALSE;
             $type = $owning = NULL;
             
             if ($property->isEntityCollection()) {
@@ -76,7 +77,6 @@ class Model {
             $association->setOwning($owning);
 
             $this->indexAssociation($association);
-            $unidirectional = FALSE;
           }
         }
 
@@ -85,6 +85,8 @@ class Model {
 
           if ($property->isEntityCollection()) {
             $type = 'ManyToMany';
+          } elseif ($property->isEntity() && $property->getRelationName() === 'ManyToOne') {
+            $type = 'ManyToOne';
           } elseif ($property->isEntity()) {
             $type = 'OneToOne';
           }
