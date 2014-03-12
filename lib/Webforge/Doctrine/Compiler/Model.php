@@ -109,9 +109,22 @@ class Model {
     //var_dump(A::keys($this->associations));
 
     $grouped = array();
-    foreach ($this->associations as $key=>$associationPair) {
+    foreach ($this->associations as $associationPair) {
+
+      if (!array_key_exists('owning', $associationPair)) {
+        $association = $associationPair['inverse'];
+        throw new InvalidModelException(
+          sprintf(
+            "You have no owning side for the association %s, detected as: %s\n".
+            "You have to set isOwning in the property of one of the sides of the association.\n",
+            $association->getUniqueSlug(), $association->type
+          )
+        );
+      }
+
       $owningAssociation = $associationPair['owning'];
-      $grouped[sprintf('%s::%s', $owningAssociation->entity->getName(), $owningAssociation->property->getName())][] = (object) $associationPair;
+      $key = sprintf('%s::%s', $owningAssociation->entity->getName(), $owningAssociation->property->getName());
+      $grouped[$key][] = (object) $associationPair;
     }
 
     $this->associations = array();
