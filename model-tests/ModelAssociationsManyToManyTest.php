@@ -65,7 +65,6 @@ class ModelAssociationsManyToManyTest extends \Webforge\Doctrine\Compiler\Test\M
 
   public function testManyToManyDoctrineMetadata_bidirectional_owningSide() {
     $metadata = $this->assertDoctrineMetadata($this->postClass->getFQN());
-
     $categories = $this->assertAssociationMapping('categories', $metadata);
 
     $this->assertHasTargetEntity($this->categoryClass, $categories);
@@ -83,6 +82,14 @@ class ModelAssociationsManyToManyTest extends \Webforge\Doctrine\Compiler\Test\M
     $this->assertIsMappedBy('categories', $posts);
 
     $this->assertDefaultJoinTable($posts, 'posts2categories', 'posts');
+  }
+
+  public function testCascadingOfAssociationsIsSetThroughCascadePropertyInModel() {
+    $metadata = $this->assertDoctrineMetadata($this->postClass);
+    $categories = $this->assertAssociationMapping('categories', $metadata);
+
+    $this->assertCascadePersist($categories);
+    $this->assertCascadeRemove($categories);
   }
 
   protected function assertDefaultJoinTable(Array $association, $tableName, $debugName) {

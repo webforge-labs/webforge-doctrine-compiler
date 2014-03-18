@@ -36,6 +36,14 @@ class ModelBase extends Base {
     $this->assertEquals($mappedBy, $association['mappedBy'], 'is mappedBy does not match');
   }
 
+  protected function assertCascadePersist(Array $association) {
+    $this->assertTrue($association['isCascadePersist'], 'cascade persist for '.$association['fieldName']);
+  }
+
+  protected function assertCascadeRemove(Array $association) {
+    $this->assertTrue($association['isCascadeRemove'], 'cascade remove for '.$association['fieldName']);
+  }
+
   protected function assertIsUnidirectional(Array $association) {
     $this->assertNull($association['mappedBy'], 'association is not unidirectional');
     $this->assertNull($association['inversedBy'], 'association is not unidirectional');

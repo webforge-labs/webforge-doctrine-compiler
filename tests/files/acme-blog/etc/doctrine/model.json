@@ -23,7 +23,7 @@
         "id": { "type": "DefaultId" },
         "author": { "type": "Author" },
         "revisor": { "type": "Author", "nullable": true },
-        "categories": { "type": "Collection<Category>", "isOwning": true },
+        "categories": { "type": "Collection<Category>", "isOwning": true, "cascade": ["persist", "remove"] },
         "tags": { "type": "Collection<Tag>" },
         "active": { "type": "Boolean" },
         "created": { "type": "DateTime" },
