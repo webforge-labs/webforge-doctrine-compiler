@@ -67,7 +67,7 @@ class AssociationsAPIGenerator {
 
       case 'remove':
         $body[] = sprintf('if ($this->%s->contains($%s)) {', $collectionName, $parameter->getName());
-        $body[] = sprintf('  $this->%s->remove($%s);', $collectionName, $parameter->getName());
+        $body[] = sprintf('  $this->%s->removeElement($%s);', $collectionName, $parameter->getName());
         if ($updateOtherside) {
           $body[] = sprintf('  $%s->%s($this);', $parameter->getName(), $association->referencedProperty->getCollectionDoerName('remove'));
         }
