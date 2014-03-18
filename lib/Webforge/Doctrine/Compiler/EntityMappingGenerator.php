@@ -130,7 +130,7 @@ class EntityMappingGenerator {
       // the many side is always existing so the referencedProperty is defined
       $annotation->mappedBy = $association->referencedProperty->getName();
 
-      // @TODO cascade
+      $annotation->cascade = $property->getRelationCascade();
 
       $annotations[] = $annotation;
 
@@ -146,7 +146,8 @@ class EntityMappingGenerator {
         $annotation->inversedBy = $association->referencedProperty->getName();
       }
 
-      // @TODO cascade
+      $annotation->cascade = $property->getRelationCascade();
+
       $annotations[] = $annotation;
 
       // serializer
@@ -162,6 +163,8 @@ class EntityMappingGenerator {
       } elseif ($hasInverse) {
         $annotation->inversedBy = $association->referencedProperty->getName();
       }
+
+      $annotation->cascade = $property->getRelationCascade();
 
       $annotations[] = $annotation;
 

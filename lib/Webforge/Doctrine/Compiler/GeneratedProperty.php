@@ -92,6 +92,10 @@ class GeneratedProperty {
     return isset($this->definition->nullable) ? $this->definition->nullable : FALSE;
   }
 
+  public function getRelationCascade() {
+    return isset($this->definition->cascade) ? (array) $this->definition->cascade : NULL;
+  }
+
   /**
    * Returns the php Documentor type for (at)param or (at)return annotations
    * 
