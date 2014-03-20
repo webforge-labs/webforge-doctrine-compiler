@@ -53,6 +53,15 @@ class ModelBase extends Base {
     $this->assertEquals($mappedBy, $association['inversedBy'], 'is inversedBy does not match');
   }
 
+  protected function assertSerializerPropertyType($expectedType, $propertyName, \JMS\Serializer\Metadata\ClassMetadata $metadata) {
+    return $this->assertSerializerType($expectedType, $metadata->propertyMetadata[$propertyName]);
+  }
+
+  protected function assertSerializerType($expectedType, \JMS\Serializer\Metadata\PropertyMetadata $property) {
+    $type = $property->type;
+    $this->assertEquals($expectedType, $type['name'], 'serializer type from '.$property->name.' does not match');
+  }
+
   protected function assertHasTargetENtity($fqn, Array $association) {
     if ($fqn instanceof ClassInterface) $fqn = $fqn->getFQN();
 

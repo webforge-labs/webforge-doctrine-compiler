@@ -28,6 +28,23 @@ class JMSSerializationTest extends \Webforge\Doctrine\Compiler\Test\ModelBase {
     );
   }
 
+  public function testThePostPrimitveTypesAreMappedCorectly() {
+    $factory = $this->serializer->getMetadataFactory();
+    $metadata = $factory->getMetadataForClass(get_class($this->post));
+
+    // this is hardcoded in the manyToOne etc mappings:
+    $this->assertSerializerPropertyType(get_class($this->author), 'revisor', $metadata);
+    $this->assertSerializerPropertyType('ArrayCollection', 'tags', $metadata);
+
+    // this are primitives equal to the doctrine type
+    $this->assertSerializerPropertyType('boolean', 'active', $metadata);
+    $this->assertSerializerPropertyType('WebforgeDateTime', 'modified', $metadata);
+    $this->assertSerializerPropertyType('string', 'content', $metadata);
+
+    // depends on detecting the SerializationType interface (all others are identical to doctrine export types)
+    $this->assertSerializerPropertyType('double', 'relevance', $metadata); // float = double in serializer
+  }
+
   public function testAnAuthorCanBeSerializedWithoutSomeChildEntities() {
     $this->assertThatObject($this->serialize($this->author))
       ->property('email')->is('p.scheit@ps-webforge.com')->end()
@@ -90,4 +107,5 @@ class JMSSerializationTest extends \Webforge\Doctrine\Compiler\Test\ModelBase {
   protected function serialize($object) {
     return $this->serializer->serialize($object, 'json');
   }
+
 }

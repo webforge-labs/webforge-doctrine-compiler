@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Webforge\Doctrine\Annotations\Writer as AnnotationsWriter;
 use Webforge\Types\IdType;
 use Webforge\Types\DoctrineExportableType;
+use Webforge\Types\SerializationType;
 use JMS\Serializer\Annotation as SA;
 
 class EntityMappingGenerator {
@@ -96,8 +97,6 @@ class EntityMappingGenerator {
       $generatedValue->strategy = 'AUTO';
       $annotations[] = $generatedValue;
 
-      $annotations[] = sprintf('@Serializer\Type("%s")', $column->type);
-
     } elseif ($type instanceof DoctrineExportableType) {
       $column = new ORM\Column();
       $column->type = $type->getDoctrineExportType();
@@ -109,9 +108,10 @@ class EntityMappingGenerator {
       $column->nullable = $property->isNullable();
 
       $annotations[] = $column;
+    }
 
-      // http://jmsyst.com/libs/serializer/master/reference/annotations#type
-      $annotations[] = sprintf('@Serializer\Type("%s")', $column->type);
+    if ($type instanceof SerializationType) {
+      $annotations[] = sprintf('@Serializer\Type("%s")', $type->getSerializationType());
     }
 
     return $annotations;

@@ -21,11 +21,13 @@
   
       "properties": {
         "id": { "type": "DefaultId" },
+        "content": { "type": "MarkupText" },
         "author": { "type": "Author" },
         "revisor": { "type": "Author", "nullable": true },
         "categories": { "type": "Collection<Category>", "isOwning": true, "cascade": ["persist", "remove"] },
         "tags": { "type": "Collection<Tag>" },
         "active": { "type": "Boolean" },
+        "relevance": { "type": "Float", "nullable": true },
         "created": { "type": "DateTime" },
         "modified": { "type": "DateTime", "nullable": true }
       },
