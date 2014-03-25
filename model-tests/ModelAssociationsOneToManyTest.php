@@ -136,4 +136,17 @@ class ModelAssociationsOneToManyTest extends \Webforge\Doctrine\Compiler\Test\Mo
     $this->assertHasTargetEntity($paragraphClass, $p2);
     $this->assertIsUnidirectional($p2);
   }
+
+
+  public function testOnDeleteIsPutIntoMetadataOfManySide() {
+    $pageClass = $this->elevateFull('ACME\Blog\Entities\Page');
+    $streamClass = $this->elevateFull('ACME\Blog\Entities\ContentStream\Stream');
+    $metadata = $this->assertDoctrineMetadata($streamClass);
+
+    $page = $this->assertAssociationMapping('page', $metadata);
+
+    $this->assertHasTargetEntity($pageClass, $page);
+    $this->assertArrayHasKey('onDelete',$page['joinColumns'][0], 'onDelete value should be set for joinColumn of ContentStream::$page');
+    $this->assertEquals('cascade', $page['joinColumns'][0]['onDelete'], 'onDelete value from page');
+  }
 }
