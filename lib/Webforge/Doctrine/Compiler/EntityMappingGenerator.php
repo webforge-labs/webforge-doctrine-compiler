@@ -150,12 +150,10 @@ class EntityMappingGenerator {
 
       $annotations[] = $annotation;
 
-      /*
-      $joinColumn = new ORM\JoinColumn();
-      $joinColumn->name = sprintf('%s_%s', $associationPair->owning->entity->getTableName(), $associationPair->owning->entity->getIdentifierColumn());
-      $joinColumn->onDelete = 'cascade';
-      */
-
+      if ($property->hasOnDelete()) {
+        $annotations[] = $joinColumn = new ORM\JoinColumn();
+        $joinColumn->onDelete = $property->getOnDelete();
+      }
 
       // serializer
       $annotations[] = sprintf('@Serializer\Type("%s")', $association->referencedEntity->getFQN());

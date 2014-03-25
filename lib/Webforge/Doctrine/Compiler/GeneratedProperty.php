@@ -96,6 +96,15 @@ class GeneratedProperty {
     return isset($this->definition->cascade) ? (array) $this->definition->cascade : NULL;
   }
 
+  // the delete on db level in the joinColumn
+  public function getOnDelete() {
+    return isset($this->definition->onDelete) ? $this->definition->onDelete : NULL;
+  }
+
+  public function hasOnDelete() {
+    return isset($this->definition->onDelete);
+  }
+
   /**
    * Returns the php Documentor type for (at)param or (at)return annotations
    * 
