@@ -67,12 +67,26 @@
     },
 
     {
+      "name": "Page",
+    
+      "properties": {
+        "id": { "type": "DefaultId" },
+        "slug": { "type": "String" },
+
+        "contentStreams": { "type": "Collection<ContentStream\\Entry>" }
+      },
+
+      "constructor": ["slug"]
+    },
+
+    {
       "name": "ContentStream\\Stream",
     
       "properties": {
         "id": { "type": "DefaultId" },
         
-        "entries": { "type": "Collection<ContentStream\\Entry>" }
+        "entries": { "type": "Collection<ContentStream\\Entry>" },
+        "page": { "type": "Page", "nullable": true, "onDelete": "cascade" }
       },
 
       "constructor": []
