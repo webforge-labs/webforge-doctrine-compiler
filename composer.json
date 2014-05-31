@@ -15,9 +15,9 @@
     }
   },
   "require":{
-    "webforge/doctrine":"1.2.*@dev",
-    "webforge/webforge":"1.9.*@dev",
-    "webforge/serializer":"1.0.*@dev",
+    "webforge/doctrine":"1.2.*",
+    "webforge/webforge":"1.9.*",
+    "webforge/serializer":"1.0.*",
     "beberlei/assert": "1.6.*@stable"
   },
   "require-dev": {
