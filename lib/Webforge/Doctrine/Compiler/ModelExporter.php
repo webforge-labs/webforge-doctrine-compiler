@@ -59,6 +59,7 @@ class ModelExporter {
 
       if ($property->hasReference()) {
         $export->type = $property->getReferencedEntity()->getFQN();
+        $export->isCollection = $property->isEntityCollection();
       } else {
         $export->type = $property->getDefinition()->type->getName();
       }
