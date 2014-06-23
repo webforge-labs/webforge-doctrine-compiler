@@ -1,0 +1,16 @@
+{
+  "vcs":"git",
+  "version-generator":"semantic",
+  "version-persister":"vcs-tag",
+  "prerequisites":[
+    "working-copy-check",
+    "display-last-changes"
+  ],
+  "pre-release-actions":[
+    "composer-update",
+    "vcs-commit"
+  ],
+  "post-release-actions":[
+    "vcs-publish"
+  ]
+}
