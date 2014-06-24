@@ -10,7 +10,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Webforge\Doctrine\Annotations\Writer as AnnotationsWriter;
 use Webforge\Types\IdType;
 use Webforge\Types\DoctrineExportableType;
-use Webforge\Types\SerializationType;
 use JMS\Serializer\Annotation as SA;
 
 class EntityMappingGenerator {
@@ -22,6 +21,8 @@ class EntityMappingGenerator {
   public function __construct(AnnotationsWriter $annotationsWriter) {
     $this->annotationsWriter = $annotationsWriter;
     $this->annotationsWriter->setAnnotationNamespaceAlias('Doctrine\ORM\Mapping', 'ORM');
+
+    $this->extensions = array(new Extensions\Serializer());
   }
 
   public function init(GeneratedEntity $entity, Model $model) {
@@ -80,8 +81,6 @@ class EntityMappingGenerator {
     $annotations = array();
     $type = $property->getType();
 
-    $annotations[] = "@Serializer\Expose";
-
     if ($property->hasReference()) {
       $associationPair = $this->model->getAssociationFor($entity, $property);
       $annotations = array_merge($annotations, $this->generateAssociationAnnotation($property, $entity, $associationPair));
@@ -110,8 +109,8 @@ class EntityMappingGenerator {
       $annotations[] = $column;
     }
 
-    if ($type instanceof SerializationType) {
-      $annotations[] = sprintf('@Serializer\Type("%s")', $type->getSerializationType());
+    foreach ($this->extensions as $extension) {
+      $extension->onPropertyAnnotationsGeneration($annotations, $property, $entity);
     }
 
     return $annotations;
