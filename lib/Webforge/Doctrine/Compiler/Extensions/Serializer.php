@@ -6,6 +6,7 @@ use Webforge\Doctrine\Compiler\GeneratedProperty;
 use Webforge\Code\Generator\GClass;
 use Webforge\Doctrine\Compiler\GeneratedEntity;
 use Webforge\Types\SerializationType;
+use \JMS\Serializer\Annotation;
 
 class Serializer implements Extension {
 
@@ -32,7 +33,8 @@ class Serializer implements Extension {
     $definition = NULL;
     if ($property->hasDefinitionOf('serializer', $definition)) {
       if (isset($definition->groups)) {
-        //$annotations[] = sprintf('@Serializer\Groups');
+        $annotations[] = $annotation = new Annotation\Groups();
+        $annotation->groups = $definition->groups;
       }
     }
   }
