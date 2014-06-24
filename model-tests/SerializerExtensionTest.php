@@ -6,7 +6,7 @@ use ACME\Blog\Entities\Author;
 use ACME\Blog\Entities\Post;
 use Webforge\Common\DateTime\DateTime;
 
-class JMSSerializationTest extends \Webforge\Doctrine\Compiler\Test\ModelBase {
+class SerializerExtensionTest extends \Webforge\Doctrine\Compiler\Test\ModelBase {
 
   public function setUp() {
     parent::setUp();

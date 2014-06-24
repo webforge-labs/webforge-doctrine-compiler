@@ -27,7 +27,7 @@
           <file>model-tests/ModelAssociationsManyToManyUnidirectionalTest.php</file>
           <file>model-tests/ModelInhertianceTest.php</file>
           <file>model-tests/ModelDCValidationTest.php</file>
-          <file>model-tests/JMSSerializationTest.php</file>
+          <file>model-tests/SerializerExtensionTest.php</file>
         </testsuite>
     </testsuites>
 
