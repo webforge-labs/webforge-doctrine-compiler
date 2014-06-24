@@ -47,8 +47,7 @@ class SerializerExtensionTest extends \Webforge\Doctrine\Compiler\Test\ModelBase
 
   public function testSerializerGroupsWillBeWrittenAsAnnotations() {
     $this->assertThatSerializerProperty('active', $this->post)
-      ->property('groups', array('cms'))
-      ->debug();
+      ->property('groups', array('cms'));
   }
 
   public function testAnAuthorCanBeSerializedWithoutSomeChildEntities() {
