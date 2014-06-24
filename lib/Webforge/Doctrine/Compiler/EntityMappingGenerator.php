@@ -22,7 +22,7 @@ class EntityMappingGenerator {
     $this->annotationsWriter = $annotationsWriter;
     $this->annotationsWriter->setAnnotationNamespaceAlias('Doctrine\ORM\Mapping', 'ORM');
 
-    $this->extensions = array(new Extensions\Serializer());
+    $this->extensions = array(new Extensions\Serializer($annotationsWriter));
   }
 
   public function init(GeneratedEntity $entity, Model $model) {
@@ -44,7 +44,11 @@ class EntityMappingGenerator {
 
   protected function annotateClass($gClass, GeneratedEntity $entity) {
     $gClass->addImport(new GClass('Doctrine\ORM\Mapping'), 'ORM');
-    $gClass->addImport(new GClass('JMS\Serializer\Annotation'), 'Serializer');
+
+    foreach ($this->extensions as $extension) {
+      $extension->onClassGeneration($entity, $gClass);
+    }
+    
     $gClass->setDocBlock(
       $this->createDocBlock(
         $entity->getDescription()."\n\n".'this entity was compiled from '.__NAMESPACE__,
@@ -57,15 +61,12 @@ class EntityMappingGenerator {
     $annotations = array();
     $annotations[] = $this->generateEntityAnnotation($entity);
     $annotations[] = $this->generateTableAnnotation($entity);
-    $annotations = array_merge($annotations, $this->generateSerializerAnnotations($entity));
+
+    foreach ($this->extensions as $extension) {
+      $extension->onClassAnnotationsGeneration($annotations, $entity);
+    }
 
     return $annotations;
-  }
-
-  protected function generateSerializerAnnotations(GeneratedEntity $entity) {
-    return array(
-      '@Serializer\ExclusionPolicy("all")'
-    );
   }
 
   protected function annotateProperty(GeneratedProperty $property, GeneratedEntity $entity) {

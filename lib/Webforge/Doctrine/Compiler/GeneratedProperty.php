@@ -102,7 +102,25 @@ class GeneratedProperty {
   }
 
   public function hasOnDelete() {
-    return isset($this->definition->onDelete);
+    return $this->hasDefinitionOf('onDelete');
+  }
+
+  public function hasDefinitionOf($subname, &$subDefinition = NULL) {
+    if (isset($this->definition->$subname)) {
+      $subDefinition = $this->definition->$subname;
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  public function requireDefinitionOf($subname) {
+    $subDefinition = NULL;
+    if (!$this->hasDefinitionOf($subname, $subDefinition)) {
+      throw new \RuntimeException('there is no definition for: '.$subname.' in: propertyDefinition for: '.$this);
+    }
+
+    return $subDefinition;
   }
 
   /**
