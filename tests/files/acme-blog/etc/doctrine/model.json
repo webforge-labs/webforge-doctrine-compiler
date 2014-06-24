@@ -26,7 +26,7 @@
         "revisor": { "type": "Author", "nullable": true },
         "categories": { "type": "Collection<Category>", "isOwning": true, "cascade": ["persist", "remove"] },
         "tags": { "type": "Collection<Tag>" },
-        "active": { "type": "Boolean" },
+        "active": { "type": "Boolean" , "serializer": { "groups": ["cms"] }},
         "relevance": { "type": "Float", "nullable": true },
         "created": { "type": "DateTime" },
         "modified": { "type": "DateTime", "nullable": true }

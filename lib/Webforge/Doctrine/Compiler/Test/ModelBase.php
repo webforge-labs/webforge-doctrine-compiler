@@ -57,6 +57,19 @@ class ModelBase extends Base {
     return $this->assertSerializerType($expectedType, $metadata->propertyMetadata[$propertyName]);
   }
 
+  protected function assertThatSerializerProperty($propertyName, $metadataOrObject) {
+    if (!($metadataOrObject instanceof \JMS\Serializer\Metadata\ClassMetadata)) {
+      $factory = $this->serializer->getMetadataFactory();
+      $metadata = $factory->getMetadataForClass(get_class($metadataOrObject));
+    } else {
+      $metadata = $metadataOrObject;
+    }
+
+    $this->assertArrayHasKey($propertyName, $metadata->propertyMetadata);
+
+    return $this->assertThatObject($metadata->propertyMetadata[$propertyName]);
+  }
+
   protected function assertSerializerType($expectedType, \JMS\Serializer\Metadata\PropertyMetadata $property) {
     $type = $property->type;
     $this->assertEquals($expectedType, $type['name'], 'serializer type from '.$property->name.' does not match');

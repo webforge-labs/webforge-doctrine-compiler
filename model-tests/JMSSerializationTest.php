@@ -45,6 +45,12 @@ class JMSSerializationTest extends \Webforge\Doctrine\Compiler\Test\ModelBase {
     $this->assertSerializerPropertyType('double', 'relevance', $metadata); // float = double in serializer
   }
 
+  public function testSerializerGroupsWillBeWrittenAsAnnotations() {
+    $this->assertThatSerializerProperty('active', $this->post)
+      ->property('groups', array('cms'))
+      ->debug();
+  }
+
   public function testAnAuthorCanBeSerializedWithoutSomeChildEntities() {
     $this->assertThatObject($this->serialize($this->author))
       ->property('email')->is('p.scheit@ps-webforge.com')->end()
@@ -53,7 +59,6 @@ class JMSSerializationTest extends \Webforge\Doctrine\Compiler\Test\ModelBase {
       ->property('revisionedPosts')->isArray()->end()
     ;
   }
-
 
   public function testAPostCanBeSerialized() {
     $this->assertThatObject($this->serialize($this->post))
