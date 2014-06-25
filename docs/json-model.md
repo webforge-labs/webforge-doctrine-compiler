@@ -115,3 +115,35 @@ If you want to use the `cascade` settings for a side of an relation ship add the
     }
 ```
 The parameters will be passed directly to the written doctrine annotation
+
+## Extensions
+
+The Serializer extension can be configured in its own subsection:
+
+```json
+    {
+      "name": "Post",
+      "serializer": { "defaultGroups": ["api"] }
+  
+      "properties": {
+        "id": { "type": "DefaultId" },
+        "content": { "type": "MarkupText" },
+        "active": { "type": "Boolean", "serializer": { "groups": ["cms"] }},
+
+      }
+    }
+```
+`groups` sets the annotation `@Groups` for the property. Every property inherits the defaultGroups from the entity, if it has no own subsection. So the model above is aequvalent to:
+
+```json
+    {
+      "name": "Post",
+  
+      "properties": {
+        "id": { "type": "DefaultId", "serializer": { "groups": ["api"] } },
+        "content": { "type": "MarkupText", "serializer": { "groups": ["api"] } },
+        "active": { "type": "Boolean", "serializer": { "groups": ["cms"] }},
+
+      }
+    }
+```
