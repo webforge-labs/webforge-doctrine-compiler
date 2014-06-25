@@ -18,6 +18,7 @@
 
     {
       "name": "Post",
+      "serializer": { "defaultGroups": ["api"] },
   
       "properties": {
         "id": { "type": "DefaultId" },

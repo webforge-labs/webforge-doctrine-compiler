@@ -65,9 +65,8 @@ class ModelBase extends Base {
       $metadata = $metadataOrObject;
     }
 
-    $this->assertArrayHasKey($propertyName, $metadata->propertyMetadata);
-
-    return $this->assertThatObject($metadata->propertyMetadata[$propertyName]);
+    return $this->assertThatObject($metadata->propertyMetadata)->isArray()
+      ->key($propertyName)->isNotEmpty();
   }
 
   protected function assertSerializerType($expectedType, \JMS\Serializer\Metadata\PropertyMetadata $property) {
