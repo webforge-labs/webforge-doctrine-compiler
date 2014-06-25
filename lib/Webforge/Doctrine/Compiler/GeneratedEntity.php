@@ -5,11 +5,9 @@ namespace Webforge\Doctrine\Compiler;
 use Webforge\Code\Generator\GClass;
 use stdClass;
 
-class GeneratedEntity {
+class GeneratedEntity extends DefinitionPart {
 
   public $gClass;
-
-  public $definition;
 
   protected $parent;
   protected $properties = array();
@@ -19,8 +17,8 @@ class GeneratedEntity {
   protected $plural;
 
   public function __construct(stdClass $definition, GClass $gClass) {
+    parent::__construct($definition);
     $this->gClass = $gClass;
-    $this->definition = $definition;
   }
 
   public function inflect(Inflector $inflector) {
@@ -89,10 +87,6 @@ class GeneratedEntity {
 
   public function getDescription() {
     return isset($this->definition->description) ? $this->definition->description : NULL;
-  }
-
-  public function getDefinition() {
-    return $this->definition;
   }
 
   /**

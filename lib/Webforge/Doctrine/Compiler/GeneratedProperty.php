@@ -7,11 +7,10 @@ use Webforge\Code\Generator\GProperty;
 use Webforge\Code\Generator\GParameter;
 use stdClass;
 
-class GeneratedProperty {
+class GeneratedProperty extends DefinitionPart {
 
   protected $name;
 
-  protected $definition;
   protected $gProperty;
 
   protected $setterName;
@@ -20,7 +19,7 @@ class GeneratedProperty {
   protected $collectionNames;
 
   public function __construct(stdClass $definition, GProperty $property) {
-    $this->definition = $definition;
+    parent::__construct($definition);
     $this->gProperty = $property;
     $this->name = $property->getName();
   }
@@ -32,7 +31,7 @@ class GeneratedProperty {
     $this->parameter = new GParameter(
       $this->getName(),
       $this->gProperty->getType(),
-      $this->definition->nullable ? NULL : GParameter::UNDEFINED
+      $this->isNullable() ? NULL : GParameter::UNDEFINED
     );
 
     $this->collectionNames['add'] = $inflector->getCollectionAdderName($this->gProperty, $this->definition);
@@ -50,10 +49,6 @@ class GeneratedProperty {
 
   public function getCollectionDoerName($type) {
     return $this->collectionNames[$type];
-  }
-
-  public function getDefinition() {
-    return $this->definition;
   }
 
   public function getGProperty() {
@@ -103,24 +98,6 @@ class GeneratedProperty {
 
   public function hasOnDelete() {
     return $this->hasDefinitionOf('onDelete');
-  }
-
-  public function hasDefinitionOf($subname, &$subDefinition = NULL) {
-    if (isset($this->definition->$subname)) {
-      $subDefinition = $this->definition->$subname;
-      return TRUE;
-    }
-
-    return FALSE;
-  }
-
-  public function requireDefinitionOf($subname) {
-    $subDefinition = NULL;
-    if (!$this->hasDefinitionOf($subname, $subDefinition)) {
-      throw new \RuntimeException('there is no definition for: '.$subname.' in: propertyDefinition for: '.$this);
-    }
-
-    return $subDefinition;
   }
 
   /**
