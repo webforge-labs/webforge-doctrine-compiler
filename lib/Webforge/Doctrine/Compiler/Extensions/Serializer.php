@@ -6,7 +6,8 @@ use Webforge\Doctrine\Compiler\GeneratedProperty;
 use Webforge\Code\Generator\GClass;
 use Webforge\Doctrine\Compiler\GeneratedEntity;
 use Webforge\Types\SerializationType;
-use \JMS\Serializer\Annotation;
+use JMS\Serializer\Annotation;
+use stdClass;
 
 class Serializer implements Extension {
 
@@ -24,18 +25,34 @@ class Serializer implements Extension {
   }
 
   public function onPropertyAnnotationsGeneration(array &$annotations, GeneratedProperty $property, GeneratedEntity $entity) {
+    $defaultDefinition = $this->getDefaultPropertyDefinition($entity);
+
+    $definition = NULL;
+    if (!$property->hasDefinitionOf('serializer', $definition)) {
+      $definition = $defaultDefinition;
+    }
+
     $annotations[] = "@Serializer\Expose";
 
     if ($property->getType() instanceof SerializationType) {
       $annotations[] = sprintf('@Serializer\Type("%s")', $property->getType()->getSerializationType());
     }
 
-    $definition = NULL;
-    if ($property->hasDefinitionOf('serializer', $definition)) {
-      if (isset($definition->groups)) {
-        $annotations[] = $annotation = new Annotation\Groups();
-        $annotation->groups = $definition->groups;
+    if (isset($definition->groups)) {
+      $annotations[] = $annotation = new Annotation\Groups();
+      $annotation->groups = $definition->groups;
+    }
+  }
+
+  protected function getDefaultPropertyDefinition(GeneratedEntity $entity) {
+    $entityDefinition = NULL;
+    $defaultDefinition = new stdClass;
+    if ($entity->hasDefinitionOf('serializer', $entityDefinition)) {
+      if (isset($entityDefinition->defaultGroups)) {
+        $defaultDefinition->groups = $entityDefinition->defaultGroups;
       }
     }
+
+    return $defaultDefinition;
   }
 }
