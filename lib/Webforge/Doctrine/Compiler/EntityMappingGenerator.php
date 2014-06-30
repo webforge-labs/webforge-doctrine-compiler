@@ -18,11 +18,10 @@ class EntityMappingGenerator {
   protected $annotationsWriter;
   protected $model;
 
-  public function __construct(AnnotationsWriter $annotationsWriter) {
+  public function __construct(AnnotationsWriter $annotationsWriter, Array $extensions) {
     $this->annotationsWriter = $annotationsWriter;
     $this->annotationsWriter->setAnnotationNamespaceAlias('Doctrine\ORM\Mapping', 'ORM');
-
-    $this->extensions = array(new Extensions\Serializer($annotationsWriter));
+    $this->extensions = $extensions;
   }
 
   public function init(GeneratedEntity $entity, Model $model) {

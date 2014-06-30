@@ -53,6 +53,7 @@ class CreateModelTest extends \Webforge\Doctrine\Compiler\Test\Base {
     $ret = $commandTester->execute(array(
       'command'=>$compileCommand->getName(),
       'model'=>'etc/doctrine/model.json',
+      '--extension'=>'Serializer',
       'psr0target'=>'lib/'
     ));
 

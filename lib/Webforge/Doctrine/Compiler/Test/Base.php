@@ -8,6 +8,7 @@ use Webforge\Doctrine\Compiler\Inflector;
 use Webforge\Doctrine\Compiler\ModelValidator;
 use Webforge\Doctrine\Compiler\EntityMappingGenerator;
 use Webforge\Doctrine\Compiler\GClassBroker;
+use Webforge\Doctrine\Compiler\Extensions;
 use Webforge\Code\Generator\ClassReader;
 use Webforge\Code\Generator\ClassElevator;
 use Webforge\Doctrine\Annotations\Writer as AnnotationsWriter;
@@ -45,7 +46,14 @@ class Base extends \Webforge\Doctrine\Test\SchemaTestCase {
 
     $this->compiler = new Compiler(
       $this->webforge->getClassWriter(), 
-      $this->entityGenerator = new EntityGenerator($inflector = new Inflector, new EntityMappingGenerator($writer = new AnnotationsWriter), new GClassBroker($this->classElevator)),
+      $this->entityGenerator = new EntityGenerator(
+        $inflector = new Inflector, 
+        new EntityMappingGenerator(
+          $writer = new AnnotationsWriter,
+          array(new Extensions\Serializer($writer))
+        ), 
+        new GClassBroker($this->classElevator)
+      ),
       new ModelValidator
     );
   }

@@ -3,6 +3,7 @@
 namespace Webforge\Doctrine\Compiler\Console;
 
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Webforge\Doctrine\Console\AbstractDoctrineCommand;
 use Webforge\Console\CommandInput;
 use Webforge\Console\CommandOutput;
@@ -51,6 +52,11 @@ class CompileCommand extends \Webforge\Console\Command\CommandAdapter {
       'Path where to write the entities to (the root of the psr0-hierarchy, namespaces will be created).'
     );
 
+    $this->addOption(
+      'extension', NULL, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+      'Name of extensions to load. (upcase word like: Serializer)'
+    );
+
     parent::configure();
   }
 
@@ -63,7 +69,7 @@ class CompileCommand extends \Webforge\Console\Command\CommandAdapter {
 
     $target = $input->getDirectory('psr0target');
 
-    $compiler = $this->getCompiler($target);
+    $compiler = $this->getCompiler($target, (array) $input->getValue('extension'));
     $jsonModel = $compiler->compileModel($jsonModel, $target, $flags = Compiler::COMPILED_ENTITIES | Compiler::RECOMPILE | Compiler::EXPORT_MODEL);
 
     $compiledModel = clone $model;
@@ -74,7 +80,7 @@ class CompileCommand extends \Webforge\Console\Command\CommandAdapter {
     return 0;
   }
 
-  protected function getCompiler(Dir $target) {
+  protected function getCompiler(Dir $target, Array $extensions) {
     if (!isset($this->compiler)) {
       $webforge = $this->getWebforge();
       $container = $GLOBALS['env']['container'];
@@ -107,9 +113,26 @@ class CompileCommand extends \Webforge\Console\Command\CommandAdapter {
         new ComposerClassFileMapper($loader)
       );
 
+      $annotationsWriter = new AnnotationsWriter;
+      $extensions = array_map(
+        function($extensionName) use ($annotationsWriter) {
+          $qn = 'Webforge\\Doctrine\\Compiler\\Extensions\\'.ucfirst($extensionName);
+
+          return new $qn($annotationsWriter);
+        },
+        $extensions
+      );
+
       $this->compiler = new Compiler(
         $webforge->getClassWriter(), 
-        new EntityGenerator(new Inflector, new EntityMappingGenerator(new AnnotationsWriter), new GClassBroker($webforge->getClassElevator())),
+        new EntityGenerator(
+          new Inflector, 
+          new EntityMappingGenerator(
+            $annotationsWriter,
+            $extensions
+          ),
+          new GClassBroker($webforge->getClassElevator())
+        ),
         new ModelValidator
       );
     }
