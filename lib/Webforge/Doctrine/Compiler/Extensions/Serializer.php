@@ -7,6 +7,7 @@ use Webforge\Code\Generator\GClass;
 use Webforge\Doctrine\Compiler\GeneratedEntity;
 use Webforge\Types\SerializationType;
 use JMS\Serializer\Annotation;
+use Webforge\Doctrine\Compiler\ModelAssociation;
 use stdClass;
 
 class Serializer implements Extension {
@@ -54,5 +55,25 @@ class Serializer implements Extension {
     }
 
     return $defaultDefinition;
+  }
+
+  public function onAssociationAnnotationsGeneration(array &$annotations, ModelAssociation $association, stdClass $associationPair, GeneratedProperty $property, GeneratedEntity $entity) {
+    if ($association->isOneToMany()) {
+      $annotations[] = '@Serializer\Type("ArrayCollection")';
+
+    } elseif ($association->isManyToOne()) {
+      if (!($property->getType() instanceof SerializationType)) {
+        $annotations[] = sprintf('@Serializer\Type("%s")', $association->referencedEntity->getFQN());
+      }
+
+    } elseif ($association->isManyToMany()) {
+      $annotations[] = '@Serializer\Type("ArrayCollection")';
+
+    } elseif ($association->isOneToOne()) {
+      if (!($property->getType() instanceof SerializationType)) {
+        $annotations[] = sprintf('@Serializer\Type("%s")', $association->referencedEntity->getFQN());
+      }
+
+    }
   }
 }

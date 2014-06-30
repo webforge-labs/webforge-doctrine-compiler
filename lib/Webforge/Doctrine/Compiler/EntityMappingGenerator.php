@@ -10,7 +10,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Webforge\Doctrine\Annotations\Writer as AnnotationsWriter;
 use Webforge\Types\IdType;
 use Webforge\Types\DoctrineExportableType;
-use JMS\Serializer\Annotation as SA;
 
 class EntityMappingGenerator {
 
@@ -133,8 +132,6 @@ class EntityMappingGenerator {
 
       $annotations[] = $annotation;
 
-      $annotations[] = sprintf('@Serializer\Type("ArrayCollection")', $association->referencedEntity->getFQN());
-
     } elseif ($association->isManyToOne()) {
       // we are always the owning side
 
@@ -154,9 +151,6 @@ class EntityMappingGenerator {
         $joinColumn->onDelete = $property->getOnDelete();
       }
 
-      // serializer
-      $annotations[] = sprintf('@Serializer\Type("%s")', $association->referencedEntity->getFQN());
-
     } elseif ($association->isManyToMany()) {
       $annotation = new ORM\ManyToMany();
 
@@ -171,8 +165,6 @@ class EntityMappingGenerator {
       $annotation->cascade = $property->getRelationCascade();
 
       $annotations[] = $annotation;
-
-      $annotations[] = sprintf('@Serializer\Type("ArrayCollection")', $association->referencedEntity->getFQN());
 
       // we need a table for manyToMany
       $table = new ORM\JoinTable();
@@ -205,9 +197,12 @@ class EntityMappingGenerator {
 
     } elseif ($association->isOneToOne()) {
       throw new \Webforge\Common\Exception\NotImplementedException('OneToOne not needed right now: '.$association->getUniqueSlug());
-
-      $annotations[] = sprintf('@Serializer\Type("%s")', $association->referencedEntity->getFQN());
     }
+
+    foreach ($this->extensions as $extension) {
+      $extension->onAssociationAnnotationsGeneration($annotations, $association, $associationPair, $property, $entity);
+    }
+
 
     return $annotations;
   }
