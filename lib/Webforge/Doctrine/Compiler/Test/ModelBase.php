@@ -44,6 +44,13 @@ class ModelBase extends Base {
     $this->assertTrue($association['isCascadeRemove'], 'cascade remove for '.$association['fieldName']);
   }
 
+  protected function assertJoinColumnNotNullable(Array $association) {
+    $this->assertThatObject($association)
+      ->key('joinColumns')->isArray()->length(1)
+        ->key(0)
+          ->key('nullable', false);
+  }
+
   protected function assertIsUnidirectional(Array $association) {
     $this->assertNull($association['mappedBy'], 'association is not unidirectional');
     $this->assertNull($association['inversedBy'], 'association is not unidirectional');

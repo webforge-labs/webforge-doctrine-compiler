@@ -146,9 +146,14 @@ class EntityMappingGenerator {
 
       $annotations[] = $annotation;
 
-      if ($property->hasOnDelete()) {
+      if ($property->hasOnDelete() || $property->hasDefinitionOf('nullable')) {
         $annotations[] = $joinColumn = new ORM\JoinColumn();
         $joinColumn->onDelete = $property->getOnDelete();
+
+        $nullable = TRUE;
+        if ($property->hasDefinitionOf('nullable', $nullable)) { // dont use isNullable because this defaults to FALSE but joinColumn->nullable defaults to TRUE
+          $joinColumn->nullable = $nullable;
+        }
       }
 
     } elseif ($association->isManyToMany()) {

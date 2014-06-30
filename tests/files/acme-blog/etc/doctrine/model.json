@@ -23,7 +23,7 @@
       "properties": {
         "id": { "type": "DefaultId" },
         "content": { "type": "MarkupText" },
-        "author": { "type": "Author" },
+        "author": { "type": "Author", "nullable": false },
         "revisor": { "type": "Author", "nullable": true },
         "categories": { "type": "Collection<Category>", "isOwning": true, "cascade": ["persist", "remove"] },
         "tags": { "type": "Collection<Tag>" },

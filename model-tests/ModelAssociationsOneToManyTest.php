@@ -88,10 +88,11 @@ class ModelAssociationsOneToManyTest extends \Webforge\Doctrine\Compiler\Test\Mo
   public function testManyToOneDoctrineMetadata() {
     $postMetadata = $this->em->getMetadataFactory()->getMetadataFor($this->postClass->getFQN());
 
-    $author = $this->assertAssociationMapping('author', $postMetadata);
+    $authorAssoc = $this->assertAssociationMapping('author', $postMetadata);
 
-    $this->assertHasTargetEntity($this->authorClass, $author);
-    $this->assertIsInversedBy('writtenPosts', $author);
+    $this->assertHasTargetEntity($this->authorClass, $authorAssoc);
+    $this->assertJoinColumnNotNullable($authorAssoc);
+    $this->assertIsInversedBy('writtenPosts', $authorAssoc);
   }
 
   public function testManyToOneWithSubNamespacesMetadata() {
