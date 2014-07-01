@@ -76,6 +76,39 @@ class ModelAssociationsOneToManyTest extends \Webforge\Doctrine\Compiler\Test\Mo
     $this->assertTrue($author->hasWrittenPost($post1));
   }
 
+  public function testSettingTheManySideUpdatesTheOneSide() {
+    $author = new Author('p.scheit@ps-webforge.com');
+    $post1 = new Post($author);
+
+    $newAuthor = new Author('ik@ps-webforge.com');
+    $post1->setAuthor($newAuthor);
+
+    $this->assertSame($newAuthor, $post1->getAuthor());
+    $this->assertTrue($newAuthor->hasWrittenPost($post1));
+  }
+
+  public function testSettingTheManySideUpdatesTheOneSideAndThePreviousOneSide() {
+    $oldAuthor = new Author('p.scheit@ps-webforge.com');
+    $post1 = new Post($oldAuthor);
+    $this->assertTrue($oldAuthor->hasWrittenPost($post1));
+
+    $newAuthor = new Author('ik@ps-webforge.com');
+    $post1->setAuthor($newAuthor);
+    $this->assertFalse($oldAuthor->hasWrittenPost($post1), 'oldAuthor should not have the post listed anymore');
+  }
+
+  public function testSettingTheManySideToNULLRemovesFromOneSide() {
+    $oldRevisor = new Author('ik@ps-webforge.com');
+    $post1 = new Post(new Author('p.scheit@ps-webforge.com'));
+    $post1->setRevisor($oldRevisor);
+    $this->assertSame($oldRevisor, $post1->getRevisor());
+    $this->assertTrue($oldRevisor->hasRevisionedPost($post1));
+
+    $post1->setRevisor(NULL);
+    $this->assertNull($post1->getRevisor());
+    $this->assertFalse($oldRevisor->hasRevisionedPost($post1), 'oldRevisor should not have the post listed anymore');
+  }
+
   public function testOneToManyDoctrineMetadata() {
     $authorMetadata = $this->assertDoctrineMetadata($this->authorClass);
 

@@ -95,10 +95,26 @@ class AssociationsAPIGenerator {
   protected function injectIntoSetter(GeneratedProperty $property, ModelAssociation $association) {
     if ($association->shouldUpdateOtherSide()) {
       $setter = $this->entity->gClass->getMethod($property->getSetterName());
+      $oneSideParam = $setter->getParameterByIndex(0);
 
-      $code[] = sprintf('$%s->%s($this);', $setter->getParameterByIndex(0)->getName(), $association->referencedProperty->getCollectionDoerName('add'));
+      // remove from previous one side (inject this before setting)
+      $remove = array();
+      $remove[] = sprintf(
+        'if (isset($this->%1$s) && $this->%1$s !== $%2$s) $this->%1$s->%3$s($this);',
+        $property->getName(), $oneSideParam->getName(), $association->referencedProperty->getCollectionDoerName('remove')
+      );
+      $setter->getBody()->insertBody($remove, 0);
 
-      $setter->getBody()->insertBody($code, 1);
+      // add to new one side (inject this after setting)
+      $add = array();
+      if ($oneSideParam->isOptional()) { 
+        // setting the many side to NULL is allowed, so we have to check if the param is NULL and were able to add (notice that remove is already done before)
+        $add[] = sprintf('if (isset($%1$s)) $%1$s->%2$s($this);', $oneSideParam->getName(), $association->referencedProperty->getCollectionDoerName('add'));
+        $setter->getBody()->insertBody($add, 2);
+      } else {
+        $add[] = sprintf('$%1$s->%2$s($this);', $oneSideParam->getName(), $association->referencedProperty->getCollectionDoerName('add'));
+        $setter->getBody()->insertBody($add, 2);
+      }
     }
   }
 }
