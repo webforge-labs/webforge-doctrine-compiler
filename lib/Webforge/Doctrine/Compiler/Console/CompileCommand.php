@@ -37,9 +37,9 @@ class CompileCommand extends \Webforge\Console\Command\CommandAdapter {
         'Compiles the entities in the model into real php entities.'
       )
       ->setHelp(
-        $this->getName()." etc/doctrine/model.json lib/ACME/Blog/Entities\n".
+        $this->getName()." etc/doctrine/model.json lib\n".
         'Compiles the entities in the model stored in etc/doctrine/model.json into real php entities into the directory: lib/'."\n".
-        'So if namespace in model is ACME\Blog\Entities this will write the entities to lib/ACME/Blog/Entities/SomeEntity.php'
+        'So if namespace in model is ACME\Blog\Entities this will write the entities like lib/ACME/Blog/Entities/SomeEntity.php'
     );
 
     $this->addArgument(
