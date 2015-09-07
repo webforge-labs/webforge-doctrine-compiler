@@ -17,10 +17,13 @@ class EntityMappingGenerator {
   protected $annotationsWriter;
   protected $model;
 
+  protected $usedTables;
+
   public function __construct(AnnotationsWriter $annotationsWriter, Array $extensions) {
     $this->annotationsWriter = $annotationsWriter;
     $this->annotationsWriter->setAnnotationNamespaceAlias('Doctrine\ORM\Mapping', 'ORM');
     $this->extensions = $extensions;
+    $this->usedTables = array();
   }
 
   public function init(GeneratedEntity $entity, Model $model) {
@@ -173,7 +176,25 @@ class EntityMappingGenerator {
 
       // we need a table for manyToMany
       $table = new ORM\JoinTable();
-      $table->name = sprintf('%s2%s', $associationPair->owning->entity->getTableName(), $associationPair->owning->referencedEntity->getTableName());
+      $table->name = $association->getTableName();
+
+      if (array_key_exists($table->name, $this->usedTables)) {
+        $conflictAssociation = $this->usedTables[$table->name];
+
+        if (!$conflictAssociation->isEqual($associationPair->owning)) {
+          throw new InvalidModelException(
+            sprintf(
+              "The ManyToMany-relation %s uses the same tablename (%s) as the relation %s.\n".
+              "To avaid this duplicate table you have to set joinTableName in one of the relations\n",
+              $associationPair->owning->getUniqueSlug(),
+              $table->name,
+              $conflictAssociation->getUniqueSlug()
+            )
+          );
+        }
+      }
+
+      $this->usedTables[$table->name] = $associationPair->owning;
 
       /*@ORM\JoinTable(
           name="page2contentstream", 
@@ -193,7 +214,12 @@ class EntityMappingGenerator {
 
       // inverse join column has to be existing no matter if associations reverse is existing
       $inverseJoinColumn  = new ORM\JoinColumn();
-      $inverseJoinColumn->name = sprintf('%s_%s', $associationPair->owning->referencedEntity->getTableName(), $associationPair->owning->referencedEntity->getIdentifierColumn());
+      $inverseJoinColumn->name = sprintf(
+        '%s%s_%s',
+        $associationPair->owning->isSelfReferencing() ? 'self_' : '',
+        $associationPair->owning->referencedEntity->getTableName(),
+        $associationPair->owning->referencedEntity->getIdentifierColumn()
+      );
       $inverseJoinColumn->onDelete = 'cascade';
 
       $table->inverseJoinColumns = array($inverseJoinColumn);

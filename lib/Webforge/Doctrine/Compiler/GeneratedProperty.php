@@ -100,6 +100,14 @@ class GeneratedProperty extends DefinitionPart {
     return $this->hasDefinitionOf('onDelete');
   }
 
+  public function hasJoinTableName() {
+    return $this->hasDefinitionOf('joinTableName');
+  }
+
+  public function getJoinTableName() {
+    return isset($this->definition->joinTableName) && !empty($this->definition->joinTableName) ? $this->definition->joinTableName : NULL;
+  }
+
   /**
    * Returns the php Documentor type for (at)param or (at)return annotations
    * 

@@ -94,4 +94,43 @@ class ModelBase extends Base {
 
     return $field;
   }
+
+  protected function assertJoinTable(Array $association, $tableName, $debugName) {
+    $this->assertNotEmpty($association['joinTable'], $debugName.' should have a join table');
+    $joinTable = (object) $association['joinTable'];
+
+    $this->assertEquals($tableName, $joinTable->name, 'the table name does not match for '.$debugName);
+
+    $this->assertCount(1, $joinTable->joinColumns);
+    $this->assertCount(1, $joinTable->inverseJoinColumns);
+
+    $joinColumn = $joinTable->joinColumns[0];
+    $inverseJoinColumn = $joinTable->inverseJoinColumns[0];
+
+    $this->assertEquals('cascade', $joinColumn['onDelete'], 'the joinColumn should cascade onDelete');
+    $this->assertEquals('cascade', $inverseJoinColumn['onDelete'], 'the inverseJoinColumn should cascade onDelete');
+
+    $this->assertNotEquals($joinColumn['name'], $inverseJoinColumn['name'], 'the name from joinColumn and inverseJoinColumn cannot be the same in the same joinTable. '.$debugName.' has an invalid joinTable.');
+  }
+
+  protected function assertDefaultJoinTable(Array $association, $tableName, $debugName) {
+    $this->assertNotEmpty($association['joinTable'], $debugName.' should have a join table');
+    $joinTable = (object) $association['joinTable'];
+
+    $this->assertEquals($tableName, $joinTable->name, 'the table name does not match for '.$debugName);
+
+    $this->assertCount(1, $joinTable->joinColumns);
+    $this->assertCount(1, $joinTable->inverseJoinColumns);
+
+    $joinColumn = $joinTable->joinColumns[0];
+    $inverseJoinColumn = $joinTable->inverseJoinColumns[0];
+
+    list($tab1, $tab2) = explode('2', $tableName);
+
+    $this->assertStringStartsWith($tab1, $joinColumn['name']);
+    $this->assertStringStartsWith($tab2, $inverseJoinColumn['name']);
+
+    $this->assertEquals('cascade', $joinColumn['onDelete'], 'the joinColumn should cascade onDelete');
+    $this->assertEquals('cascade', $inverseJoinColumn['onDelete'], 'the inverseJoinColumn should cascade onDelete');
+  }
 }

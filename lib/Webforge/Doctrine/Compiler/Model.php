@@ -49,53 +49,79 @@ class Model {
       if ($property->hasReference()) {
         $referencedEntity = $property->getReferencedEntity();
 
-        $unidirectional = TRUE;
-        foreach ($referencedEntity->getProperties() as $referencedProperty) {
-          if ($referencedProperty->hasReference() && $entity->equals($referencedProperty->getReferencedEntity())) {
-            $unidirectional = FALSE;
-            $type = $owning = NULL;
-            
-            if ($property->isEntityCollection()) {
-              if ($referencedProperty->isEntityCollection()) {
-                $type = 'ManyToMany';
-                $owning = isset($property->getDefinition()->isOwning) && $property->getDefinition()->isOwning; // this might produce a conflict that no side isOwning (check chis later)
-              } else {
-                $type = 'OneToMany';
-                $owning = FALSE;
-              }
-            } elseif ($property->isEntity()) {
-              if ($referencedProperty->isEntityCollection()) {
-                $type = 'ManyToOne';
-                $owning = TRUE;
-              } else {
-                $type = 'OneToOne';
-                $owning = isset($property->getDefinition()->isOwning) && $property->getDefinition()->isOwning;
-              }
-            }
-
-            $association = new ModelAssociation($type, $entity, $property, $referencedEntity, $referencedProperty);
-            $association->setOwning($owning);
-
-            $this->indexAssociation($association);
-          }
-        }
-
-        if ($unidirectional) {
-          $referencedProperty = NULL;
+        if ($referencedEntity->equals($entity)) {
+          // self referencing
+          $type = NULL;
+          $owning = TRUE;
 
           if ($property->isEntityCollection()) {
+            // @TODO unhandled case: OneToMany self-referencing!!
+
+            // search for the Many Side of a OneToMany self-referencing association
+            /*
+            foreach ($entity->getProperties() as $referencedProperty) {
+              if ($referencedProperty->hasReference() && $entity->equals($referencedProperty->getReferencedEntity())) {
+            }
+            */
             $type = 'ManyToMany';
-          } elseif ($property->isEntity() && $property->getRelationName() === 'OneToOne') {
+            $referencedProperty = $property;
+
+          } else {
             $type = 'OneToOne';
-          } elseif ($property->isEntity()) {
-            // this is a more sensible default then OneToOne because OneToOne is used less often than ManyToOne in that case
-            $type = 'ManyToOne';
+            $referencedProperty = $property;
           }
 
-          $association = new ModelAssociation($type, $entity, $property, $referencedEntity, $referencedProperty);
-          $association->setOwning(TRUE);
-          
+          $association = new ModelAssociation($type, $entity, $property, $referencedEntity, $referencedProperty, $owning);
+
           $this->indexAssociation($association);
+          
+        } else {
+
+          $unidirectional = TRUE;
+          foreach ($referencedEntity->getProperties() as $referencedProperty) {
+            if ($referencedProperty->hasReference() && $entity->equals($referencedProperty->getReferencedEntity())) {
+              $unidirectional = FALSE;
+              $type = $owning = NULL;
+              
+              if ($property->isEntityCollection()) {
+                if ($referencedProperty->isEntityCollection()) {
+                  $type = 'ManyToMany';
+                  $owning = isset($property->getDefinition()->isOwning) && $property->getDefinition()->isOwning; // this might produce a conflict that no side isOwning (check chis later)
+                } else {
+                  $type = 'OneToMany';
+                  $owning = FALSE;
+                }
+              } elseif ($property->isEntity()) {
+                if ($referencedProperty->isEntityCollection()) {
+                  $type = 'ManyToOne';
+                  $owning = TRUE;
+                } else {
+                  $type = 'OneToOne';
+                  $owning = isset($property->getDefinition()->isOwning) && $property->getDefinition()->isOwning;
+                }
+              }
+
+              $association = new ModelAssociation($type, $entity, $property, $referencedEntity, $referencedProperty, $owning);
+              $this->indexAssociation($association);
+            }
+          }
+
+          if ($unidirectional) {
+            $referencedProperty = NULL;
+
+            if ($property->isEntityCollection()) {
+              $type = 'ManyToMany';
+            } elseif ($property->isEntity() && $property->getRelationName() === 'OneToOne') {
+              $type = 'OneToOne';
+            } elseif ($property->isEntity()) {
+              // this is a more sensible default then OneToOne because OneToOne is used less often than ManyToOne in that case
+              $type = 'ManyToOne';
+            }
+
+            $association = new ModelAssociation($type, $entity, $property, $referencedEntity, $referencedProperty, $owning = TRUE);
+            
+            $this->indexAssociation($association);
+          }
         }
       }
     }
@@ -129,24 +155,32 @@ class Model {
 
     $this->associations = array();
     foreach ($grouped as $groupKey => $associationPairs) {
-      //print "investigating group: ".$groupKey."\n";
 
       if (count($associationPairs) > 1) {
         /* we have a conflict with non-ambigous associations (see developer docs) */
 
         $foundPair = NULL; // the one that has the matching relation (can be found or not)
         $associationPairs = array_filter($associationPairs, function($associationPair) use (&$foundPair) {
-          $inverse = $associationPair->inverse;
+          if (isset($associationPair->inverse)) { 
+            $inverse = $associationPair->inverse;
 
-          //print $inverse->getUniqueSlug()."\n";
-          //var_dump($inverse->property->getRelationName(), $inverse->referencedProperty->getName());
+            //print $inverse->getUniqueSlug()."\n";
+            //var_dump($inverse->property->getRelationName(), $inverse->referencedProperty->getName());
 
-          if (($relation = $inverse->property->getRelationName()) != NULL) {
-            if ($relation === $inverse->referencedProperty->getName()) {
+            if (($relation = $inverse->property->getRelationName()) != NULL) {
+              if ($relation === $inverse->referencedProperty->getName()) {
+                $foundPair = $associationPair;
+                return TRUE;
+              } else {
+                return FALSE;
+              }
+            }
+
+          } else { 
+            // self-referencing have no inverse
+            if (($relation = $associationPair->owning->property->getRelationName()) != NULL && $relation === $associationPair->owning->property->getName()) {
               $foundPair = $associationPair;
               return TRUE;
-            } else {
-              return FALSE;
             }
           }
 
@@ -176,7 +210,7 @@ class Model {
             implode(' or ', $properties)
           )
         );
-      } elseif(count($associationPairs) === 1) {
+      } elseif (count($associationPairs) === 1) {
         $associationPair = current($associationPairs);
 
         $this->associations[$associationPair->owning->getUniqueSlug()] = $associationPair;
