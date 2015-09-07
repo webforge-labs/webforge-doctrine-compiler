@@ -1,8 +1,9 @@
 language: php
+sudo: false
 
 php:
-  - 5.3
   - 5.4
+  - 5.5
 
 branches:
   only:
@@ -10,7 +11,7 @@ branches:
 
 before_install:
   - composer self-update
-  - COMPOSER_ROOT_VERSION=dev-master composer install --dev --prefer-source --no-interaction
+  - COMPOSER_ROOT_VERSION=dev-master composer install --no-interaction
 
 before_script:
   - mysql -e 'create database IF NOT EXISTS `doctrine`;'
