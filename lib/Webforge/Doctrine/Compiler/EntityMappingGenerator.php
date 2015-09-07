@@ -73,7 +73,8 @@ class EntityMappingGenerator {
   protected function annotateProperty(GeneratedProperty $property, GeneratedEntity $entity) {
     $property->setDocBlock(
       $this->createDocBlock(
-        isset($definition->description) ? $definition->description : $property->getName(),
+        (isset($definition->description) ? $definition->description : $property->getName())."\n".
+        sprintf('@var %s', $property->getDocType()),
         $this->generatePropertyAnnotations($property, $entity)
       )
     );
@@ -228,6 +229,12 @@ class EntityMappingGenerator {
 
     } elseif ($association->isOneToOne()) {
       throw new \Webforge\Common\Exception\NotImplementedException('OneToOne not needed right now: '.$association->getUniqueSlug());
+    }
+
+    if (($association->isOneToMany() || $association->isManyToMany()) && $association->hasOrderBy()) {
+      $orderBy = new ORM\OrderBy();
+      $orderBy->value = $association->getOrderBy();
+      $annotations[] = $orderBy;
     }
 
     foreach ($this->extensions as $extension) {
