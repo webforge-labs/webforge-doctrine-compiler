@@ -22,13 +22,28 @@ class ModelAssociation {
 
   protected $owning;
 
-  public function __construct($type, GeneratedEntity $entity, GeneratedProperty $property, GeneratedEntity $referencedEntity, GeneratedProperty $referencedProperty = NULL) {
+  protected $tableName;
+
+  public function __construct($type, GeneratedEntity $entity, GeneratedProperty $property, GeneratedEntity $referencedEntity, GeneratedProperty $referencedProperty = NULL, $owning = FALSE) {
     $this->type = $type;
     $this->entity = $entity;
     $this->property = $property;
     $this->referencedEntity = $referencedEntity;
     $this->referencedProperty = $referencedProperty;
-    $this->owning = FALSE;
+    $this->owning = $owning;
+
+    if ($this->owning) {
+      // later ones will override previous
+      $tabProperties = array($this->referencedProperty, $this->property);
+    } else {
+      $tabProperties = array($this->property, $this->referencedProperty);
+    }
+
+    foreach ($tabProperties as $prop) {
+      if ($prop && $prop->hasJoinTableName()) {
+        $this->tableName = $prop->getJoinTableName();
+      }
+    }
   }
 
   public function shouldUpdateOtherSide() {
@@ -72,10 +87,6 @@ class ModelAssociation {
     } 
   }
 
-  public function setOwning($bool) {
-    $this->owning = $bool;
-  }
-
   public function isOwning() {
     return $this->owning;
   }
@@ -94,5 +105,27 @@ class ModelAssociation {
 
   public function isOneToOne() {
     return $this->type === 'OneToOne';
+  }
+
+  public function isSelfReferencing() {
+    return $this->entity->equals($this->referencedEntity);
+  }
+
+  public function isEqual(ModelAssociation $other) {
+    return $this->getUniqueSlug() === $other->getUniqueSlug();
+  }
+
+  public function getTableName() {
+    if (isset($this->tableName)) {
+      return $this->tableName;
+    } else {
+      $format = '%s2%s';
+
+      if ($this->owning) {
+        return sprintf($format, $this->entity->getTableName(), $this->referencedEntity->getTableName());
+      } else {
+        return sprintf($format, $this->referencedEntity->getTableName(), $this->entity->getTableName());
+      }
+    }
   }
 }

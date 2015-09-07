@@ -52,7 +52,10 @@
 
       "properties": {
         "id": "DefaultId",
-        "posts": { "type": "Collection<Post>" }
+        "posts": { "type": "Collection<Post>" },
+
+        "relatedCategories": { "type": "Collection<Category>", "isOwning": true },
+        "parentCategories": { "type": "Collection<Category>", "joinTableName": "parent_categories", "isOwning": true }
       }
     },
 

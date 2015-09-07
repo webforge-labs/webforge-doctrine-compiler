@@ -10,6 +10,7 @@ use Webforge\Types\ObjectType;
 use Webforge\Code\Generator\GClass;
 use Webforge\Common\ClassUtil;
 use Webforge\Common\String as S;
+use Webforge\Types\DCEnumType;
 
 class ModelValidator {
 
@@ -152,6 +153,15 @@ class ModelValidator {
           throw new InvalidModelException(
             sprintf("The entityName '%s' in type from property %s::%s cannot be found in model. Did you misspelled the name of the entity?", $referenceEntityName, $entity->fqn, $property->name)
           );
+        }
+      }
+
+      if ($type instanceof DCEnumType) {
+        // register types that arent registered, because doctrine will complain about not registered types
+        $typeName = str_replace('\\','', $typeClass = $type->getClass()->getFQN());
+
+        if (!\Doctrine\DBAL\Types\Type::hasType($typeName)) {
+          \Doctrine\DBAL\Types\Type::addType($typeName, $typeClass);
         }
       }
     }

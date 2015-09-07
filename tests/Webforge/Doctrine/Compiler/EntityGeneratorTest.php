@@ -52,6 +52,41 @@ JSON
     }
   }
 
+  public function testDuplicateTableNameForSelfReferencingAssociations() {
+    $json = <<<'JSON'
+{
+  "namespace": "ACME\\Blog\\Entities",
+
+  "entities": [
+    {
+      "name": "Category",
+      "plural": "categories",
+
+      "properties": {
+        "id": "DefaultId",
+
+        "relatedCategories": { "type": "Collection<Category>", "isOwning": true },
+        "parentCategories": { "type": "Collection<Category>", "isOwning": true }
+      }
+    }
+  ]
+}
+JSON
+    ;
+
+    $this->setExpectedException(__NAMESPACE__.'\InvalidModelException');
+
+    try {
+      $this->entityGenerator->generate($this->getModel($json));
+
+    } catch (InvalidModelException $e) {
+      $this->assertContains('duplicate table', $e->getMessage());
+      $this->assertContains('Category::relatedCategories', $e->getMessage());
+      $this->assertContains('Category::parentCategories', $e->getMessage());
+      throw $e;
+    }
+  }
+
   protected function getModel($json) {
     if (is_string($json)) {
       $json = json_decode($json);

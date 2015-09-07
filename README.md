@@ -167,6 +167,12 @@ You can then compile your entities with the binary installed by composer. You ha
 
 This will create the entities within a PSR-1 named directory in src/php
 
+# Known Issues
+
+- OneToMany, self-referencing Assocations are not yet supported
+- the primary defaultId with name 'id' is hardcoded on many cases (you are encouraged to use such an id)
+
+
 # LICENSE
 
 The MIT License (MIT)

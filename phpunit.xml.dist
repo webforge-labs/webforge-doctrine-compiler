@@ -25,6 +25,7 @@
           <file>model-tests/ModelAssociationsOneToManyTest.php</file>
           <file>model-tests/ModelAssociationsManyToManyTest.php</file>
           <file>model-tests/ModelAssociationsManyToManyUnidirectionalTest.php</file>
+          <file>model-tests/ModelAssociationsManyToManySelfReferencingTest.php</file>
           <file>model-tests/ModelInhertianceTest.php</file>
           <file>model-tests/ModelDCValidationTest.php</file>
           <file>model-tests/SerializerExtensionTest.php</file>
