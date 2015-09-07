@@ -33,9 +33,10 @@ class AssociationsAPIGenerator {
     }
     
     if ($property->isEntityCollection()) {
-      $this->generateDoer('add', $property, $association);
-      $this->generateDoer('remove', $property, $association);
-      $this->generateDoer('has', $property, $association);
+      $add = $this->generateDoer('add', $property, $association);
+      $remove = $this->generateDoer('remove', $property, $association);
+      $has = $this->generateDoer('has', $property, $association);
+      $this->orderMethods(array($add, $remove, $has), $property);
     }
   }
 
@@ -82,7 +83,7 @@ class AssociationsAPIGenerator {
         break;
     }
 
-    $this->entity->gClass->createMethod(
+    return $this->entity->gClass->createMethod(
       $property->getCollectionDoerName($type),
       array(
         $parameter
@@ -114,6 +115,22 @@ class AssociationsAPIGenerator {
       } else {
         $add[] = sprintf('$%1$s->%2$s($this);', $oneSideParam->getName(), $association->referencedProperty->getCollectionDoerName('add'));
         $setter->getBody()->insertBody($add, 2);
+      }
+    }
+  }
+
+  protected function orderMethods(Array $methods, GeneratedProperty $property) {
+    $position = NULL;
+    foreach ($this->entity->gClass->getMethods() as $mposition => $method) {
+      if ($method->getName() === $property->getSetterName()) {
+        $position = $mposition;
+        break;
+      }
+    }
+
+    if ($position !== NULL) {
+      foreach ($methods as $order => $method) {
+        $this->entity->gClass->setMethodOrder($method, $position+1+$order);
       }
     }
   }
