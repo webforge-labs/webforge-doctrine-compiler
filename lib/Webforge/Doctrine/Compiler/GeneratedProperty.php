@@ -28,6 +28,8 @@ class GeneratedProperty extends DefinitionPart {
     $this->setterName = $inflector->getPropertySetterName($this->gProperty, $this->definition);
     $this->getterName = $inflector->getPropertyGetterName($this->gProperty, $this->definition);
 
+    // note: this is the parameter for the setter but not its not 100% identical with the constructor parameter
+    // the constructor parameter might have another default value (see in EntityGenerator)
     $this->parameter = new GParameter(
       $this->getName(),
       $this->gProperty->getType(),

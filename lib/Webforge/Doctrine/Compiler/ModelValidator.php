@@ -91,15 +91,29 @@ class ModelValidator {
     $constructor = new stdClass;
     foreach ($entity->constructor as $key=>$value) {
       if (is_string($value)) {
-        $propertyName = $value;
-        if (!isset($entity->properties->$propertyName)) {
+        $definition = (object) array('name'=>$value);
+
+      } elseif (is_object($value)) {
+        if (!isset($value->name)) {
           throw new InvalidModelException(
-            sprintf("Undefined property '%s' in the constructor from entity %s. Only property-names can be used", $propertyName, $entity->name)
+            sprintf("Invalid object as constructor argument: %s in the constructor from entity %s. Only property-names or objects with property .name and .defaultValue can be used", json_encode($value), $entity->name)
           );
         }
 
-        $constructor->$propertyName = (object) array('name'=>$propertyName);
-      } // @TODO else: validate constructor parameter-object
+        $definition = $value;
+      } else {
+        throw new InvalidModelException(
+          sprintf("Invalid value-type as constructor argument: %s in the constructor from entity %s. Only property-names or objects with property .name and .defaultValue can be used", gettype($value), $entity->name)
+        );
+      }
+
+      if (!isset($entity->properties->{$definition->name})) {
+        throw new InvalidModelException(
+          sprintf("Undefined property '%s' in the constructor from entity %s. Use an existing property-name", $definition->name, $entity->name)
+        );
+      }
+
+      $constructor->{$definition->name} = $definition;
     }
     $entity->constructor = $constructor;
 

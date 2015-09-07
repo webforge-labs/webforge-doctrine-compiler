@@ -8,6 +8,7 @@ use Webforge\Code\Generator\GClass;
 use Webforge\Common\JS\JSONConverter;
 use ACME\Blog\Entities\Author;
 use ACME\Blog\Entities\User;
+use ACME\Blog\Entities\Category;
 
 class EntitiesTest extends \Webforge\Doctrine\Compiler\Test\ModelBase {
 
@@ -21,5 +22,19 @@ class EntitiesTest extends \Webforge\Doctrine\Compiler\Test\ModelBase {
 
     $author = new Author($email);
     $this->assertEquals($email, $author->getEmail(), 'email should be set through constructor from user for author');
+  }
+
+  public function testConstructorIsCreated() {
+    $category = new Category("the-label", 3);
+
+    $this->assertEquals('the-label', $category->getLabel());
+    $this->assertEquals(3, $category->getPosition(), '2nd argument should set position property');
+  }
+
+  public function testConstructorHasDefaultValues() {
+    $category = new Category("the-label");
+
+    $this->assertEquals('the-label', $category->getLabel());
+    $this->assertSame(1, $category->getPosition());
   }
 }

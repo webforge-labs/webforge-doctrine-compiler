@@ -172,21 +172,26 @@ class EntityGenerator {
     }
 
     $constructed = array();
-    foreach ($entity->definition->constructor as $propertyName => $parameter) {
+    foreach ($entity->definition->constructor as $propertyName => $parameterDefinition) {
       $property = $entity->getProperty($propertyName);
-      $parameter = $property->getParameter();
+      $gParameter = clone $property->getParameter();
       $constructed[$property->getName()] = $property;
 
-      if ($property->isEntity()) {
-        $code[] = sprintf('if (isset($%s)) {', $parameter->getName());
-        $code[] = sprintf('  $this->%s($%s);', $property->getSetterName(), $parameter->getName());
-        $code[] = '}';
-      } else {
-        $code[] = sprintf('$this->%s = $%s;', $property->getName(), $parameter->getName());
+      if (isset($parameterDefinition->defaultValue)) {
+        $gParameter->interpretDefaultValueLiterally();
+        $gParameter->setDefault($parameterDefinition->defaultValue);
       }
 
-      if (!array_key_exists($parameter->getName(), $parameters)) {
-        $parameters[] = $parameter;
+      if ($property->isEntity()) {
+        $code[] = sprintf('if (isset($%s)) {', $gParameter->getName());
+        $code[] = sprintf('  $this->%s($%s);', $property->getSetterName(), $gParameter->getName());
+        $code[] = '}';
+      } else {
+        $code[] = sprintf('$this->%s = $%s;', $property->getName(), $gParameter->getName());
+      }
+
+      if (!array_key_exists($gParameter->getName(), $parameters)) {
+        $parameters[] = $gParameter;
       }
     }
 

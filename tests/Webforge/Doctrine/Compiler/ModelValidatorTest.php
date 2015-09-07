@@ -329,6 +329,74 @@ JSON;
     $this->assertEquals('email', $user->constructor->email->name);
   }
 
+  public function testLikesConstructorWithDefinitions() {
+    $model = $this->assertValid($this->wrapEntity(
+      $this->json('
+    {
+      "name": "User",
+
+      "properties": {
+        "id": { "type": "DefaultId" },
+        "email": { }
+      },
+
+      "constructor": [
+        { "name": "email", "defaultValue": "\'nobody@example.com\'" }
+      ]
+    }'
+      )
+    ));
+
+    $user = $model->getEntity('User');
+
+    $this->assertObjectHasAttribute('constructor', $user);
+    $this->assertObjectHasAttribute("email", $user->constructor, 'email should be defined as key in constructor');
+    $this->assertInternalType('object', $user->constructor->email);
+    $this->assertObjectHasAttribute('name', $user->constructor->email, 'name should be defined for constructor parameter');
+    $this->assertObjectHasAttribute('defaultValue', $user->constructor->email, 'defaultValue from email should be defined for constructor parameter');
+    $this->assertEquals('email', $user->constructor->email->name);
+    $this->assertEquals("'nobody@example.com'", $user->constructor->email->defaultValue);
+  }
+
+  public function testDoesNotLikesConstructorWithoutName() {
+    $this->assertInvalid($this->wrapEntity(
+      $this->json('
+    {
+      "name": "User",
+
+      "properties": {
+        "id": { "type": "DefaultId" },
+        "email": { }
+      },
+
+      "constructor": [
+        { "ame": "email" }
+      ]
+    }'
+      )
+    ), 'Invalid object as constructor argument');
+  }
+
+  public function testDoesNotLikesConstructorWithWrongType() {
+    $this->assertInvalid($this->wrapEntity(
+      $this->json('
+    {
+      "name": "User",
+
+      "properties": {
+        "id": { "type": "DefaultId" },
+        "email": { }
+      },
+
+      "constructor": [
+        7
+      ]
+    }'
+      )
+    ), 'Invalid value-type as constructor argument');
+  }
+
+
   public function testRegressionNullableIsSettable() {
     $model = $this->validateAcceptanceModel();
 
@@ -346,8 +414,8 @@ JSON;
     $this->assertIsCollectionReference($author->properties->writtenPosts->type, 'author::writtenPosts type does not match');
   }
 
-  protected function assertInvalid(stdClass $jsonModel) {
-    $this->setExpectedException(__NAMESPACE__.'\\InvalidModelException');
+  protected function assertInvalid(stdClass $jsonModel, $message = NULL) {
+    $this->setExpectedException(__NAMESPACE__.'\\InvalidModelException', $message);
     $this->validator->validateModel($jsonModel);
   }
 

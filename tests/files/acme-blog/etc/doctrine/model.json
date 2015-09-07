@@ -52,12 +52,18 @@
 
       "properties": {
         "id": "DefaultId",
+        "label": { "type": "String" },
         "posts": { "type": "Collection<Post>" },
         "position": { "type": "Integer", "nullable": true },
 
         "relatedCategories": { "type": "Collection<Category>", "isOwning": true },
         "parentCategories": { "type": "Collection<Category>", "joinTableName": "parent_categories", "isOwning": true }
-      }
+      },
+
+      "constructor": [
+        "label",
+        { "name": "position", "defaultValue": "1" }
+      ]
     },
 
     {

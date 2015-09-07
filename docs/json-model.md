@@ -168,3 +168,18 @@ will be compiled to:
 
 so the default Behavior is, that the value from "defaultValue" will be interpretet as literal PHP Code. This allows more flexibility (but less portability, which is not a huge factor yet)
 
+## defaultValues in constructor arguments
+
+```json
+    "constructor": [
+      { "name": somePrecisionValue", "defaultValue": 0.5" }
+    ]
+```
+
+will be compiled to:
+
+```php
+  __construct($somePrecisionValue = 0.5) {
+```
+
+so defaultValues for constructor arguments are interpretedas literal PHP Code, as well.
