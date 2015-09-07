@@ -49,8 +49,7 @@ class Model {
       if ($property->hasReference()) {
         $referencedEntity = $property->getReferencedEntity();
 
-        if ($referencedEntity->equals($entity)) {
-          // self referencing
+        if ($referencedEntity->equals($entity)) { // self referencing associations
           $type = NULL;
           $owning = TRUE;
 

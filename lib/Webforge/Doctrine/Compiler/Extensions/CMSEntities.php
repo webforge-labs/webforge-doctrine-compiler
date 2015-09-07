@@ -45,7 +45,8 @@ class CMSEntities implements Extension {
       'setIdentifier',
       array($param = $entity->getProperty('id')->getParameter()),
       GFunctionBody::create(array(
-        sprintf('$this->id = $%s;', $param->getName())
+        sprintf('$this->id = $%s;', $param->getName()),
+        'return $this;'
       )),
       GMethod::MODIFIER_PUBLIC
     );

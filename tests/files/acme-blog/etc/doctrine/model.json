@@ -25,7 +25,7 @@
         "content": { "type": "MarkupText" },
         "author": { "type": "Author", "nullable": false },
         "revisor": { "type": "Author", "nullable": true },
-        "categories": { "type": "Collection<Category>", "isOwning": true, "cascade": ["persist", "remove"] },
+        "categories": { "type": "Collection<Category>", "isOwning": true, "orderBy": { "position":"ASC" }, "cascade": ["persist", "remove"] },
         "tags": { "type": "Collection<Tag>" },
         "active": { "type": "Boolean" , "serializer": { "groups": ["cms"] }},
         "relevance": { "type": "Float", "nullable": true },
@@ -41,7 +41,7 @@
       "extends": "User",
   
       "properties": {    
-        "writtenPosts": { "type": "Collection<Post>" },
+        "writtenPosts": { "type": "Collection<Post>", "orderBy": { "relevance": "DESC" } },
         "revisionedPosts": { "type": "Collection<Post>", "relation": "revisor" }
       }
     },
@@ -53,6 +53,7 @@
       "properties": {
         "id": "DefaultId",
         "posts": { "type": "Collection<Post>" },
+        "position": { "type": "Integer", "nullable": true },
 
         "relatedCategories": { "type": "Collection<Category>", "isOwning": true },
         "parentCategories": { "type": "Collection<Category>", "joinTableName": "parent_categories", "isOwning": true }

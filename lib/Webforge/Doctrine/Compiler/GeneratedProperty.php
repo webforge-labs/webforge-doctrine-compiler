@@ -104,6 +104,14 @@ class GeneratedProperty extends DefinitionPart {
     return $this->hasDefinitionOf('joinTableName');
   }
 
+  public function hasOrderBy() {
+    return $this->hasDefinitionOf('orderBy');
+  }
+
+  public function getOrderBy() {
+    return $this->requireDefinitionOf('orderBy');
+  }
+
   public function getJoinTableName() {
     return isset($this->definition->joinTableName) && !empty($this->definition->joinTableName) ? $this->definition->joinTableName : NULL;
   }

@@ -24,6 +24,8 @@ class ModelAssociation {
 
   protected $tableName;
 
+  protected $orderBy;
+
   public function __construct($type, GeneratedEntity $entity, GeneratedProperty $property, GeneratedEntity $referencedEntity, GeneratedProperty $referencedProperty = NULL, $owning = FALSE) {
     $this->type = $type;
     $this->entity = $entity;
@@ -44,6 +46,8 @@ class ModelAssociation {
         $this->tableName = $prop->getJoinTableName();
       }
     }
+
+    $this->orderBy = $property->hasOrderBy() ? (array) $property->getOrderBy() : NULL;
   }
 
   public function shouldUpdateOtherSide() {
@@ -127,5 +131,13 @@ class ModelAssociation {
         return sprintf($format, $this->referencedEntity->getTableName(), $this->entity->getTableName());
       }
     }
+  }
+
+  public function hasOrderBy() {
+    return isset($this->orderBy);
+  }
+
+  public function getOrderBy() {
+    return $this->orderBy;
   }
 }
