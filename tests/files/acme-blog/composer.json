@@ -15,6 +15,7 @@
     },
     "extra": {
         "directory-locations": {
+            "lib": "lib/",
             "doctrine-entities": "lib/ACME/Blog/Entities"
         }
     }

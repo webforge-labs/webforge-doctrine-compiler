@@ -16,7 +16,7 @@
   },
   "require":{
     "webforge/doctrine":"1.2.*",
-    "webforge/webforge":"1.9.*",
+    "webforge/webforge":"1.10.*",
     "webforge/serializer":"1.0.*",
     "beberlei/assert": "1.6.*@stable"
   },
@@ -30,6 +30,11 @@
   "extra":{
     "branch-alias":{
       "dev-master":"1.0.x-dev"
+    },
+    "directory-locations": {
+      "lib": "lib/",
+      "tpl": "resources/tpl/",
+      "resources": "resources"
     }
   }
 }
