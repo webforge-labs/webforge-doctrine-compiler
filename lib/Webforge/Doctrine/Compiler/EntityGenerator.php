@@ -5,7 +5,6 @@ namespace Webforge\Doctrine\Compiler;
 use stdClass;
 use Webforge\Code\Generator\GClass;
 use Webforge\Code\Generator\GProperty;
-use Webforge\Code\Generator\GParameter;
 use Webforge\Code\Generator\GMethod;
 use Webforge\Code\Generator\GFunctionBody;
 use Webforge\Types\Type;
@@ -56,8 +55,8 @@ class EntityGenerator {
     $this->model->completeAssociations();
 
     foreach ($this->generated as $entity) {
-      $this->generateAssociationsAPI($entity);
       $this->generateConstructor($entity);
+      $this->generateAssociationsAPI($entity);
 
       $this->mappingGenerator->init($entity, $this->model);
       $this->mappingGenerator->annotate($entity->gClass);
@@ -93,8 +92,8 @@ class EntityGenerator {
       $property->inflect($this->inflector);
       $entity->addProperty($property);
 
-      $this->generateSetter($property, $entity);
       $this->generateGetter($property, $entity);
+      $this->generateSetter($property, $entity);
     }
   }
 
@@ -151,7 +150,6 @@ class EntityGenerator {
   }
 
   protected function generateConstructor(GeneratedEntity $entity) {
-    // @TODO: add a test to use the parent constructor if avaible (user author?)
     $code = array();
 
     $parameters = array();
@@ -194,7 +192,9 @@ class EntityGenerator {
       }
     }
 
-    $entity->gClass->createMethod('__construct', $parameters, GFunctionBody::create($code));
+    $constructor = $entity->gClass->createMethod('__construct', $parameters, GFunctionBody::create($code));
+
+    $entity->gClass->setMethodOrder($constructor, $position = 0);
   }
 
   protected function generateAssociationsAPI(GeneratedEntity $entity) {
