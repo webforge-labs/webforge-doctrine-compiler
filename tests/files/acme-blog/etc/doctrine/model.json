@@ -28,7 +28,7 @@
         "categories": { "type": "Collection<Category>", "isOwning": true, "orderBy": { "position":"ASC" }, "cascade": ["persist", "remove"] },
         "tags": { "type": "Collection<Tag>" },
         "active": { "type": "Boolean" , "serializer": { "groups": ["cms"] }},
-        "relevance": { "type": "Float", "nullable": true },
+        "relevance": { "type": "Float", "nullable": true, "defaultValue": "0.5" },
         "created": { "type": "DateTime" },
         "modified": { "type": "DateTime", "nullable": true }
       },

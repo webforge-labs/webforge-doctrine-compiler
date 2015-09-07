@@ -147,3 +147,24 @@ The Serializer extension can be configured in its own subsection:
       }
     }
 ```
+
+## defaultValue for Properties
+
+```json
+    "properties": {
+      "somePrecisionValue": { "type": "Float", "defaultValue": "0.5" }
+      "someEnum": { "type": "Enum<tiptoi\\SoundType>", "defaultValue": "\\tiptoi\\SoundType::FX" }
+      "someString": { "type": "String", "defaultValue": "'myString'" }
+    }
+```
+
+will be compiled to:
+
+```php
+  protected $somePrecisionValue = 0.5;
+  protected $someEnum = \tiptoi\SoundType::FX;
+  protected $someString = 'myString';
+```
+
+so the default Behavior is, that the value from "defaultValue" will be interpretet as literal PHP Code. This allows more flexibility (but less portability, which is not a huge factor yet)
+

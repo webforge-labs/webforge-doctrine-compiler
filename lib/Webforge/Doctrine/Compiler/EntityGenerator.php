@@ -87,9 +87,15 @@ class EntityGenerator {
         $default = GClass::UNDEFINED,
         $modifiers = GProperty::MODIFIER_PROTECTED
       );
+      $gProperty->interpretDefaultValueLiterally();
 
       $property = new GeneratedProperty($propertyDefinition, $gProperty);
       $property->inflect($this->inflector);
+
+      if ($property->hasDefaultValue()) {
+        $gProperty->setDefaultValue($property->getDefaultValue());
+      }
+
       $entity->addProperty($property);
 
       $this->generateGetter($property, $entity);

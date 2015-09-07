@@ -108,6 +108,14 @@ class GeneratedProperty extends DefinitionPart {
     return $this->hasDefinitionOf('orderBy');
   }
 
+  public function hasDefaultValue() {
+    return $this->hasDefinitionOf('defaultValue');
+  }
+
+  public function getDefaultValue() {
+    return $this->requireDefinitionOf('defaultValue');
+  }
+
   public function getOrderBy() {
     return $this->requireDefinitionOf('orderBy');
   }

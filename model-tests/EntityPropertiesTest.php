@@ -6,6 +6,8 @@ use Webforge\Common\System\Dir;
 use Doctrine\Common\Cache\ArrayCache;
 use Webforge\Code\Generator\GClass;
 use Webforge\Common\JS\JSONConverter;
+use ACME\Blog\Entities\Post;
+use ACME\Blog\Entities\Author;
 
 class EntityPropertiesTest extends \Webforge\Doctrine\Compiler\Test\ModelBase {
 
@@ -51,5 +53,12 @@ class EntityPropertiesTest extends \Webforge\Doctrine\Compiler\Test\ModelBase {
     $created = $this->assertMetadataField('Post', 'created');
 
     $this->assertEquals('WebforgeDateTime', $created['type']);
+  }
+
+  public function testFieldCanHaveADefaultValueSetOnPropertyLevel() {
+    $post = new Post(new Author('p.scheit@ps-webforge.com'));
+
+    $this->assertEquals(0.5, $post->getRelevance(), 'property relevance should have a default value from model', 0.01);
+    $this->assertInternalType('float', $post->getRelevance(), 'defaultValue should be a float');
   }
 }
