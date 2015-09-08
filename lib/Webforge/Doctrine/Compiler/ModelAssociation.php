@@ -26,13 +26,62 @@ class ModelAssociation {
 
   protected $orderBy;
 
-  public function __construct($type, GeneratedEntity $entity, GeneratedProperty $property, GeneratedEntity $referencedEntity, GeneratedProperty $referencedProperty = NULL, $owning = FALSE) {
-    $this->type = $type;
+  public function __construct(GeneratedEntity $entity, GeneratedProperty $property, GeneratedEntity $referencedEntity, GeneratedProperty $referencedProperty = NULL) {
     $this->entity = $entity;
     $this->property = $property;
     $this->referencedEntity = $referencedEntity;
-    $this->referencedProperty = $referencedProperty;
-    $this->owning = $owning;
+    $this->owning = FALSE;
+
+    if ($isSelfReferencing = $entity->equals($referencedEntity)) {
+      $this->owning = TRUE;
+
+      if ($property->isEntityCollection()) {
+        // @TODO unhandled case: OneToMany self-referencing!!
+
+        // search for the Many Side of a OneToMany self-referencing association
+        /*
+        foreach ($entity->getProperties() as $referencedProperty) {
+          if ($referencedProperty->hasReference() && $entity->equals($referencedProperty->getReferencedEntity())) {
+        }
+        */
+        $this->type = 'ManyToMany';
+      } else {
+        $this->type = 'OneToOne';
+      }
+
+    } elseif ($unidirectional = !isset($referencedProperty)) {
+      $this->owning = TRUE;
+
+      if ($property->isEntityCollection()) {
+        $this->type = 'ManyToMany';
+      } elseif ($property->isEntity() && $property->getRelationName() === 'OneToOne') {
+        $this->type = 'OneToOne';
+      } elseif ($property->isEntity()) {
+        // this is a more sensible default then OneToOne because OneToOne is used less often than ManyToOne in that case
+        $this->type = 'ManyToOne';
+      }
+
+    } else {
+      $this->referencedProperty = $referencedProperty;
+
+      if ($property->isEntityCollection()) {
+        if ($referencedProperty->isEntityCollection()) {
+          $this->type = 'ManyToMany';
+          $this->owning = isset($property->getDefinition()->isOwning) && $property->getDefinition()->isOwning; // this might produce a conflict that no side isOwning (check chis later)
+        } else {
+          $this->type = 'OneToMany';
+          $this->owning = FALSE;
+        }
+      } elseif ($property->isEntity()) {
+        if ($referencedProperty->isEntityCollection()) {
+          $this->type = 'ManyToOne';
+          $this->owning = TRUE;
+        } else {
+          $this->type = 'OneToOne';
+          $this->owning = isset($property->getDefinition()->isOwning) && $property->getDefinition()->isOwning;
+        }
+      }
+    }
 
     if ($this->owning) {
       // later ones will override previous
@@ -91,6 +140,28 @@ class ModelAssociation {
     } 
   }
 
+  public function getSlug() {
+    if ($this->isUnidirectional()) {
+      // i think we're always the owning side for unidirectional associations
+      $format = '%s::%s => %s';
+
+      return sprintf($format, $this->entity->getName(), $this->property->getName(), $this->referencedEntity->getName());
+    } else {
+      $format = '%s::%s => %s::%s';
+
+      return sprintf($format, $this->entity->getName(), $this->property->getName(), $this->referencedEntity->getName(), $this->referencedProperty->getName());
+    }
+  }
+
+  public function getPropertySlug() {
+    // see model as well if this is changed
+    return sprintf('%s::%s', $this->entity->getName(), $this->property->getName());
+  }
+
+  public function getReferencedPropertySlug() {
+    return sprintf('%s::%s', $this->referencedEntity->getName(), $this->referencedProperty->getName());
+  }
+
   public function isOwning() {
     return $this->owning;
   }
@@ -131,6 +202,10 @@ class ModelAssociation {
         return sprintf($format, $this->referencedEntity->getTableName(), $this->entity->getTableName());
       }
     }
+  }
+
+  public function getType() {
+    return $this->type;
   }
 
   public function hasOrderBy() {

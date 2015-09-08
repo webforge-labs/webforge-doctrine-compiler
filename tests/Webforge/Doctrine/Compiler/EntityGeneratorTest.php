@@ -45,7 +45,7 @@ JSON
       $this->entityGenerator->generate($this->getModel($json));
 
     } catch (InvalidModelException $e) {
-      $this->assertContains('no owning side for the association ContentStream::page <=> Page::contentStream', $e->getMessage());
+      $this->assertContains('no owning side for the association Page::contentStream => ContentStream::page', $e->getMessage());
       $this->assertContains('OneToOne', $e->getMessage());
       $this->assertContains('to set isOwning', $e->getMessage());
       throw $e;

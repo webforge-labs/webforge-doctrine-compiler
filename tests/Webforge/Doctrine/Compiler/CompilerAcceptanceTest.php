@@ -92,15 +92,89 @@ JSON;
     }
 JSON;
   
+    /* this is another view of the same problem:
+    $this->assertCompilerThrowsModelException($jsonModel, array(
+      'You have an ambigous definition for the association ACME\Blog\Entities\Author => ACME\Blog\Entities\Post',
+      'The properties: Post::author, Post::revisor are pointing to Author'
+    ));
+    */
+
     $this->assertCompilerThrowsModelException($jsonModel, array(
       'You have an ambigous definition for the association ACME\Blog\Entities\Post => ACME\Blog\Entities\Author',
-      'The properties: Author::writtenPosts, Author::revisionedPosts are both pointing to Post'
+      'The properties: Author::writtenPosts, Author::revisionedPosts are pointing to Post'
     ));
   }
 
-  public function testThrowsModelException_WhenUnidirectorionalAssociationsAreAmbigousInType() {
-    return 'This can be conflict-resolved to ManyToMany';
+  public function testThrowsModelException_WhenINVERSEAssociationsAreAmbigous() {
+    $jsonModel = <<<'JSON'
+    {
+      "namespace": "ACME\\Blog\\Entities",
 
+      "entities": [
+        {
+          "name": "Post",
+      
+          "properties": {
+            "id": { "type": "DefaultId" },
+            "categories": { "type": "Collection<Category>", "isOwning": true, "orderBy": { "position":"ASC" }, "cascade": ["persist", "remove"] },
+            "topCategory": { "type": "Category" }
+
+          }
+        },
+
+        {
+          "name": "Category",
+
+          "properties": {
+            "id": "DefaultId",
+            "label": { "type": "String" },
+            "posts": { "type": "Collection<Post>" }
+          }
+        }
+      ]
+    }
+JSON;
+  
+    $this->assertCompilerThrowsModelException($jsonModel, array(
+      'You have an ambigous definition for the association ACME\Blog\Entities\Category => ACME\Blog\Entities\Post',
+      'The properties: Post::categories, Post::topCategory are pointing to Category',
+      'set "relation" in the definition of Post::categories or Post::topCategory to the name of the property you want'
+    ));
+  }
+
+  public function testThrowsIfARelationIsReferencedThatIsNotExisting() {
+    $jsonModel = <<<'JSON'
+    {
+      "namespace": "ACME\\Blog\\Entities",
+
+      "entities": [
+        {
+          "name": "Post",
+      
+          "properties": {
+            "id": { "type": "DefaultId" }
+          }
+        },
+
+        {
+          "name": "Category",
+
+          "properties": {
+            "id": "DefaultId",
+
+            "posts": { "type": "Collection<Post>", "relation": "cats" }
+          }
+        }
+      ]
+    }
+JSON;
+
+    $this->assertCompilerThrowsModelException($jsonModel, array(
+      'You are referencing a non existing property Post::cats in the relation of Category::posts'
+    ));
+  }
+
+  public function testCanCompile_WhenUnidirectorionalAssociationsAreAmbigousInType() {
     /*
      First i though we need a relationType in tags here because its not determinable if this is a OneToMany OneToOne or ManyToMany relationship, but:
      OneToOne is not possible because its Collection<Tag>
@@ -118,7 +192,7 @@ JSON;
       
           "properties": {
             "id": { "type": "DefaultId" },
-            "tags": { "type": "Collection<Tag>", "isOwning": true },
+            "tags": { "type": "Collection<Tag>", "isOwning": true }
           }
         },
 
@@ -134,9 +208,7 @@ JSON;
     }
 JSON;
 
-    $this->assertCompilerThrowsModelException($jsonModel, array(
-      'You have an ambigous type definition for the association ACME\Blog\Entities\Post => ACME\Blog\Entities\Tag',
-    ));
+    $this->compiler->compileModel($this->json($jsonModel), $this->psr0Directory, Compiler::PLAIN_ENTITIES);
   }
 
   protected function assertCompilerThrowsModelException($jsonModel, Array $containments) {

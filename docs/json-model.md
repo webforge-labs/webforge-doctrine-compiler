@@ -97,7 +97,7 @@ There is one case where the doctrine-compiler cannot guess what you really want 
     }
 ```
 
-*Notice*: Paragraph has not relationship defined to TextBlock, otherwise the compiler could have guessed the relationship (OneToOne if it is a property, ManyToOne if it is a collection).
+*Notice*: The Paragraph has no reverse-relationship defined to TextBlock, otherwise the compiler could have guessed the relationship (OneToOne if it is a property, ManyToOne if it is a collection).
 Because OneToOne is less common doctrine guesses here ManyToOne per default. You **HAVE** to use `"relation": "OneToOne"` for unidirectional OneToOne relationships.
 
 ## cascade and other properties for associations

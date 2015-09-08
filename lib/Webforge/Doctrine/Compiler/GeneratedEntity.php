@@ -49,7 +49,7 @@ class GeneratedEntity extends DefinitionPart {
   }
 
   public function hasProperty($name) {
-    return array_key_exists($this->properties, $name);
+    return array_key_exists($name, $this->properties);
   }
 
   // be sure to connnect with gClass yourself

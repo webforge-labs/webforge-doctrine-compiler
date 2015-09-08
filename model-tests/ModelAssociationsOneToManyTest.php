@@ -183,4 +183,14 @@ class ModelAssociationsOneToManyTest extends \Webforge\Doctrine\Compiler\Test\Mo
     $this->assertArrayHasKey('onDelete',$page['joinColumns'][0], 'onDelete value should be set for joinColumn of ContentStream::$page');
     $this->assertEquals('cascade', $page['joinColumns'][0]['onDelete'], 'onDelete value from page');
   }
+
+  public function testManyToOne_Unidirectional_AmbigousMapping() {
+    $metadata = $this->assertDoctrineMetadata($this->postClass);
+    $categoryClass = $this->elevateFull('ACME\Blog\Entities\Category');
+
+    $assoc = $this->assertAssociationMapping('topCategory', $metadata);
+
+    $this->assertHasTargetEntity($categoryClass, $assoc);
+    $this->assertIsUnidirectional($assoc);
+  }
 }

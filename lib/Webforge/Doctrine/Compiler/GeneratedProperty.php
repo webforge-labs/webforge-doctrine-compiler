@@ -18,6 +18,9 @@ class GeneratedProperty extends DefinitionPart {
   protected $parameter;
   protected $collectionNames;
 
+  protected $relationName;
+  protected $relationType;
+
   public function __construct(stdClass $definition, GProperty $property) {
     parent::__construct($definition);
     $this->gProperty = $property;
@@ -39,6 +42,14 @@ class GeneratedProperty extends DefinitionPart {
     $this->collectionNames['add'] = $inflector->getCollectionAdderName($this->gProperty, $this->definition);
     $this->collectionNames['remove'] = $inflector->getCollectionRemoverName($this->gProperty, $this->definition);
     $this->collectionNames['has'] = $inflector->getCollectionCheckerName($this->gProperty, $this->definition);
+
+    if ($this->hasDefinitionOf('relation')) {
+      if (in_array($this->definition->relation, array('OneToOne', 'ManyToOne'))) {
+        $this->relationType = $this->definition->relation;
+      } else {
+        $this->relationName = $this->definition->relation;
+      }
+    }
   }
 
   public function getName() {
@@ -82,7 +93,15 @@ class GeneratedProperty extends DefinitionPart {
   }
 
   public function getRelationName() {
-    return isset($this->definition->relation) ? $this->definition->relation : NULL;
+    return $this->relationName;
+  }
+
+  public function getRelationType() {
+    return $this->relationType;
+  }
+
+  public function hasRelationName() {
+    return isset($this->relationName);
   }
 
   public function isNullable() {

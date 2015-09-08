@@ -52,8 +52,8 @@ class ModelBase extends Base {
   }
 
   protected function assertIsUnidirectional(Array $association) {
-    $this->assertNull($association['mappedBy'], 'association is not unidirectional');
-    $this->assertNull($association['inversedBy'], 'association is not unidirectional');
+    $this->assertNull($association['mappedBy'], 'association is not unidirectional (mappedBy attribute exists)');
+    $this->assertNull($association['inversedBy'], 'association is not unidirectional (inversedBy attribute exists)');
   }
 
   protected function assertIsInversedBy($mappedBy, Array $association) {

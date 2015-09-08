@@ -23,7 +23,7 @@ class ModelExporterTest extends \Webforge\Doctrine\Compiler\Test\Base {
     $this->originalModel = $this->validator->validateModel($this->originalModelJson);
 
     $this->mapper->shouldReceive('getFile')
-       ->with('Webforge\Doctrine\Compiler\Test\BaseUserEntity')
+      ->with('Webforge\Doctrine\Compiler\Test\BaseUserEntity')
       ->andReturn(
         $this->frameworkHelper->getProject()->dir('lib')->getFile('Webforge/Doctrine/Compiler/Test/BaseUserEntity.php')
       );
@@ -52,7 +52,6 @@ class ModelExporterTest extends \Webforge\Doctrine\Compiler\Test\Base {
       $this->assertThatObject($entity)->property('fqn');
       $fqns[] = $entity->fqn;
     }
-
 
     $this->assertArrayEquals(TestReflection::flatEntityFQNs(), $fqns);
   }
