@@ -150,9 +150,13 @@ class EntityMappingGenerator {
 
       $annotations[] = $annotation;
 
-      if ($property->hasOnDelete() || $property->hasDefinitionOf('nullable')) {
+      if ($property->hasOnDelete() || $property->hasDefinitionOf('nullable') || $associationPair->owning->entity->getIdentifierColumn() != 'id') {
         $annotations[] = $joinColumn = new ORM\JoinColumn();
         $joinColumn->onDelete = $property->getOnDelete();
+
+        if ($associationPair->owning->entity->getIdentifierColumn() != 'id') {
+          $joinColumn->referencedColumnName = $associationPair->owning->entity->getIdentifierColumn();
+        }
 
         $nullable = TRUE;
         if ($property->hasDefinitionOf('nullable', $nullable)) { // dont use isNullable because this defaults to FALSE but joinColumn->nullable defaults to TRUE
@@ -208,8 +212,12 @@ class EntityMappingGenerator {
         )
       */
       $joinColumn = new ORM\JoinColumn();
-      $joinColumn->name = sprintf('%s_%s', $associationPair->owning->entity->getTableName(), $associationPair->owning->entity->getIdentifierColumn());
+      $joinColumn->name = sprintf('%s_%s', $associationPair->owning->entity->getColumnPrefix(), $associationPair->owning->entity->getIdentifierColumn());
       $joinColumn->onDelete = 'cascade';
+
+      if ($associationPair->owning->entity->getIdentifierColumn() != 'id') {
+        $joinColumn->referencedColumnName = $associationPair->owning->entity->getIdentifierColumn();
+      }
 
       $table->joinColumns = array($joinColumn);
 
@@ -218,10 +226,14 @@ class EntityMappingGenerator {
       $inverseJoinColumn->name = sprintf(
         '%s%s_%s',
         $associationPair->owning->isSelfReferencing() ? 'self_' : '',
-        $associationPair->owning->referencedEntity->getTableName(),
+        $associationPair->owning->referencedEntity->getColumnPrefix(),
         $associationPair->owning->referencedEntity->getIdentifierColumn()
       );
       $inverseJoinColumn->onDelete = 'cascade';
+
+      if ($associationPair->owning->referencedEntity->getIdentifierColumn() != 'id') {
+        $inverseJoinColumn->referencedColumnName = $associationPair->owning->referencedEntity->getIdentifierColumn();
+      }
 
       $table->inverseJoinColumns = array($inverseJoinColumn);
       

@@ -33,6 +33,8 @@ class InflectorTest extends \Webforge\Code\Test\Base {
     $definition = (object) array();
   
     $test('getId', new GProperty('id'), $definition);
+    $test('getOid', new GProperty('oid'), $definition);
+    $test('getOids', new GProperty('oids'), $definition);
   
     return $tests;
   }
@@ -57,10 +59,33 @@ class InflectorTest extends \Webforge\Code\Test\Base {
     $definition = (object) array();
   
     $test('setId', new GProperty('id'), $definition);
+    $test('setOid', new GProperty('oid'), $definition);
+    $test('setOids', new GProperty('oids'), $definition);
   
     return $tests;
   }
 
+  /**
+   * @dataProvider provideCollectionAdderName
+   */
+  public function testCollectionAdderName($expectedName, GProperty $property, $definition) {
+    $this->assertEquals(
+      $expectedName, 
+      $this->inflector->getCollectionAdderName($property, $definition)
+    );
+  }
+  
+  public static function provideCollectionAdderName() {
+    $tests = array();
+  
+    $test = function() use (&$tests) {
+      $tests[] = func_get_args();
+    };
+  
+    $test('addOid', new GProperty('oids'), (object) array());
+  
+    return $tests;
+  }
 
   /**
    * @dataProvider provideTableName

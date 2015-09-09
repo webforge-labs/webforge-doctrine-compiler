@@ -55,6 +55,7 @@ class AssociationsAPIGenerator {
     $updateOtherside = $association->shouldUpdateOtherSide();
 
     $body = array();
+    $docBlock = array();
     switch ($type) {
       case 'add':
         $body[] = sprintf('if (!$this->%s->contains($%s)) {', $collectionName, $parameter->getName());
@@ -64,6 +65,8 @@ class AssociationsAPIGenerator {
         }
         $body[] = '}';
         $body[] = 'return $this;';
+
+        $docBlock[] = sprintf('@param %s $%s', $association->referencedEntity->getFQN(), $parameter->getName());
         break;
 
       case 'remove':
@@ -74,16 +77,21 @@ class AssociationsAPIGenerator {
         }
         $body[] = '}';
         $body[] = 'return $this;';
+
+        $docBlock[] = sprintf('@param %s $%s', $association->referencedEntity->getFQN(), $parameter->getName());
         break;
 
       case 'has':
         $body = array(
           sprintf('return $this->%s->contains($%s);', $collectionName, $parameter->getName()),
         );
+
+        $docBlock[] = sprintf('@param %s $%s', $association->referencedEntity->getFQN(), $parameter->getName());
+        $docBlock[] = '@return bool';
         break;
     }
 
-    return $this->entity->gClass->createMethod(
+    $method = $this->entity->gClass->createMethod(
       $property->getCollectionDoerName($type),
       array(
         $parameter
@@ -91,6 +99,15 @@ class AssociationsAPIGenerator {
       GFunctionBody::create($body),
       GMethod::MODIFIER_PUBLIC
     );
+
+    if (count($docBlock) > 0) {
+      $block = $method->createDocBlock();
+      foreach ($docBlock as $line) {
+        $block->append($line);
+      }
+    }
+
+    return $method;
   }
 
   protected function injectIntoSetter(GeneratedProperty $property, ModelAssociation $association) {

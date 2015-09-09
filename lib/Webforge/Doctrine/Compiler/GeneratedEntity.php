@@ -82,7 +82,7 @@ class GeneratedEntity extends DefinitionPart {
   }
 
   public function getIdentifierColumn() {
-    return 'id';
+    return isset($this->definition->identifier) ? $this->definition->identifier : 'id';
   }
 
   public function getDescription() {
@@ -107,5 +107,15 @@ class GeneratedEntity extends DefinitionPart {
    */
   public function getSingular() {
     return $this->singular;
+  }
+
+  /**
+   * Returns the prefix in joinColumns and such
+   *
+   * its the table name in singujlar often
+   * @return string
+   */
+  public function getColumnPrefix() {
+    return str_replace('-', '', $this->singular);
   }
 }

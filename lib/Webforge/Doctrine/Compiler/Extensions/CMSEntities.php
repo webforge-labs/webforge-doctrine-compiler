@@ -32,7 +32,7 @@ class CMSEntities implements Extension {
       'getIdentifier',
       array(),
       GFunctionBody::create(array(
-        'return $this->id;'
+        sprintf('return $this->%s;', $entity->getIdentifierColumn())
       )),
       GMethod::MODIFIER_PUBLIC
     );
@@ -43,7 +43,8 @@ class CMSEntities implements Extension {
   protected function buildSetIdentifier(GeneratedEntity $entity, GClass $gClass) {
     $setter = $gClass->createMethod(
       'setIdentifier',
-      array($param = $entity->getProperty('id')->getParameter()),
+      // workaround that the identifier might be a property which is no generated
+      array($param = new GParameter($entity->getIdentifierColumn())), // this will be MixedType
       GFunctionBody::create(array(
         sprintf('$this->id = $%s;', $param->getName()),
         'return $this;'
@@ -51,8 +52,8 @@ class CMSEntities implements Extension {
       GMethod::MODIFIER_PUBLIC
     );
 
-    $gClass->setMethodOrder($setter, 3);
-  }
+     $gClass->setMethodOrder($setter, 3);
+   }
 
   protected function buildGetEntityName(GeneratedEntity $entity, GClass $gClass) {
     return $gClass->createMethod(

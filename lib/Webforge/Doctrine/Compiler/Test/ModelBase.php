@@ -125,10 +125,8 @@ class ModelBase extends Base {
     $joinColumn = $joinTable->joinColumns[0];
     $inverseJoinColumn = $joinTable->inverseJoinColumns[0];
 
-    list($tab1, $tab2) = explode('2', $tableName);
-
-    $this->assertStringStartsWith($tab1, $joinColumn['name']);
-    $this->assertStringStartsWith($tab2, $inverseJoinColumn['name']);
+    $this->assertNotEmpty($joinColumn['name']);
+    $this->assertNotEmpty($inverseJoinColumn['name']);
 
     $this->assertEquals('cascade', $joinColumn['onDelete'], 'the joinColumn should cascade onDelete');
     $this->assertEquals('cascade', $inverseJoinColumn['onDelete'], 'the inverseJoinColumn should cascade onDelete');
