@@ -30,7 +30,7 @@ class ModelValidator {
       $entities[$key] = $this->validateEntity($entity, $key, $model);
     }
 
-    $this->model = new Model($model->namespace, $entities);
+    $this->model = new Model($model->namespace, $entities, isset($model->collectionType) ? $model->collectionType : 'default');
 
     // snd pass: check names, check entity property references
     foreach ($this->model->getEntities() as $entity) {

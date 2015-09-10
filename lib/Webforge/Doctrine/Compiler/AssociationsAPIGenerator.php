@@ -8,7 +8,6 @@ use Webforge\Code\Generator\GParameter;
 use Webforge\Code\Generator\GFunctionBody;
 use Webforge\Code\Generator\GMethod;
 use stdClass;
-use Webforge\Types\PersistentCollectionType;
 use Webforge\Types\EntityType;
 
 class AssociationsAPIGenerator {

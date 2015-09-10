@@ -10,9 +10,8 @@ use Webforge\Code\Generator\GFunctionBody;
 use Webforge\Types\Type;
 use Webforge\Common\String as S;
 use InvalidArgumentException;
-use Webforge\Types\PersistentCollectionType;
 use Webforge\Types\TypeException;
-use Webforge\Types\CollectionType;
+use Webforge\Types\PersistentCollectionType;
 use Webforge\Types\ObjectType;
 use Webforge\Types\EntityType;
 use Webforge\Common\ClassInterface;
@@ -109,7 +108,7 @@ class EntityGenerator {
       $def->referencedEntity = $this->getEntity($def->reference->getFQN());
     
       if ($def->reference instanceof EntityCollectionReference) {
-        $def->type = new PersistentCollectionType($def->referencedEntity->getGClass());
+        $def->type = new PersistentCollectionType($def->referencedEntity->getGClass(), $this->model->getCollectionImplementation());
       } else {
         $def->type = new EntityType($def->referencedEntity->getGClass());
       }
@@ -133,6 +132,10 @@ class EntityGenerator {
     
     $gMethod->createDocBlock()
       ->append(sprintf('@param %s $%s', $property->getDocType(), $property->getName()));
+
+    if ($parameter->getHintImport() != NULL) {
+      $entity->gClass->addImport($parameter->getHintImport());
+    }
 
     return $gMethod;
   }

@@ -3,6 +3,7 @@
 namespace Webforge\Doctrine\Compiler;
 
 use Webforge\Common\ArrayUtil as A;
+use Webforge\Types\CollectionType;
 
 class Model {
 
@@ -36,9 +37,13 @@ class Model {
    */
   protected $groupedAssociations = array();
 
-  public function __construct($namespace, Array $entities) {
+
+  protected $collectionType;
+
+  public function __construct($namespace, Array $entities, $collectionType = 'default') {
     $this->namespace = $namespace;
     $this->indexEntities($entities);
+    $this->collectionType = $collectionType;
   }
 
   /**
@@ -282,6 +287,14 @@ class Model {
 
   public function hasEntity($name) {
     return array_key_exists($name, $this->entities);
+  }
+
+  public function getCollectionImplementation() {
+    if ($this->collectionType === 'psc-cms') {
+      return CollectionType::PSC_ARRAY_COLLECTION;
+    }
+
+    return CollectionType::WEBFORGE_COLLECTION;
   }
 
   protected function indexEntities(Array $entities) {
