@@ -68,7 +68,38 @@ Therefore a JSON format for creating entities should be used. This is a rough dr
     - the relationside from `Post` on the `Author`-side is ambigous, thats why its referenced with: `relation: "revisor"`
     -  `"author": { "type": "Author" },` is expanded to `"author": { "type": "Author", "relation": "author" }`
        `"revisor": { "type": "Author" },` is expanded to `"revisor": { "type": "Author", "relation": "revisor" }`
-    
+
+## Ambigous Relations
+
+When you have more than one relation between two entities, the doctrine-compiler needs to know, how to match them:
+
+```json
+    {
+      "name": "Post",
+
+      "properties": {
+      
+        "categories": { "type": "Collection<Category>", "isOwning": true, "relation": "posts", "orderBy": { "position":"ASC" }, "cascade": ["persist", "remove"] },
+        "topCategory": { "type": "Category" }
+      }
+    }
+```
+and
+```json
+    {
+      "name": "Category",
+
+      "properties": {
+        
+        "posts": { "type": "Collection<Post>" },
+        "position": { "type": "Integer", "nullable": true },
+
+      }
+    }
+```
+
+to assign the categories to the `Category.posts` property you have to set the `relation` in `Post.categories`. That makes `Post.topCategory` to a unidirectional relation and `Post.categories <=> Category.posts` to a Many2Many-relation
+
 ## Ambigous Relation Sides
 
 There is one case where the doctrine-compiler cannot guess what you really want to do. In case you have a unidirectional ManyToOne relationship (that is specified on the Many-side). It cannot determine if this should be a OneToOne or an ManyToOne relationships, so you have to give a little advice:
