@@ -13,6 +13,7 @@ class TestReflection {
       array('ACME\Blog\Entities\Tag', 'Tag'),
 
       array('ACME\Blog\Entities\Page', 'Page'),
+      array('ACME\Blog\Entities\NavigationNode', 'NavigationNode'),
 
       array('ACME\Blog\Entities\ContentStream\Entry', 'ContentStream/Entry'),
       array('ACME\Blog\Entities\ContentStream\TextBlock', 'ContentStream/TextBlock'),
@@ -29,6 +30,7 @@ class TestReflection {
       array('ACME\Blog\Entities\Category', 'category', 'categories'),
       array('ACME\Blog\Entities\Tag', 'tag', 'tags'),
       array('ACME\Blog\Entities\Page', 'page', 'pages'),
+      array('ACME\Blog\Entities\NavigationNode', 'navigation-node', 'navigation-nodes'),
 
       array('ACME\Blog\Entities\ContentStream\Entry', 'content-stream_entry', 'content-stream_entries'),
       array('ACME\Blog\Entities\ContentStream\Paragraph', 'content-stream_paragraph', 'content-stream_paragraphs'),

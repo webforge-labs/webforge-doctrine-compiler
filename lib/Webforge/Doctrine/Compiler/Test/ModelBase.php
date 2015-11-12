@@ -18,12 +18,26 @@ class ModelBase extends Base {
     return $this->getPackageDir('build/package/');
   }
 
-  protected function assertAssociationMapping($name, \Doctrine\ORM\Mapping\ClassMetadata $metadata) {
+  protected function assertAssociationMapping($name, \Doctrine\ORM\Mapping\ClassMetadata $metadata, $type = NULL) {
     $associations = $metadata->getAssociationMappings();
     $this->assertNotEmpty($associations, 'There should be associations defined for entity '.$metadata->name);
 
     $this->assertArrayHasKey($name, $associations, 'association metadata for '.$name.' is not defined in '.$metadata->name);
-    return $associations[$name];
+
+    $association = $associations[$name];
+
+    if ($type) {
+      $const = array(
+        \Doctrine\ORM\Mapping\ClassMetadata::MANY_TO_ONE=>'ManyToOne',
+        \Doctrine\ORM\Mapping\ClassMetadata::ONE_TO_MANY=>'OneToMany',
+        \Doctrine\ORM\Mapping\ClassMetadata::MANY_TO_MANY=>'ManyToMany',
+        \Doctrine\ORM\Mapping\ClassMetadata::ONE_TO_ONE=>'OneToOne'
+      );
+
+      $this->assertEquals($type, $const[$association['type']], 'Type of Association does not match');
+    }
+
+    return $association;
   }
 
   protected function assertTableName($expectedTableName, $entityShortName) {

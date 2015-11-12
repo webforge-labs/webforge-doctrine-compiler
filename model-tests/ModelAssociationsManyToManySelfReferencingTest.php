@@ -27,7 +27,7 @@ class ModelAssociationsManyToManySelfReferencingTest extends \Webforge\Doctrine\
     ;
   }
 
-  public function testManyToManyDoctrineMetadata_selfReferencing() {
+  public function testManyToManyDoctrineMetadata_selfReferencing_unidirectional() {
     $metadata = $this->assertDoctrineMetadata($this->categoryClass->getFQN());
 
     $relatedCategories = $this->assertAssociationMapping('relatedCategories', $metadata);
@@ -38,13 +38,13 @@ class ModelAssociationsManyToManySelfReferencingTest extends \Webforge\Doctrine\
     $this->assertJoinTable($relatedCategories, 'categories2categories', 'relatedCategories');
   }
 
-  public function testManyToManyDoctrineMetadata_selfReferencing_withJoinTableName() {
+  public function testManyToManyDoctrineMetadata_selfReferencing_unidirectional_withJoinTableName() {
     $metadata = $this->assertDoctrineMetadata($this->categoryClass->getFQN());
 
     $parentCategories = $this->assertAssociationMapping('parentCategories', $metadata);
 
     $this->assertHasTargetEntity($this->categoryClass, $parentCategories);
-    $this->assertEmpty($parentCategories['inversedBy']);
+    $this->assertEmpty($parentCategories['inversedBy'], 'inversedBy should not be set');
 
     $this->assertJoinTable($parentCategories, 'parent_categories', 'parentCategories');
   }
