@@ -57,7 +57,7 @@
         "posts": { "type": "Collection<Post>" },
         "position": { "type": "Integer", "nullable": true },
 
-        "relatedCategories": { "type": "Collection<Category>" },
+        "relatedCategories": { "type": "Collection<Category>", "relation": "relatedCategories" },
         "parentCategories": { "type": "Collection<Category>", "joinTableName": "parent_categories" }
       },
 
@@ -89,6 +89,19 @@
       },
 
       "constructor": ["slug"]
+    },
+
+    {
+      "name": "NavigationNode",
+
+      "properties": {
+        "id": { "type": "DefaultId" },
+
+        "title": { "type":"String", "i18n": true },
+
+        "children": { "type": "Collection<NavigationNode>" },
+        "parent": { "type": "NavigationNode", "nullable": true, "relation": "children" }
+      }
     },
 
     {

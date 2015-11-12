@@ -32,24 +32,44 @@ class ModelAssociation {
     $this->referencedEntity = $referencedEntity;
     $this->owning = FALSE;
 
-    if ($isSelfReferencing = $entity->equals($referencedEntity)) {
-      $this->owning = TRUE;
+    $isSelfReferencing = $entity->equals($referencedEntity);    
+    
+    if ($isSelfReferencing) {
+      // $referencedProperty is always defined, because we will at least find our self as "other" side
+      $this->referencedProperty = $referencedProperty;
 
-      if ($property->isEntityCollection()) {
-        // @TODO unhandled case: OneToMany self-referencing!!
+      if ($this->referencedProperty->getName() === $this->property->getName()) {
+        // the property and referencedProperty are the same
+        $this->owning = TRUE;
 
-        // search for the Many Side of a OneToMany self-referencing association
-        /*
-        foreach ($entity->getProperties() as $referencedProperty) {
-          if ($referencedProperty->hasReference() && $entity->equals($referencedProperty->getReferencedEntity())) {
+        if ($property->isEntityCollection()) {
+          $this->type = 'ManyToMany';
+        } else {
+          $this->type = 'OneToOne';
         }
-        */
-        $this->type = 'ManyToMany';
       } else {
-        $this->type = 'OneToOne';
+
+        // the property is another property in this entity
+        if ($property->isEntityCollection()) {
+          if ($referencedProperty->isEntityCollection()) {
+            $this->type = 'ManyToMany';
+            $this->owning = isset($property->getDefinition()->isOwning) && $property->getDefinition()->isOwning; // this might produce a conflict that no side isOwning (check chis later)
+          } else {
+            $this->type = 'OneToMany';
+            $this->owning = FALSE;
+          }
+        } elseif ($property->isEntity()) {
+          if ($referencedProperty->isEntityCollection()) {
+            $this->type = 'ManyToOne';
+            $this->owning = TRUE;
+          } else {
+            $this->type = 'OneToOne';
+            $this->owning = isset($property->getDefinition()->isOwning) && $property->getDefinition()->isOwning;
+          }
+        }
       }
 
-    } elseif ($unidirectional = !isset($referencedProperty)) {
+    } elseif ($isUnidirectional = !isset($referencedProperty)) {
       $this->owning = TRUE;
 
       if ($property->isEntityCollection()) {
@@ -184,6 +204,17 @@ class ModelAssociation {
 
   public function isSelfReferencing() {
     return $this->entity->equals($this->referencedEntity);
+  }
+
+
+  /**
+   * note: this is not the same as isSelfReferecing() && isUnidrectional()
+   *
+   * Return true if the relation is self-referencing and uses the same property for owning and inverse side
+   * @return boolean
+   */
+  public function isSelfReferencingUnidirectional() {
+    return $this->isSelfReferencing() && isset($this->referencedProperty) && $this->referencedProperty->getName() === $this->property->getName();
   }
 
   public function isEqual(ModelAssociation $other) {

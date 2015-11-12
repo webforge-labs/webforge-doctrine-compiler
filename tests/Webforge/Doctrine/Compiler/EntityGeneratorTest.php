@@ -66,7 +66,7 @@ JSON
         "id": "DefaultId",
 
         "relatedCategories": { "type": "Collection<Category>", "isOwning": true },
-        "parentCategories": { "type": "Collection<Category>", "isOwning": true }
+        "parentCategories": { "type": "Collection<Category>", "isOwning": true, "relation": "parentCategories" }
       }
     }
   ]

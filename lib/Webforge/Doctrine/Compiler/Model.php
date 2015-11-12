@@ -73,15 +73,16 @@ class Model {
       if ($property->hasReference()) {
         $referencedEntity = $property->getReferencedEntity();
 
-        if ($referencedEntity->equals($entity)) { // self referencing associations
+        $isSelfReferencing = $referencedEntity->equals($entity);
 
+        /*
           $this->createManifestedAssociation(
             $entity, $property,
             $referencedEntity, $property
           );
+        */
           
-        } elseif (!$this->isAlreadyAssociated($entity, $property)) {
-
+        if (!$this->isAlreadyAssociated($entity, $property)) {
           // case: we have a relation tag that should find a matching property
           
           if ($property->hasRelationName()) {
@@ -102,7 +103,7 @@ class Model {
               );
             }
           } else {
-            // we have no relation tag on us, and we need to find matching candidates in the referencedEntity
+            // case: we have no relation tag on us, and we need to find matching candidates in the referencedEntity
 
             $unidirectional = TRUE;
             foreach ($referencedEntity->getProperties() as $referencedProperty) {
@@ -186,9 +187,11 @@ class Model {
   }
 
   public function completeAssociations() {
-    //echo "new case\n";
-    //$this->debugAssociations();
-    //$this->debugPossibleAssociations();
+    /*
+    echo "new case\n";
+    $this->debugAssociations();
+    $this->debugPossibleAssociations();
+    */
 
     $grouped = array();
     $index = array();

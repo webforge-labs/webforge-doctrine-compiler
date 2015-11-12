@@ -122,8 +122,8 @@ class EntityMappingGenerator {
   protected function generateAssociationAnnotation(GeneratedProperty $property, GeneratedEntity $entity, stdClass $associationPair) {
     $annotations = array();
 
-    $association = $entity->equals($associationPair->owning->entity) ? $associationPair->owning : $associationPair->inverse;
-    $hasInverse = isset($associationPair->inverse);
+    $association = $entity->equals($associationPair->owning->entity) && $property === $associationPair->owning->property ? $associationPair->owning : $associationPair->inverse;
+    $hasInverse = isset($associationPair->inverse) && !$association->isSelfReferencingUnidirectional();
 
     if ($association->isOneToMany()) {
       $annotation = new ORM\OneToMany();
