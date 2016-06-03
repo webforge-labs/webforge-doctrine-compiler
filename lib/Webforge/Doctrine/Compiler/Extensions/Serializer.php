@@ -43,6 +43,10 @@ class Serializer implements Extension {
       $annotations[] = $annotation = new Annotation\Groups();
       $annotation->groups = $definition->groups;
     }
+
+    if (isset($definition->inline)) {
+      $annotations[] = new Annotation\Inline();
+    }
   }
 
   protected function getDefaultPropertyDefinition(GeneratedEntity $entity) {
