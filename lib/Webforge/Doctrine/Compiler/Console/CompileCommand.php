@@ -94,12 +94,12 @@ class CompileCommand extends \Webforge\Console\Command\CommandAdapter {
         if ($dir->exists()) {
           $map = require (string) $dir->getFile('autoload_namespaces.php');
           foreach ($map as $namespace => $path) {
-            $loader->set($namespace, $path);
+            $loader->add($namespace, $path);
           }
 
           $map = require (string) $dir->getFile('autoload_psr4.php');
           foreach ($map as $namespace => $path) {
-            $loader->setPsr4($namespace, $path);
+            $loader->addPsr4($namespace, $path);
           }
 
           $classMap = require $dir->getFile('autoload_classmap.php');
