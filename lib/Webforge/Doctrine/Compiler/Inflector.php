@@ -64,14 +64,14 @@ class Inflector {
 
   public function singularSlug(stdClass $entity) {
     $parts = explode('\\', $entity->name);
-    $parts = array_map(array('Webforge\Common\String','camelCaseToDash'), $parts);
+    $parts = array_map(array(S::class,'camelCaseToDash'), $parts);
 
     return implode('_', $parts);
   }
 
   public function pluralSlug(stdClass $entity) {
     $parts = explode('\\', $entity->name);
-    $parts = array_map(array('Webforge\Common\String','camelCaseToDash'), $parts);
+    $parts = array_map(array(S::class,'camelCaseToDash'), $parts);
 
     $name = DCInflector::pluralize(array_pop($parts));
 
