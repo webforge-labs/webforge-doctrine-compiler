@@ -9,7 +9,7 @@ use Webforge\Types\CollectionType;
 use Webforge\Types\ObjectType;
 use Webforge\Code\Generator\GClass;
 use Webforge\Common\ClassUtil;
-use Webforge\Common\String as S;
+use Webforge\Common\StringUtil as S;
 use Webforge\Types\DCEnumType;
 
 class ModelValidator {

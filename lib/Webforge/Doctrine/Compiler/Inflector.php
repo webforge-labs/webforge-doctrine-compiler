@@ -5,7 +5,7 @@ namespace Webforge\Doctrine\Compiler;
 use Webforge\Code\Generator\GProperty;
 use stdClass;
 use Doctrine\Common\Inflector\Inflector as DCInflector;
-use Webforge\Common\String as S;
+use Webforge\Common\StringUtil as S;
 
 class Inflector {
 

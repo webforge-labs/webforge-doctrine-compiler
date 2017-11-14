@@ -8,7 +8,7 @@ use Webforge\Code\Generator\GProperty;
 use Webforge\Code\Generator\GMethod;
 use Webforge\Code\Generator\GFunctionBody;
 use Webforge\Types\Type;
-use Webforge\Common\String as S;
+use Webforge\Common\StringUtil as S;
 use InvalidArgumentException;
 use Webforge\Types\TypeException;
 use Webforge\Types\PersistentCollectionType;
