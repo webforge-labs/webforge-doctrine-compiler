@@ -16,19 +16,19 @@
   },
   "require":{
     "webforge/doctrine":"1.2.*",
-    "webforge/webforge":"1.10.*",
+    "webforge/webforge":"~1.11.0",
     "webforge/serializer":"1.0.*",
     "beberlei/assert": "1.6.*@stable"
   },
   "require-dev": {
-    "mockery/mockery": "dev-master",
-    "webforge/testplate": ">=1.5.2",
+    "mockery/mockery": "~0.9",
+    "webforge/testplate": "~1.6.0",
     "mikey179/vfsStream": "1.3.*@dev"
   },
   "bin": ["bin/webforge-doctrine-compiler"],
   "extra":{
     "branch-alias":{
-      "dev-master":"1.0.x-dev"
+      "dev-master":"1.1.x-dev"
     },
     "directory-locations": {
       "lib": "lib/",
