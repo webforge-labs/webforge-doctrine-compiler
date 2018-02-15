@@ -297,6 +297,10 @@ class Model {
       return CollectionType::PSC_ARRAY_COLLECTION;
     }
 
+    if ($this->collectionType === 'doctrine') {
+        return CollectionType::DOCTRINE_ARRAY_COLLECTION;
+    }
+
     return CollectionType::WEBFORGE_COLLECTION;
   }
 
