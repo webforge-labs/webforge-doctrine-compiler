@@ -13,7 +13,6 @@ before_install:
 
 before_script:
   - mysql -e 'create database IF NOT EXISTS `doctrine`;'
-  - mysql -e 'create database IF NOT EXISTS `doctrine_tests`;'
 
 script: phpunit --stop-on-failure
 

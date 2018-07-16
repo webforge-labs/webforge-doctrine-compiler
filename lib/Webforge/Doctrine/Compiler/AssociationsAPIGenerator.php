@@ -72,7 +72,7 @@ class AssociationsAPIGenerator
 
                 $docBlock[] = sprintf(
                     '@param %s $%s',
-                    $association->referencedEntity->getFQN(),
+                    $association->referencedEntity->getDocType(),
                     $parameter->getName()
                 );
                 break;
@@ -92,7 +92,7 @@ class AssociationsAPIGenerator
 
                 $docBlock[] = sprintf(
                     '@param %s $%s',
-                    $association->referencedEntity->getFQN(),
+                    $association->referencedEntity->getDocType(),
                     $parameter->getName()
                 );
                 break;
@@ -104,7 +104,7 @@ class AssociationsAPIGenerator
 
                 $docBlock[] = sprintf(
                     '@param %s $%s',
-                    $association->referencedEntity->getFQN(),
+                    $association->referencedEntity->getDocType(),
                     $parameter->getName()
                 );
                 $docBlock[] = '@return bool';

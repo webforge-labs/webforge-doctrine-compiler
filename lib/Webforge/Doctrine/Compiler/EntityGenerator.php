@@ -4,17 +4,12 @@ namespace Webforge\Doctrine\Compiler;
 
 use stdClass;
 use Webforge\Code\Generator\GClass;
-use Webforge\Code\Generator\GProperty;
-use Webforge\Code\Generator\GMethod;
 use Webforge\Code\Generator\GFunctionBody;
-use Webforge\Types\Type;
-use Webforge\Common\StringUtil as S;
-use InvalidArgumentException;
-use Webforge\Types\TypeException;
-use Webforge\Types\PersistentCollectionType;
-use Webforge\Types\ObjectType;
-use Webforge\Types\EntityType;
+use Webforge\Code\Generator\GMethod;
+use Webforge\Code\Generator\GProperty;
 use Webforge\Common\ClassInterface;
+use Webforge\Types\EntityType;
+use Webforge\Types\PersistentCollectionType;
 
 class EntityGenerator
 {
