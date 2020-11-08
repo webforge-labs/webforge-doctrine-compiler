@@ -23,7 +23,7 @@ abstract class GObject
     abstract public function getKey();
 
     /**
-     * @param Webforge\Code\Generator\DocBlock $docBlock
+     * @param \Webforge\Code\Generator\DocBlock $docBlock
      * @chainable
      */
     public function setDocBlock(DocBlock $docBlock)

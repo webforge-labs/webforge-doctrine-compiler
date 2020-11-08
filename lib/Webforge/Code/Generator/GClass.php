@@ -82,9 +82,9 @@ class GClass extends GModifiersObject implements ClassInterface
     }
 
     /**
-     * @return Webforge\Code\Generator\GClass
+     * @return \Webforge\Code\Generator\GClass
      */
-    public static function create($fqn, $parentClass = null)
+    public static function create($fqn, $parentClass = null): self
     {
         $gClass = new static($fqn);
 

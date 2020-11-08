@@ -138,38 +138,43 @@ class ClassWriter
             );
         }
 
-        $php .= $eol . '{' . $eol;
+        $php .= $eol . '{';
 
-        /* those other methods make the margin with line breaks to top and to their left.*/
+
+        $body = '';
+        $glue = $eol . $eol . '%s';
 
         /* Constants */
-        $php .= A::joinc(
+        $body .= A::joinc(
             $gClass->getConstants(),
-            '    %s;' . $eol,
+            $glue . ';',
             function ($constant) use ($that, $eol) {
                 return $that->writeConstant($constant, 4, $eol);
             }
         );
 
         /* Properties */
-        $php .= A::joinc(
+        $body .= A::joinc(
             $gClass->getProperties(),
-            '    %s;' . $eol,
+            $glue . ';',
             function ($property) use ($that, $eol) {
                 return $that->writeProperty($property, 4, $eol);
             }
         );
 
         /* Methods */
-        $php .= A::joinc(
+        $body .= A::joinc(
             $gClass->getMethods(),
-            '    %s' . $eol,
+            $glue,
             function ($method) use ($that, $eol) {
                 return $that->writeMethod($method, 4, $eol);
             }
         );
 
-        $php .= '}';
+        $body = mb_substr($body, 1); // cut of first empty line after {
+
+        $php .= $body;
+        $php .= $eol . '}';
 
         return $php;
     }
@@ -188,6 +193,8 @@ class ClassWriter
             $php = $this->writeDocBlock($method->getDocBlock(), $baseIndent, $eol);
         }
 
+        $php .= str_repeat(' ', $baseIndent);
+
         $php .= $this->writeModifiers($method->getModifiers());
         $php .= $this->writeGFunction($method, $baseIndent, $eol);
 
@@ -200,7 +207,7 @@ class ClassWriter
      */
     public function writeGFunction($function, $baseIndent = 0, $eol = "\n")
     {
-        $php = null;
+        $php = '';
 
         $php .= $this->writeFunctionSignature($function, $baseIndent, $eol);
 
@@ -221,16 +228,12 @@ class ClassWriter
      */
     public function writeFunctionBody(GFunctionBody $body = null, $baseIndent = 0, $eol = "\n")
     {
-        $php = NULL;
-
-        $phpBody = $body ? '    '.$body->php($baseIndent+4, $eol).$eol : '';
-
-        $php .= $eol.'{';
-        //if ($this->cbraceComment != NULL) { // inline comment wie dieser
-          //$php .= ' '.$this->cbraceComment;
-        //}
+        $php = $eol;
+        $php .= S::indent('{', $baseIndent, $eol);
         $php .= $eol;
-        $php .= $phpBody;
+        if ($body !== null) {
+            $php .= $body->php($baseIndent + 4, $eol) . $eol;
+        }
         $php .= S::indent('}', $baseIndent, $eol);
 
         return $php;
@@ -343,12 +346,13 @@ class ClassWriter
      */
     public function writeProperty(GProperty $property, $baseIndent, $eol = "\n")
     {
-        $php = null;
+        $php = '';
 
         if ($property->hasDocBlock()) {
             $php = $this->writeDocBlock($property->getDocBlock(), $baseIndent, $eol);
         }
 
+        $php .= str_repeat(' ', $baseIndent);
         $php .= $this->writeModifiers($property->getModifiers());
 
         $php .= '$' . $property->getName();

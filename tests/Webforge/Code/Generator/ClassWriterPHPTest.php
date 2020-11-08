@@ -2,6 +2,8 @@
 
 namespace Webforge\Code\Generator;
 
+use Webforge\Types\IntegerType;
+use Webforge\Types\StringType;
 use Webforge\Types\Type;
 
 /**
@@ -87,7 +89,8 @@ PHP;
     public function testWritesGMethodWithParameters()
     {
         $method = GMethod::create(
-            'someAction', array(
+            'someAction',
+            array(
                 GParameter::create('xValue', new GClass('PointValue')),
                 GParameter::create('yValue', new GClass('PointValue')),
                 GParameter::create('info', Type::create('Array'))
@@ -101,18 +104,6 @@ public function someAction(PointValue $xValue, PointValue $yValue, Array $info =
 PHP;
 
         $this->assertSameStrings($phpCode, $this->classWriter->writeMethod($method));
-    }
-
-    protected function assertSameStrings(string $expected, string $actual): void
-    {
-        $this->assertEquals(
-            $expected,
-            $actual,
-            sprintf("<<<expected>>>\n%s\n\n<<<actual>>>\n%s",
-                strtr($expected, ["\n"=>"-n-\n"]),
-                strtr($actual, ["\n"=>"-n-\n"])
-            )
-        );
     }
 
     public function testWritesGMethodBodyNearlyCorrect()
@@ -213,6 +204,59 @@ PHP;
         $this->assertInnerCodeEquals($phpCode);
     }
 
+    public function testFullClass()
+    {
+        $gClass = GClass::create('ACME\CompiledEntity')->setAbstract(true);
+
+        $method = GMethod::create(
+            '__construct',
+            array(),
+            GFunctionBody::create(array(
+                sprintf("parent::__construct('%s');\n", 'TheName'),
+                '$this->other = \'def\';'
+            ))
+        );
+        $gClass->addMethod($method);
+
+        //$gClass->addConstant(GConstant::create('SET1', null, 8));
+
+        $gClass->addProperty(
+            GProperty::create('something', new StringType(), 'default')
+                ->setDocBlock(new DocBlock('@var string'))
+        );
+
+        $gClass->addProperty(
+            GProperty::create('other', new IntegerType())
+                ->setDocBlock(new DocBlock('@var int'))
+        );
+
+        $phpCode = <<<'PHP'
+abstract class CompiledEntity
+{
+    /**
+     * @var string
+     */
+    protected $something = 'default';
+
+    /**
+     * @var int
+     */
+    protected $other;
+
+    public function __construct()
+    {
+        parent::__construct('TheName');
+        $this->other = 'def';
+    }
+}
+PHP;
+
+        $this->assertSameStrings(
+            $phpCode,
+            $this->classWriter->writeGClass($gClass, 'ACME')
+        );
+    }
+
     protected function assertInnerCodeEquals($innerPhpCode)
     {
         $phpCode =
@@ -226,6 +270,21 @@ PHP;
         $this->assertSameStrings(
             sprintf($phpCode, $innerPhpCode),
             $this->classWriter->writeGClass($this->gClass, $namespace = 'ACME')
+        );
+    }
+
+    protected function assertSameStrings(string $expected, string $actual): void
+    {
+        $debugEol = "-n-";
+        //$debugEol = '';
+        $this->assertEquals(
+            $expected,
+            $actual,
+            sprintf(
+                "<<<expected>>>\n%s\n\n<<<actual>>>\n%s",
+                strtr($expected, ["\n" => $debugEol . "\n"]),
+                strtr($actual, ["\n" => $debugEol . "\n"])
+            )
         );
     }
 }
