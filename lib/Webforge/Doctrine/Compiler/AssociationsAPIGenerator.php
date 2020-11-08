@@ -10,6 +10,7 @@ use Webforge\Types\EntityType;
 
 class AssociationsAPIGenerator
 {
+
     protected $entity;
     protected $inflector;
 

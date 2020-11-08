@@ -22,6 +22,7 @@ use Webforge\Doctrine\Compiler\Inflector;
 use Webforge\Doctrine\Compiler\ModelValidator;
 
 class CompileCommand extends CommandAdapter
+
 {
     protected $name = 'orm:compile';
 

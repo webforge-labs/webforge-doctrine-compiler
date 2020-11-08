@@ -13,6 +13,7 @@ use Webforge\Types\PersistentCollectionType;
 
 class EntityGenerator
 {
+
     /**
      * @var GeneratedEntity[]
      */

@@ -24,12 +24,12 @@ class ClassCreater
     protected $gClass;
 
     /**
-     * @var \Webforge\Code\Generator\ClassWriter
+     * @var Webforge\Code\Generator\ClassWriter
      */
     protected $writer;
 
     /**
-     * @var \Webforge\Code\Generator\ClassElevator
+     * @var Webforge\Code\Generator\ClassElevator
      */
     protected $elevator;
 

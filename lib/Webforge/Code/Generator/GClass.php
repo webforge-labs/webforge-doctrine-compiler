@@ -11,7 +11,7 @@ use Webforge\Types\ObjectType;
 
 class GClass extends GModifiersObject implements ClassInterface
 {
-   public const WITHOUT_CONSTRUCTOR = true;
+    public const WITHOUT_CONSTRUCTOR = true;
     public const END = GObjectCollection::END;
 
     public const WITH_OWN = 0x000001;

@@ -35,7 +35,7 @@ class GlobalClassFileMapper implements ClassFileMapper
     /**
      * A Registry for Packages installed on the host (e.g.)
      *
-     * @var \Webforge\Framework\Package\Registry
+     * @var Webforge\Framework\Package\Registry
      */
     protected $packageRegistry;
 

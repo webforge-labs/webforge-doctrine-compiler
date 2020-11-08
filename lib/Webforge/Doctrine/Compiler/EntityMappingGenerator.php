@@ -13,6 +13,7 @@ use Webforge\Types\IdType;
 
 class EntityMappingGenerator
 {
+
     protected $entity;
     protected $annotationsWriter;
     protected $model;
@@ -182,11 +183,10 @@ class EntityMappingGenerator
                 }
 
                 $nullable = true;
-                if (
-                    $property->hasDefinitionOf(
-                        'nullable',
-                        $nullable
-                    )
+                if ($property->hasDefinitionOf(
+                    'nullable',
+                    $nullable
+                )
                 ) { // dont use isNullable because this defaults to FALSE but joinColumn->nullable defaults to TRUE
                     $joinColumn->nullable = $nullable;
                 }

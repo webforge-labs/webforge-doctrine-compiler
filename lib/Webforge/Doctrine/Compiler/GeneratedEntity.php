@@ -81,6 +81,7 @@ class GeneratedEntity extends DefinitionPart
     }
 
     public function getName()
+
     {
         return $this->gClass->getName();
     }
@@ -88,10 +89,8 @@ class GeneratedEntity extends DefinitionPart
     public function getDocType()
     {
         return '\\'.$this->gClass->getFQN();
-    }
-
-    public function equals(GeneratedEntity $otherEntity)
-    {
+    }public function equals(GeneratedEntity $otherEntity)
+        {
         return $otherEntity->getFQN() === $this->getFQN();
     }
 

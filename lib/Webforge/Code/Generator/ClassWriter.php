@@ -37,7 +37,7 @@ class ClassWriter
     protected $namespaceContext;
 
     /**
-     * @var \Webforge\Code\Generator\Imports
+     * @var Webforge\Code\Generator\Imports
      */
     protected $classImports;
 
@@ -106,9 +106,9 @@ class ClassWriter
 
         /* Class */
         if ($gClass->isInterface()) {
-            $php .= 'interface ' . $gClass->getName();
+            $php .= 'interface ' . $gClass->getName() . ' ';
         } else {
-            $php .= 'class ' . $gClass->getName();
+            $php .= 'class ' . $gClass->getName() . ' ';
         }
 
         /* Extends */

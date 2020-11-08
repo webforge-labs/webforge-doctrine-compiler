@@ -25,6 +25,7 @@ use Webforge\Doctrine\Compiler\ModelValidator;
 use Webforge\Doctrine\Test\SchemaTestCase;
 
 class Base extends SchemaTestCase
+
 {
     protected $webforge;
     protected $compiler;

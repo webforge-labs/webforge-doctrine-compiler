@@ -7,6 +7,7 @@ use stdClass;
 
 class DefinitionPart
 {
+
     public $definition;
 
     public function __construct(stdClass $definition)

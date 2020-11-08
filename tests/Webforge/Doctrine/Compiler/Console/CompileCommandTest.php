@@ -16,8 +16,7 @@ class CompileCommandTest extends Base
     public function testItCanBeInstantiatedStandalone()
     {
         $compileCommand = new CompileCommand(
-            'compile-entities',
-            Container::createDefault()->getSystem()
+            'compile-entities', Container::createDefault()->getSystem()
         );
     }
 }

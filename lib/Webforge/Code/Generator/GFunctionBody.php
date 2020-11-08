@@ -35,7 +35,7 @@ class GFunctionBody
     public function php($baseIndent = 0, $eol = "\n")
     {
         if (!isset($this->stmts)) {
-            $parser = new PHPParser_Parser(new PHPParser_Lexer());
+            $parser = new PHPParser_Parser(new PHPParser_Lexer);
             $body = A::join($this->body, "%s\n");
 
             $this->stmts = $parser->parse('<?php ' . $body);

@@ -6,6 +6,7 @@ use RuntimeException;
 use Webforge\Doctrine\Compiler\Test\Base;
 
 class CompilerAcceptanceTest extends Base
+
 {
     public function setUp()
     {

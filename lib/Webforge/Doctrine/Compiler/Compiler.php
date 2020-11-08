@@ -10,6 +10,7 @@ use Webforge\Common\System\Dir;
 
 class Compiler
 {
+
     protected $flags;
     protected $model;
     protected $validator;
@@ -24,9 +25,9 @@ class Compiler
 
     protected $generatedEntities;
 
-    public const PLAIN_ENTITIES = 0x000001;
-    public const COMPILED_ENTITIES = 0x000002;
-    public const RECOMPILE = 0x000004;
+    publicconst PLAIN_ENTITIES = 0x000001;
+    publicconst COMPILED_ENTITIES = 0x000002;
+    publicconst RECOMPILE = 0x000004;
     public const EXPORT_MODEL = 0x000008;
 
     public function __construct(ClassWriter $classWriter, EntityGenerator $entityGenerator, ModelValidator $validator)

@@ -6,6 +6,7 @@ use stdClass;
 
 class EntityReference
 {
+
     protected $definition;
 
     public function __construct(stdClass $entityDefinition)
