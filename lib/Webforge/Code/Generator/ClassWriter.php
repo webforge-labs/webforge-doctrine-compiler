@@ -22,12 +22,12 @@ class ClassWriter
     public const OVERWRITE = true;
 
     /**
-     * @var Webforge\Code\Generator\Imports
+     * @var \Webforge\Code\Generator\Imports
      */
     protected $imports;
 
     /**
-     * @var Webforge\Common\CodeWriter
+     * @var \Webforge\Common\CodeWriter
      */
     protected $codeWriter;
 
@@ -37,7 +37,7 @@ class ClassWriter
     protected $namespaceContext;
 
     /**
-     * @var Webforge\Code\Generator\Imports
+     * @var \Webforge\Code\Generator\Imports
      */
     protected $classImports;
 
@@ -140,14 +140,14 @@ class ClassWriter
             $php .= ' ';
         }
 
-        $php .= '{' . $eol;
+        $php .= $eol . '{' . $eol;
 
         /* those other methods make the margin with line breaks to top and to their left.*/
 
         /* Constants */
         $php .= A::joinc(
             $gClass->getConstants(),
-            '  ' . $eol . '%s;' . $eol,
+            '    ' . $eol . '%s;' . $eol,
             function ($constant) use ($that, $eol) {
                 return $that->writeConstant($constant, 2, $eol);
             }
@@ -156,7 +156,7 @@ class ClassWriter
         /* Properties */
         $php .= A::joinc(
             $gClass->getProperties(),
-            '  ' . $eol . '%s;' . $eol,
+            '    ' . $eol . '%s;' . $eol,
             function ($property) use ($that, $eol) {
                 return $that->writeProperty($property, 2, $eol);
             }
@@ -165,7 +165,7 @@ class ClassWriter
         /* Methods */
         $php .= A::joinc(
             $gClass->getMethods(),
-            '  ' . $eol . '%s' . $eol,
+            '    ' . $eol . '%s' . $eol,
             function ($method) use ($that, $eol) {
                 return $that->writeMethod($method, 2, $eol);
             }
@@ -191,7 +191,7 @@ class ClassWriter
         }
 
         // vor die modifier muss das indent
-        $php .= str_repeat(' ', $baseIndent);
+        $php .= str_repeat('   ', $baseIndent);
 
         $php .= $this->writeModifiers($method->getModifiers());
         $php .= $this->writeGFunction($method, $baseIndent, $eol);
@@ -202,7 +202,6 @@ class ClassWriter
     /**
      * returns PHPCode for a GFunction/GMethod
      *
-     * nach der } ist kein LF
      */
     public function writeGFunction($function, $baseIndent = 0, $eol = "\n")
     {
@@ -227,21 +226,15 @@ class ClassWriter
      */
     public function writeFunctionBody(GFunctionBody $body = null, $baseIndent = 0, $eol = "\n")
     {
-        $php = null;
-
-        $phpBody = $body ? $body->php($baseIndent + 2, $eol) . $eol : '';
-
-        $php .= ' {';
+        $php = $eol . S::indent('{', $baseIndent) . $eol;
         //if ($this->cbraceComment != NULL) { // inline comment wie dieser
         //$php .= ' '.$this->cbraceComment;
         //}
-        $php .= $eol;
-        $php .= $phpBody;
+        $php .= $body ? S::indent('', $baseIndent + 4) . $body->php($baseIndent + 4, $eol) . $eol : '';
         $php .= S::indent('}', $baseIndent, $eol);
 
         return $php;
     }
-
 
     protected function writeFunctionSignature($function, $baseIndent = 0, $eol = "\n")
     {

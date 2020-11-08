@@ -9,6 +9,9 @@ services:
     volumes:
       - ./:/app
 
+    environment:
+      - COMPOSER_HOME=/app/.composer
+
   mysqldb:
     image: mysql:5.6
 
