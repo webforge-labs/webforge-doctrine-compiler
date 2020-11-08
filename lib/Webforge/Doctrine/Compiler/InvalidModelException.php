@@ -2,5 +2,8 @@
 
 namespace Webforge\Doctrine\Compiler;
 
-class InvalidModelException extends \Webforge\Common\Exception {
+use Webforge\Common\Exception;
+
+class InvalidModelException extends Exception
+{
 }

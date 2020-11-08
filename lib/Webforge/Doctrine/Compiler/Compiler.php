@@ -3,119 +3,129 @@
 namespace Webforge\Doctrine\Compiler;
 
 use stdClass;
-use Webforge\Common\System\Dir;
-use Webforge\Common\ClassUtil;
 use Webforge\Code\Generator\ClassWriter;
 use Webforge\Code\Generator\DocBlock;
 use Webforge\Code\Generator\GClass;
+use Webforge\Common\System\Dir;
 
-class Compiler {
+class Compiler
+{
+    protected $flags;
+    protected $model;
+    protected $validator;
+    protected $broker;
 
-  protected $flags;
-  protected $model;
-  protected $validator;
-  protected $broker;
+    protected $dir;
 
-  protected $dir;
-  protected $classWriter;
+    /**
+     * @var ClassWriter
+     */
+    protected $classWriter;
 
-  protected $generatedEntities;
+    protected $generatedEntities;
 
-  const PLAIN_ENTITIES = 0x000001;
-  const COMPILED_ENTITIES = 0x000002;
-  const RECOMPILE = 0x000004;
-  const EXPORT_MODEL = 0x000008;
+    public const PLAIN_ENTITIES = 0x000001;
+    public const COMPILED_ENTITIES = 0x000002;
+    public const RECOMPILE = 0x000004;
+    public const EXPORT_MODEL = 0x000008;
 
-  public function __construct(ClassWriter $classWriter, EntityGenerator $entityGenerator, ModelValidator $validator) {
-    $this->classWriter = $classWriter;
-    $this->validator = $validator;
-    $this->entityGenerator = $entityGenerator;
-  }
-
-  public function compileModel(stdClass $model, Dir $target, $flags) {
-    $this->flags = $flags;
-    $this->dir = $target;
-    $this->model = $this->validator->validateModel($model);
-
-    $this->entityGenerator->generate($this->model);
-    $this->generatedEntities = array();
-
-    foreach ($this->entityGenerator->getEntities() as $entity) {
-      list($entityFile, $compiledEntityFile) = $this->compileEntity($entity);
-      $this->generatedEntities[$entity->getFQN()] = $entity;
-      //print "compiled entity ".$entity->name.' to '.$entityFile."\n";
+    public function __construct(ClassWriter $classWriter, EntityGenerator $entityGenerator, ModelValidator $validator)
+    {
+        $this->classWriter = $classWriter;
+        $this->validator = $validator;
+        $this->entityGenerator = $entityGenerator;
     }
 
-    if ($flags & self::EXPORT_MODEL) {
-      $exporter = new ModelExporter();
-      return $exporter->exportModel($this->model, $this->entityGenerator);
-    }
-  }
+    public function compileModel(stdClass $model, Dir $target, $flags)
+    {
+        $this->flags = $flags;
+        $this->dir = $target;
+        $this->model = $this->validator->validateModel($model);
 
-  protected function compileEntity(GeneratedEntity $entity) {
-    $compiledEntityFile = $compiledClass = NULL;
+        $this->entityGenerator->generate($this->model);
+        $this->generatedEntities = array();
 
-    if ($this->flags & self::COMPILED_ENTITIES) {
-      // we split up the gclass into Compiled$entityName and $entityName class
-      // the $entityName class needs the docblock from the "real" class because this is what doctrine sees
-      $entityClass = clone $entity->gClass;
+        foreach ($this->entityGenerator->getEntities() as $entity) {
+            list($entityFile, $compiledEntityFile) = $this->compileEntity($entity);
+            $this->generatedEntities[$entity->getFQN()] = $entity;
+            //print "compiled entity ".$entity->name.' to '.$entityFile."\n";
+        }
 
-      $compiledClass = clone $entityClass;
-      $compiledClass->setName('Compiled'.$entityClass->getName());
-      $compiledClass->setAbstract(TRUE);
-      $compiledClass->setDocBlock(
-        $docBlock = new DocBlock(
-          'Compiled Entity for '.$entityClass->getFQN()."\n\nTo change table name or entity repository edit the ".$entityClass->getFQN().' class.'."\n".
-          '@ORM\MappedSuperclass'
-        )
-      );
-
-      // entity extends Generation-Gap Entity
-      $entityClass->setParent($compiledClass);
-
-      foreach ($entityClass->getMethods() as $method) {
-        $entityClass->removeMethod($method);
-      }
-
-      foreach ($entityClass->getProperties() as $property) {
-        $entityClass->removeProperty($property);
-      }
-
-      // write both
-      $entityFile = $this->write($entityClass, 'entityFile');
-      $compiledEntityFile = $this->write($compiledClass, 'compiledEntityFile');
-
-    } else {
-      $entityFile = $this->write($entity->gClass, 'entityFile');
+        if ($flags & self::EXPORT_MODEL) {
+            $exporter = new ModelExporter();
+            return $exporter->exportModel($this->model, $this->entityGenerator);
+        }
     }
 
-    return array($entityFile, $compiledEntityFile);
-  }
+    protected function compileEntity(GeneratedEntity $entity)
+    {
+        $compiledEntityFile = $compiledClass = null;
 
-  protected function write(GClass $gClass, $type) {
-    $entityFile = $this->mapToFile($gClass->getFQN());
+        if ($this->flags & self::COMPILED_ENTITIES) {
+            // we split up the gclass into Compiled$entityName and $entityName class
+            // the $entityName class needs the docblock from the "real" class because this is what doctrine sees
+            $entityClass = clone $entity->gClass;
 
-    if ($type === 'entityFile' && $entityFile->exists()) {
-      // dont write. warn?
-    } else {
-      $entityFile->getDirectory()->create();
+            $compiledClass = clone $entityClass;
+            $compiledClass->setName('Compiled' . $entityClass->getName());
+            $compiledClass->setAbstract(true);
+            $compiledClass->setDocBlock(
+                $docBlock = new DocBlock(
+                    'Compiled Entity for ' . $entityClass->getFQN(
+                    ) . "\n\nTo change table name or entity repository edit the " . $entityClass->getFQN(
+                    ) . ' class.' . "\n" .
+                    '@ORM\MappedSuperclass'
+                )
+            );
 
-      $this->classWriter->write(
-        $gClass, 
-        $entityFile, 
-        ($type === 'compiledEntityFile' && ($this->flags & self::COMPILED_ENTITIES))
-          ? ClassWriter::OVERWRITE : FALSE);
+            // entity extends Generation-Gap Entity
+            $entityClass->setParent($compiledClass);
+
+            foreach ($entityClass->getMethods() as $method) {
+                $entityClass->removeMethod($method);
+            }
+
+            foreach ($entityClass->getProperties() as $property) {
+                $entityClass->removeProperty($property);
+            }
+
+            // write both
+            $entityFile = $this->write($entityClass, 'entityFile');
+            $compiledEntityFile = $this->write($compiledClass, 'compiledEntityFile');
+        } else {
+            $entityFile = $this->write($entity->gClass, 'entityFile');
+        }
+
+        return array($entityFile, $compiledEntityFile);
     }
 
-    return $entityFile;
-  }
+    protected function write(GClass $gClass, $type)
+    {
+        $entityFile = $this->mapToFile($gClass->getFQN());
 
-  /**
-   * @return Webforge\Common\System\File
-   */
-  protected function mapToFile($fqn) {
-    $url = str_replace('\\', '/', $fqn).'.php';
+        if ($type === 'entityFile' && $entityFile->exists()) {
+            // dont write. warn?
+        } else {
+            $entityFile->getDirectory()->create();
 
-    return $this->dir->getFile($url);
-  }
+            $this->classWriter->write(
+                $gClass,
+                $entityFile,
+                ($type === 'compiledEntityFile' && ($this->flags & self::COMPILED_ENTITIES))
+                    ? ClassWriter::OVERWRITE : false
+            );
+        }
+
+        return $entityFile;
+    }
+
+    /**
+     * @return Webforge\Common\System\File
+     */
+    protected function mapToFile($fqn)
+    {
+        $url = str_replace('\\', '/', $fqn) . '.php';
+
+        return $this->dir->getFile($url);
+    }
 }

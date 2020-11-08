@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<ruleset name="Webforge Standard" namespace="Webforge\CS\Standard">
+    <rule ref="PSR12">
+        <exclude name="Generic.Files.LineLength"/>
+
+    </rule>
+
+    <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
+        <exclude-pattern type="relative">*Test\.php</exclude-pattern>
+    </rule>
+
+    <rule ref="Squiz.WhiteSpace.FunctionOpeningBraceSpace" />
+    <rule ref="SlevomatCodingStandard.Classes.EmptyLinesAroundClassBraces">
+           <properties>
+               <property name="linesCountAfterOpeningBrace" value="0"/>
+               <property name="linesCountBeforeClosingBrace" value="0"/>
+           </properties>
+       </rule>
+
+
+
+    <file>./lib</file>
+    <file>./tests</file>
+
+    <exclude-pattern>./lib/package.boot.php</exclude-pattern>
+
+    <autoload>vendor/autoload.php</autoload>
+</ruleset>

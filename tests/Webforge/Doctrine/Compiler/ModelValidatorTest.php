@@ -5,30 +5,33 @@ namespace Webforge\Doctrine\Compiler;
 use stdClass;
 use Webforge\Common\JS\JSONConverter;
 
-class ModelValidatorTest extends \Webforge\Doctrine\Compiler\Test\Base {
+class ModelValidatorTest extends \Webforge\Doctrine\Compiler\Test\Base
+{
+    public function setUp()
+    {
+        $this->validator = new ModelValidator();
+    }
 
-  public function setUp() {
-    $this->validator = new ModelValidator();
-  }
 
-  
-  public function testLikesAValidModel() {
-    $jsonModel = (object) array(
-      'namespace'=>'ACME\Blog\Entities',
+    public function testLikesAValidModel()
+    {
+        $jsonModel = (object) array(
+        'namespace' => 'ACME\Blog\Entities',
 
-      'entities'=>Array(
+        'entities' => array(
         (object) array(
-          'name'=>'User',
-          'properties'=>array()
+          'name' => 'User',
+          'properties' => array()
         )
-      )
-    );
+        )
+        );
 
-    $this->assertValid($jsonModel);
-  }
+        $this->assertValid($jsonModel);
+    }
 
-  public function testExpandsPropertyValues() {
-    $jsonModel = <<<'JSON'
+    public function testExpandsPropertyValues()
+    {
+        $jsonModel = <<<'JSON'
 {
   "namespace": "ACME\\Blog\\Entities",
 
@@ -45,28 +48,31 @@ class ModelValidatorTest extends \Webforge\Doctrine\Compiler\Test\Base {
 }    
 JSON;
 
-    $model = $this->assertValid($this->json($jsonModel));
+        $model = $this->assertValid($this->json($jsonModel));
 
-    $this->assertCount(1, $model->getEntities());
-    $user = $model->getEntity('User');
+        $this->assertCount(1, $model->getEntities());
+        $user = $model->getEntity('User');
 
-    $this->assertEquals('String', $user->properties->email->type->getName(), 'Type should be expanded to stringType for empty member');
-    $this->assertFalse($user->properties->id->nullable, 'nullable should be expanded to FALSE for not empty property');
-    $this->assertFalse($user->properties->email->nullable, 'nullable should be expanded to FALSE for empty property');
-  }
+        $this->assertEquals('String', $user->properties->email->type->getName(), 'Type should be expanded to stringType for empty member');
+        $this->assertFalse($user->properties->id->nullable, 'nullable should be expanded to FALSE for not empty property');
+        $this->assertFalse($user->properties->email->nullable, 'nullable should be expanded to FALSE for empty property');
+    }
 
-  public function testDoesNotLikeEmptyModels() {
-    $this->assertInvalid(new stdClass());
-  }
+    public function testDoesNotLikeEmptyModels()
+    {
+        $this->assertInvalid(new stdClass());
+    }
 
-  public function testDoesNotLikeEmptyModelsWithoutEntities() {
-    $this->assertInvalid((object) array(
-      'namespace'=>'ACME\Blog\Enttities'
-    ));
-  }
+    public function testDoesNotLikeEmptyModelsWithoutEntities()
+    {
+        $this->assertInvalid((object) array(
+        'namespace' => 'ACME\Blog\Enttities'
+        ));
+    }
 
-  public function testLikesShortPropertiesWithOnlyTypeAndName() {
-    $jsonModel = <<<'JSON'
+    public function testLikesShortPropertiesWithOnlyTypeAndName()
+    {
+        $jsonModel = <<<'JSON'
     {
       "namespace": "ACME\\Blog\\Entities",
 
@@ -84,106 +90,116 @@ JSON;
     }
 JSON;
 
-    $this->assertValid($this->json($jsonModel));
-  }
+        $this->assertValid($this->json($jsonModel));
+    }
 
-  public function testDoesNotLikeModelsWithoutNamespace() {
-    $jsonModel = (object) array(
-      'entities'=>array()
-    );
+    public function testDoesNotLikeModelsWithoutNamespace()
+    {
+        $jsonModel = (object) array(
+        'entities' => array()
+        );
 
-    $this->assertInvalid($jsonModel);
-  }
+        $this->assertInvalid($jsonModel);
+    }
 
-  public function testDoesNotLikeEntityWithEmptyExtends() {
-    $this->assertInvalid($this->wrapEntity(
-      (object) array(
-        'name'=>'User',
-        'extends'=>''
-      )
-    ));
-  }
+    public function testDoesNotLikeEntityWithEmptyExtends()
+    {
+        $this->assertInvalid($this->wrapEntity(
+            (object) array(
+            'name' => 'User',
+            'extends' => ''
+            )
+        ));
+    }
 
-  public function testDoesNotLikeEntityWithEmptyName() {
-    $this->assertInvalid($this->wrapEntity(
-      (object) array(
-        'name'=>'',
-        'extends'=>''
-      )
-    ));
-  }
+    public function testDoesNotLikeEntityWithEmptyName()
+    {
+        $this->assertInvalid($this->wrapEntity(
+            (object) array(
+            'name' => '',
+            'extends' => ''
+            )
+        ));
+    }
 
-  public function testDoesNotLikeEntityWithoutName() {
-    $this->assertInvalid($this->wrapEntity(
-      (object) array(
-        "properties"=>(object) array(
-        )
-      )
-    ));
-  }
+    public function testDoesNotLikeEntityWithoutName()
+    {
+        $this->assertInvalid($this->wrapEntity(
+            (object) array(
+            "properties" => (object) array(
+            )
+            )
+        ));
+    }
 
-  public function testDoesNotLikeEntityAsArray() {
-    $this->assertInvalid($this->wrapEntity(
-      array(
-        "name"=>"User",
-        "properties"=>(object) array(
-        )
-      )
-    ));
-  }
+    public function testDoesNotLikeEntityAsArray()
+    {
+        $this->assertInvalid($this->wrapEntity(
+            array(
+            "name" => "User",
+            "properties" => (object) array(
+            )
+            )
+        ));
+    }
 
-  public function testDoesNotLikeNonObjectProperties() {
-    $this->assertInvalid($this->wrapEntity(
-      (object) array(
-        "name"=>"User",
-        "properties"=>(object) array(
-          "email"=>true
-        )
-      )
-    ));
-  }
+    public function testDoesNotLikeNonObjectProperties()
+    {
+        $this->assertInvalid($this->wrapEntity(
+            (object) array(
+            "name" => "User",
+            "properties" => (object) array(
+            "email" => true
+            )
+            )
+        ));
+    }
 
-  public function testDoesNotLikeNonExistingTypes() {
-    $this->assertInvalid($this->wrapEntity(
-      (object) array(
-        "name"=>"User",
-        "properties"=>(object) array(
-          "email"=>(object) array(
-            'type'=>'nonsense'
-          )
-        )
-      )
-    ));
-  }
+    public function testDoesNotLikeNonExistingTypes()
+    {
+        $this->assertInvalid($this->wrapEntity(
+            (object) array(
+            "name" => "User",
+            "properties" => (object) array(
+            "email" => (object) array(
+            'type' => 'nonsense'
+            )
+            )
+            )
+        ));
+    }
 
-  public function testDoesNotLikeMalFormedTypes() {
-    $this->assertInvalid($this->wrapEntity(
-      (object) array(
-        "name"=>"User",
-        "properties"=>(object) array(
-          "email"=>(object) array(
-            'type'=>'Collection<wrong'
-          )
-        )
-      )
-    ));
-  }
+    public function testDoesNotLikeMalFormedTypes()
+    {
+        $this->assertInvalid($this->wrapEntity(
+            (object) array(
+            "name" => "User",
+            "properties" => (object) array(
+            "email" => (object) array(
+            'type' => 'Collection<wrong'
+            )
+            )
+            )
+        ));
+    }
 
-  public function testDoesNotLikeCollectionTypesWithWrongEntityName() {
-    $this->assertInvalid($this->wrapEntity(
-      (object) array(
-        "name"=>"User",
-        "properties"=>(object) array(
-          "email"=>(object) array(
-            'type'=>'Collection<NonExistingEntity>'
-          )
-        )
-      )
-    ));
-  }
+    public function testDoesNotLikeCollectionTypesWithWrongEntityName()
+    {
+        $this->assertInvalid($this->wrapEntity(
+            (object) array(
+            "name" => "User",
+            "properties" => (object) array(
+            "email" => (object) array(
+            'type' => 'Collection<NonExistingEntity>'
+            )
+            )
+            )
+        ));
+    }
 
-  public function testDoesNotLikeEntitiesThatArentExisting() {
-    $jsonModel = <<<'JSON'
+    public function testDoesNotLikeEntitiesThatArentExisting()
+    {
+        $jsonModel = <<<'JSON'
     {
       "namespace": "ACME\\Blog\\Entities",
 
@@ -195,33 +211,13 @@ JSON;
       ]
     }
 JSON;
-  
-    $this->assertInvalid($this->json($jsonModel));
-  }
 
-  public function testLikesEntitiesInAnyOrder_butOnlyForValidation() {
-    $jsonModel = <<<'JSON'
-    {
-      "namespace": "ACME\\Blog\\Entities",
-
-      "entities": [
-        {
-          "name": "Author",
-          "extends": "User"
-        },
-        {
-          "name": "User",
-          "extends": "User"
-        }
-      ]
+        $this->assertInvalid($this->json($jsonModel));
     }
-JSON;
-  
-    $this->assertValid($this->json($jsonModel));
-  }
 
-  public function testExpandsEntitiesFQNsAndExtends() {
-    $jsonModel = <<<'JSON'
+    public function testLikesEntitiesInAnyOrder_butOnlyForValidation()
+    {
+        $jsonModel = <<<'JSON'
     {
       "namespace": "ACME\\Blog\\Entities",
 
@@ -237,24 +233,47 @@ JSON;
       ]
     }
 JSON;
-    
-    $model = $this->assertValid($this->json($jsonModel));
 
-    $this->assertTrue($model->hasEntity('User'));
-    $this->assertTrue($model->hasEntity('Author'));
+        $this->assertValid($this->json($jsonModel));
+    }
 
-    $author = $model->getEntity('Author');
-    $user = $model->getEntity('User');
+    public function testExpandsEntitiesFQNsAndExtends()
+    {
+        $jsonModel = <<<'JSON'
+    {
+      "namespace": "ACME\\Blog\\Entities",
 
-    $this->assertEquals('ACME\Blog\Entities\Author', $author->fqn);
-    $this->assertEquals('ACME\Blog\Entities\User', $user->fqn);
+      "entities": [
+        {
+          "name": "Author",
+          "extends": "User"
+        },
+        {
+          "name": "User",
+          "extends": "User"
+        }
+      ]
+    }
+JSON;
 
-    $this->assertSame($user, $author->extends);
-  }
+        $model = $this->assertValid($this->json($jsonModel));
+
+        $this->assertTrue($model->hasEntity('User'));
+        $this->assertTrue($model->hasEntity('Author'));
+
+        $author = $model->getEntity('Author');
+        $user = $model->getEntity('User');
+
+        $this->assertEquals('ACME\Blog\Entities\Author', $author->fqn);
+        $this->assertEquals('ACME\Blog\Entities\User', $user->fqn);
+
+        $this->assertSame($user, $author->extends);
+    }
 
 
-  public function testExpandsEntitiesFQNsWithSubNamespaces() {
-    $jsonModel = <<<'JSON'
+    public function testExpandsEntitiesFQNsWithSubNamespaces()
+    {
+        $jsonModel = <<<'JSON'
     {
       "namespace": "ACME\\Blog\\Entities",
 
@@ -265,30 +284,32 @@ JSON;
       ]
     }
 JSON;
-    
-    $model = $this->assertValid($this->json($jsonModel));
 
-    $this->assertTrue($model->hasEntity('ContentStream\Paragraph'));
+        $model = $this->assertValid($this->json($jsonModel));
 
-    $p = $model->getEntity('ContentStream\Paragraph');
+        $this->assertTrue($model->hasEntity('ContentStream\Paragraph'));
 
-    $this->assertEquals('ACME\Blog\Entities\ContentStream\Paragraph', $p->fqn);
-  }
+        $p = $model->getEntity('ContentStream\Paragraph');
 
-  public function testDoesNotLikeEntitiesAsNonObjects() {
-    $jsonModel = (object) array(
-      'entities'=>array(
-        'name'=>'User',
-        'properties'=>array()
-      )
-    );
+        $this->assertEquals('ACME\Blog\Entities\ContentStream\Paragraph', $p->fqn);
+    }
 
-    $this->assertInvalid($jsonModel);
-  }
+    public function testDoesNotLikeEntitiesAsNonObjects()
+    {
+        $jsonModel = (object) array(
+        'entities' => array(
+        'name' => 'User',
+        'properties' => array()
+        )
+        );
 
-  public function testDoesNotLikeConstructorWithNonPropertiesNames() {
-    $model = $this->assertInvalid($this->wrapEntity(
-      $this->json('
+        $this->assertInvalid($jsonModel);
+    }
+
+    public function testDoesNotLikeConstructorWithNonPropertiesNames()
+    {
+        $model = $this->assertInvalid($this->wrapEntity(
+            $this->json('
     {
       "name": "User",
 
@@ -298,15 +319,14 @@ JSON;
       },
 
       "constructor": ["email", "wrong"]
-    }'
-      )
-    ));
+    }')
+        ));
+    }
 
-  }
-
-  public function testLikesConstructorWithPropertiesNames() {
-    $model = $this->assertValid($this->wrapEntity(
-      $this->json('
+    public function testLikesConstructorWithPropertiesNames()
+    {
+        $model = $this->assertValid($this->wrapEntity(
+            $this->json('
     {
       "name": "User",
 
@@ -316,22 +336,22 @@ JSON;
       },
 
       "constructor": ["email"]
-    }'
-      )
-    ));
+    }')
+        ));
 
-    $user = $model->getEntity('User');
+        $user = $model->getEntity('User');
 
-    $this->assertObjectHasAttribute('constructor', $user);
-    $this->assertObjectHasAttribute("email", $user->constructor, 'email should be defined as key in constructor');
-    $this->assertInternalType('object', $user->constructor->email);
-    $this->assertObjectHasAttribute('name', $user->constructor->email, 'name should be defined for constructor parameter');
-    $this->assertEquals('email', $user->constructor->email->name);
-  }
+        $this->assertObjectHasAttribute('constructor', $user);
+        $this->assertObjectHasAttribute("email", $user->constructor, 'email should be defined as key in constructor');
+        $this->assertInternalType('object', $user->constructor->email);
+        $this->assertObjectHasAttribute('name', $user->constructor->email, 'name should be defined for constructor parameter');
+        $this->assertEquals('email', $user->constructor->email->name);
+    }
 
-  public function testLikesConstructorWithDefinitions() {
-    $model = $this->assertValid($this->wrapEntity(
-      $this->json('
+    public function testLikesConstructorWithDefinitions()
+    {
+        $model = $this->assertValid($this->wrapEntity(
+            $this->json('
     {
       "name": "User",
 
@@ -343,24 +363,24 @@ JSON;
       "constructor": [
         { "name": "email", "defaultValue": "\'nobody@example.com\'" }
       ]
-    }'
-      )
-    ));
+    }')
+        ));
 
-    $user = $model->getEntity('User');
+        $user = $model->getEntity('User');
 
-    $this->assertObjectHasAttribute('constructor', $user);
-    $this->assertObjectHasAttribute("email", $user->constructor, 'email should be defined as key in constructor');
-    $this->assertInternalType('object', $user->constructor->email);
-    $this->assertObjectHasAttribute('name', $user->constructor->email, 'name should be defined for constructor parameter');
-    $this->assertObjectHasAttribute('defaultValue', $user->constructor->email, 'defaultValue from email should be defined for constructor parameter');
-    $this->assertEquals('email', $user->constructor->email->name);
-    $this->assertEquals("'nobody@example.com'", $user->constructor->email->defaultValue);
-  }
+        $this->assertObjectHasAttribute('constructor', $user);
+        $this->assertObjectHasAttribute("email", $user->constructor, 'email should be defined as key in constructor');
+        $this->assertInternalType('object', $user->constructor->email);
+        $this->assertObjectHasAttribute('name', $user->constructor->email, 'name should be defined for constructor parameter');
+        $this->assertObjectHasAttribute('defaultValue', $user->constructor->email, 'defaultValue from email should be defined for constructor parameter');
+        $this->assertEquals('email', $user->constructor->email->name);
+        $this->assertEquals("'nobody@example.com'", $user->constructor->email->defaultValue);
+    }
 
-  public function testDoesNotLikesConstructorWithoutName() {
-    $this->assertInvalid($this->wrapEntity(
-      $this->json('
+    public function testDoesNotLikesConstructorWithoutName()
+    {
+        $this->assertInvalid($this->wrapEntity(
+            $this->json('
     {
       "name": "User",
 
@@ -372,14 +392,14 @@ JSON;
       "constructor": [
         { "ame": "email" }
       ]
-    }'
-      )
-    ), 'Invalid object as constructor argument');
-  }
+    }')
+        ), 'Invalid object as constructor argument');
+    }
 
-  public function testDoesNotLikesConstructorWithWrongType() {
-    $this->assertInvalid($this->wrapEntity(
-      $this->json('
+    public function testDoesNotLikesConstructorWithWrongType()
+    {
+        $this->assertInvalid($this->wrapEntity(
+            $this->json('
     {
       "name": "User",
 
@@ -391,67 +411,75 @@ JSON;
       "constructor": [
         7
       ]
-    }'
-      )
-    ), 'Invalid value-type as constructor argument');
-  }
+    }')
+        ), 'Invalid value-type as constructor argument');
+    }
 
 
-  public function testRegressionNullableIsSettable() {
-    $model = $this->validateAcceptanceModel();
+    public function testRegressionNullableIsSettable()
+    {
+        $model = $this->validateAcceptanceModel();
 
-    $post = $model->getEntity('Post');
-    $this->assertTrue($post->properties->revisor->nullable, 'nullable for revisor does not match');
-  }
+        $post = $model->getEntity('Post');
+        $this->assertTrue($post->properties->revisor->nullable, 'nullable for revisor does not match');
+    }
 
-  public function testCreatesEntityReferencesForTheParsedModel() {
-    $model = $this->validateAcceptanceModel();
+    public function testCreatesEntityReferencesForTheParsedModel()
+    {
+        $model = $this->validateAcceptanceModel();
 
-    $post = $model->getEntity('Post');
-    $this->assertIsReference($post->properties->author->type, 'post::author type does not match');
+        $post = $model->getEntity('Post');
+        $this->assertIsReference($post->properties->author->type, 'post::author type does not match');
 
-    $author = $model->getEntity('Author');
-    $this->assertIsCollectionReference($author->properties->writtenPosts->type, 'author::writtenPosts type does not match');
-  }
+        $author = $model->getEntity('Author');
+        $this->assertIsCollectionReference($author->properties->writtenPosts->type, 'author::writtenPosts type does not match');
+    }
 
-  protected function assertInvalid(stdClass $jsonModel, $message = NULL) {
-    $this->setExpectedException(__NAMESPACE__.'\\InvalidModelException', $message);
-    $this->validator->validateModel($jsonModel);
-  }
+    protected function assertInvalid(stdClass $jsonModel, $message = null)
+    {
+        $this->setExpectedException(__NAMESPACE__ . '\\InvalidModelException', $message);
+        $this->validator->validateModel($jsonModel);
+    }
 
-  protected function wrapEntity($entity) {
-    return (object) array(
-      'namespace'=>__NAMESPACE__,
-      'entities'=>array($entity)
-    );
-  }
+    protected function wrapEntity($entity)
+    {
+        return (object) array(
+        'namespace' => __NAMESPACE__,
+        'entities' => array($entity)
+        );
+    }
 
-  protected function wrapEntities(Array $entities) {
-    return (object) array(
-      'namespace'=>__NAMESPACE__,
-      'entities'=>$entities
-    );
-  }
+    protected function wrapEntities(array $entities)
+    {
+        return (object) array(
+        'namespace' => __NAMESPACE__,
+        'entities' => $entities
+        );
+    }
 
   /**
    * @return Webforge\Doctrine\Compiler\Model
    */
-  protected function assertValid(stdClass $jsonModel) {
-    $this->assertInstanceOf(__NAMESPACE__.'\\Model', $model = $this->validator->validateModel($jsonModel));
-    return $model;
-  }
+    protected function assertValid(stdClass $jsonModel)
+    {
+        $this->assertInstanceOf(__NAMESPACE__ . '\\Model', $model = $this->validator->validateModel($jsonModel));
+        return $model;
+    }
 
-  protected function validateAcceptanceModel() {
-    $jsonModel = JSONConverter::create()->parseFile($this->getTestDirectory('acme-blog/etc/doctrine')->getFile('model.json'));
+    protected function validateAcceptanceModel()
+    {
+        $jsonModel = JSONConverter::create()->parseFile($this->getTestDirectory('acme-blog/etc/doctrine')->getFile('model.json'));
 
-    return $this->assertValid($jsonModel);
-  }
+        return $this->assertValid($jsonModel);
+    }
 
-  protected function assertIsReference($object, $msg = '') {
-    $this->assertInstanceOf(__NAMESPACE__.'\EntityReference', $object, $msg);
-  }
+    protected function assertIsReference($object, $msg = '')
+    {
+        $this->assertInstanceOf(__NAMESPACE__ . '\EntityReference', $object, $msg);
+    }
 
-  protected function assertIsCollectionReference($object, $msg = '') {
-    $this->assertInstanceOf(__NAMESPACE__.'\EntityCollectionReference', $object, $msg);
-  }
+    protected function assertIsCollectionReference($object, $msg = '')
+    {
+        $this->assertInstanceOf(__NAMESPACE__ . '\EntityCollectionReference', $object, $msg);
+    }
 }

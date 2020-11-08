@@ -5,8 +5,8 @@ namespace Webforge\Doctrine\Compiler\Test;
 /**
  * A simple base class that user (compileduser) should extend
  */
-abstract class BaseUserEntity {
-
+abstract class BaseUserEntity
+{
     protected $id;
 
     /**
@@ -28,5 +28,4 @@ abstract class BaseUserEntity {
      * @var boolean
      */
     protected $enabled;
-
 }

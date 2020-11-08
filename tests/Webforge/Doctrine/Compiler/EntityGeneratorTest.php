@@ -2,15 +2,20 @@
 
 namespace Webforge\Doctrine\Compiler;
 
-class EntityGeneratorTest extends \Webforge\Doctrine\Compiler\Test\Base {
-  public function setUp() {
-    $this->chainClass = __NAMESPACE__ . '\\EntityGenerator';
-    parent::setUp();
-    // setup siehe base
-  }
+use Webforge\Doctrine\Compiler\Test\Base;
 
-  public function testUndefinedIndexOwningError() {
-    $json = <<<'JSON'
+class EntityGeneratorTest extends Base
+{
+    public function setUp()
+    {
+        $this->chainClass = __NAMESPACE__ . '\\EntityGenerator';
+        parent::setUp();
+        // setup siehe base
+    }
+
+    public function testUndefinedIndexOwningError()
+    {
+        $json = <<<'JSON'
 {
   "namespace": "SSC\\Entities",
 
@@ -36,24 +41,23 @@ class EntityGeneratorTest extends \Webforge\Doctrine\Compiler\Test\Base {
     }
   ]
 }
-JSON
-    ;
+JSON;
 
-    $this->setExpectedException(__NAMESPACE__.'\InvalidModelException');
+        $this->setExpectedException(__NAMESPACE__ . '\InvalidModelException');
 
-    try {
-      $this->entityGenerator->generate($this->getModel($json));
-
-    } catch (InvalidModelException $e) {
-      $this->assertContains('no owning side for the association Page::contentStream => ContentStream::page', $e->getMessage());
-      $this->assertContains('OneToOne', $e->getMessage());
-      $this->assertContains('to set isOwning', $e->getMessage());
-      throw $e;
+        try {
+            $this->entityGenerator->generate($this->getModel($json));
+        } catch (InvalidModelException $e) {
+            $this->assertContains('no owning side for the association Page::contentStream => ContentStream::page', $e->getMessage());
+            $this->assertContains('OneToOne', $e->getMessage());
+            $this->assertContains('to set isOwning', $e->getMessage());
+            throw $e;
+        }
     }
-  }
 
-  public function testDuplicateTableNameForSelfReferencingAssociations() {
-    $json = <<<'JSON'
+    public function testDuplicateTableNameForSelfReferencingAssociations()
+    {
+        $json = <<<'JSON'
 {
   "namespace": "ACME\\Blog\\Entities",
 
@@ -71,28 +75,27 @@ JSON
     }
   ]
 }
-JSON
-    ;
+JSON;
 
-    $this->setExpectedException(__NAMESPACE__.'\InvalidModelException');
+        $this->setExpectedException(__NAMESPACE__ . '\InvalidModelException');
 
-    try {
-      $this->entityGenerator->generate($this->getModel($json));
-
-    } catch (InvalidModelException $e) {
-      $this->assertContains('duplicate table', $e->getMessage());
-      $this->assertContains('Category::relatedCategories', $e->getMessage());
-      $this->assertContains('Category::parentCategories', $e->getMessage());
-      throw $e;
-    }
-  }
-
-  protected function getModel($json) {
-    if (is_string($json)) {
-      $json = json_decode($json);
+        try {
+            $this->entityGenerator->generate($this->getModel($json));
+        } catch (InvalidModelException $e) {
+            $this->assertContains('duplicate table', $e->getMessage());
+            $this->assertContains('Category::relatedCategories', $e->getMessage());
+            $this->assertContains('Category::parentCategories', $e->getMessage());
+            throw $e;
+        }
     }
 
-    $this->validator = new ModelValidator();
-    return $model = $this->validator->validateModel($json);
-  }
+    protected function getModel($json)
+    {
+        if (is_string($json)) {
+            $json = json_decode($json);
+        }
+
+        $this->validator = new ModelValidator();
+        return $model = $this->validator->validateModel($json);
+    }
 }

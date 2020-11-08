@@ -1,34 +1,42 @@
 {
-  "name":"webforge/doctrine-compiler",
-  "description":"Generate your doctrine entities metadata from a simple json file, including the php code for the entity",
-  "license":"MIT",
-  "authors":[
+  "name": "webforge/doctrine-compiler",
+  "description": "Generate your doctrine entities metadata from a simple json file, including the php code for the entity",
+  "license": "MIT",
+  "authors": [
     {
-      "name":"Philipp Scheit",
-      "email":"p.scheit@ps-webforge.com"
+      "name": "Philipp Scheit",
+      "email": "p.scheit@ps-webforge.com"
     }
   ],
-  "minimum-stability":"dev",
-  "autoload":{
-    "psr-0":{
-      "Webforge\\Doctrine\\Compiler":["lib/", "tests/"]
+  "minimum-stability": "dev",
+  "autoload": {
+    "psr-0": {
+      "Webforge\\Doctrine\\Compiler": [
+        "lib/",
+        "tests/"
+      ],
+      "Webforge\\Code": "lib/"
     }
   },
-  "require":{
-    "webforge/doctrine":"1.2.*",
-    "webforge/webforge":"~1.11.0",
-    "webforge/serializer":"1.0.*",
+  "require": {
+    "php": ">=7.3",
+    "webforge/doctrine": "1.2.*",
+    "webforge/webforge": "^1.11@dev",
+    "webforge/serializer": "1.0.*",
     "beberlei/assert": "1.6.*@stable"
   },
   "require-dev": {
     "mockery/mockery": "~0.9",
     "webforge/testplate": "~1.6.0",
-    "mikey179/vfsStream": "1.3.*@dev"
+    "mikey179/vfsstream": "1.3.*@dev",
+    "slevomat/coding-standard": "^6.0@stable"
   },
-  "bin": ["bin/webforge-doctrine-compiler"],
-  "extra":{
-    "branch-alias":{
-      "dev-master":"1.1.x-dev"
+  "bin": [
+    "bin/webforge-doctrine-compiler"
+  ],
+  "extra": {
+    "branch-alias": {
+      "dev-master": "2.0.x-dev"
     },
     "directory-locations": {
       "lib": "lib/",

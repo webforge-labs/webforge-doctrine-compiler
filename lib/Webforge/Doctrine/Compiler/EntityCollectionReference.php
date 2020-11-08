@@ -2,5 +2,6 @@
 
 namespace Webforge\Doctrine\Compiler;
 
-class EntityCollectionReference extends EntityReference {
+class EntityCollectionReference extends EntityReference
+{
 }

@@ -4,15 +4,17 @@ namespace Webforge\Doctrine\Compiler;
 
 use stdClass;
 
-class EntityReference {
+class EntityReference
+{
+    protected $definition;
 
-  protected $definition;
+    public function __construct(stdClass $entityDefinition)
+    {
+        $this->definition = $entityDefinition;
+    }
 
-  public function __construct(stdClass $entityDefinition) {
-    $this->definition = $entityDefinition;
-  }
-
-  public function getFQN() {
-    return $this->definition->fqn;
-  }
+    public function getFQN()
+    {
+        return $this->definition->fqn;
+    }
 }

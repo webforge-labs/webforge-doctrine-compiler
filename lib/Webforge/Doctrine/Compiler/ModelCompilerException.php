@@ -2,5 +2,8 @@
 
 namespace Webforge\Doctrine\Compiler;
 
-class ModelCompilerException extends \Webforge\Common\Exception {
+use Webforge\Common\Exception;
+
+class ModelCompilerException extends Exception
+{
 }
