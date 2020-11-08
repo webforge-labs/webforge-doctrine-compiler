@@ -4,16 +4,33 @@ namespace Webforge\Code\Generator;
 
 class ClassWriterTest extends \Webforge\Code\Test\Base
 {
+    /**
+     * @var ClassWriter
+     */
     protected $classWriter;
+
+    /**
+     * @var GClass
+     */
+    protected $classWithImports;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|\Webforge\Common\System\File
+     */
+    protected $file;
+
+    /**
+     * @var GClass
+     */
+    protected $classWithoutImports;
 
     public function setUp()
     {
         $this->classWriter = new ClassWriter();
 
-        $this->file = $this->getMock('Webforge\Common\System\File', array('writeContents','exists'), array('tmp'));
+        $this->file = $this->getMock(\Webforge\Common\System\File::class, array('writeContents','exists'), array('tmp'));
         $this->classWithImports = new GClass('Webforge\Code\Generator\Fixtures\MyGPSLocateableClass');
         $this->classWithImports->addImport(new GClass('Other\UsedClass'));
-
         $this->classWithoutImports = new GClass('Webforge\Code\Generator\Fixtures\MyEmptyClass');
     }
 
@@ -79,7 +96,7 @@ class ClassWriterTest extends \Webforge\Code\Test\Base
         $this->assertContains('$propWithDefault = 0.5', $php);
     }
 
-    public function testArgumentsCanHaveLiteralDefaultValuesThatGetWrittnByTheWritterLiterally()
+    public function testArgumentsCanHaveLiteralDefaultValuesThatGetWrittenByTheWriterLiterally()
     {
         $param = new GParameter(
             'argWithDefault',

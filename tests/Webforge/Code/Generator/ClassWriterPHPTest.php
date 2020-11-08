@@ -9,7 +9,15 @@ use Webforge\Types\Type;
  */
 class ClassWriterPHPTest extends \Webforge\Code\Test\Base
 {
+    /**
+     * @var ClassWriter
+     */
     protected $classWriter;
+
+    /**
+     * @var GClass
+     */
+    protected $gClass;
 
     public function setUp()
     {
@@ -27,11 +35,12 @@ class ClassWriterPHPTest extends \Webforge\Code\Test\Base
 /**
  * The comment
  */
-class WithDocBlock {
+class WithDocBlock
+{
 }
 PHP;
 
-        $this->assertEquals($phpCode, $this->classWriter->writeGClass($gClass, $namespace = null, "\n"));
+        $this->assertSameStrings($phpCode, $this->classWriter->writeGClass($gClass, $namespace = null, "\n"));
     }
 
     public function testWriteGClass_ExtendsIsWrittenAsClassNameWhenInSameCONTEXTNamespace()
@@ -40,11 +49,12 @@ PHP;
 
         $phpCode =
         <<<'PHP'
-class Type extends BaseType {
+class Type extends BaseType
+{
 }
 PHP;
 
-        $this->assertCodeEquals($phpCode, $this->classWriter->writeGClass($gClass, $namespace = 'ACME\Types', "\n"));
+        $this->assertSameStrings($phpCode, $this->classWriter->writeGClass($gClass, $namespace = 'ACME\Types', "\n"));
     }
 
     public function testWriteGClass_ExtendsIsWrittenAsFullIfNotSameCONTEXTNamespace()
@@ -53,34 +63,56 @@ PHP;
 
         $phpCode =
         <<<'PHP'
-class Console extends \Webforge\System\Console {
+class Console extends \Webforge\System\Console
+{
 }
 PHP;
 
-        $this->assertCodeEquals($phpCode, $this->classWriter->writeGClass($gClass, $namespace = 'ACME', "\n"));
+        $this->assertSameStrings($phpCode, $this->classWriter->writeGClass($gClass, $namespace = 'ACME', "\n"));
     }
 
     public function testGClassHasModifiers()
     {
         $gClass = GClass::create('ACME\Console')->setAbstract(true);
 
-        $phpCode = 'abstract class Console {}';
-        $this->assertCodeEquals($phpCode, $this->classWriter->writeGClass($gClass, $namespace = 'ACME'));
+        $phpCode =
+        <<<'PHP'
+abstract class Console
+{
+}
+PHP;
+        $this->assertSameStrings($phpCode, $this->classWriter->writeGClass($gClass, $namespace = 'ACME'));
     }
 
     public function testWritesGMethodWithParameters()
     {
-        $method = GMethod::create('someAction', array(GParameter::create('xValue', new GClass('PointValue')),
-                                                  GParameter::create('yValue', new GClass('PointValue')),
-                                                  GParameter::create('info', Type::create('Array'))
-                                                    ->setDefault(array('x','y'))
-                                                  ));
+        $method = GMethod::create(
+            'someAction', array(
+                GParameter::create('xValue', new GClass('PointValue')),
+                GParameter::create('yValue', new GClass('PointValue')),
+                GParameter::create('info', Type::create('Array'))
+                    ->setDefault(array('x','y'))
+            )
+        );
         $phpCode = <<<'PHP'
-public function someAction(PointValue $xValue, PointValue $yValue, Array $info = array('x','y')) {
+public function someAction(PointValue $xValue, PointValue $yValue, Array $info = array('x','y'))
+{
 }
 PHP;
 
-        $this->assertEquals($phpCode, $this->classWriter->writeMethod($method));
+        $this->assertSameStrings($phpCode, $this->classWriter->writeMethod($method));
+    }
+
+    protected function assertSameStrings(string $expected, string $actual): void
+    {
+        $this->assertEquals(
+            $expected,
+            $actual,
+            sprintf("<<<expected>>>\n%s\n\n<<<actual>>>\n%s",
+                strtr($expected, ["\n"=>"-n-\n"]),
+                strtr($actual, ["\n"=>"-n-\n"])
+            )
+        );
     }
 
     public function testWritesGMethodBodyNearlyCorrect()
@@ -89,13 +121,14 @@ PHP;
             '__construct',
             array(),
             GFunctionBody::create(array(
-            sprintf("parent::__construct('%s');\n", 'TheName')
+                sprintf("parent::__construct('%s');\n", 'TheName')
             ))
         );
 
         $phpCode = <<<'PHP'
-public function __construct() {
-  parent::__construct('TheName');
+public function __construct()
+{
+    parent::__construct('TheName');
 }
 PHP;
 
@@ -137,8 +170,13 @@ PHP;
     {
         $if = GInterface::create('ACME\Exportable');
 
-        $phpCode = 'interface Exportable {}';
-        $this->assertCodeEquals($phpCode, $this->classWriter->writeGClass($if, $namespace = 'ACME'));
+        $phpCode =
+        <<<'PHP'
+interface Exportable
+{
+}
+PHP;
+        $this->assertSameStrings($phpCode, $this->classWriter->writeGClass($if, $namespace = 'ACME'));
     }
 
     public function testWritesInterfaceMethodsAsMethodWithoutBody()
@@ -148,20 +186,20 @@ PHP;
 
         $phpCode =
         <<<'PHP'
-interface Exportable {
-
-  public function export();
+interface Exportable
+{
+    public function export();
 }
 PHP;
 
-        $this->assertCodeEquals($phpCode, $this->classWriter->writeGClass($if, $namespace = 'ACME'));
+        $this->assertSameStrings($phpCode, $this->classWriter->writeGClass($if, $namespace = 'ACME'));
     }
 
     public function testPropertyWithDefaultValue()
     {
         $this->gClass->addProperty(GProperty::create('defaultNamespace', 'String', 'Psc\CMS\Controllers'));
 
-        $phpCode = "protected \$defaultNamespace = 'Psc\\\\CMS\\\\Controllers';";
+        $phpCode = "    protected \$defaultNamespace = 'Psc\\\\CMS\\\\Controllers';";
 
         $this->assertInnerCodeEquals($phpCode);
     }
@@ -170,7 +208,7 @@ PHP;
     {
         $this->gClass->addProperty(GProperty::create('defaultNamespace', 'String'));
 
-        $phpCode = "protected \$defaultNamespace;";
+        $phpCode = "    protected \$defaultNamespace;";
 
         $this->assertInnerCodeEquals($phpCode);
     }
@@ -179,12 +217,13 @@ PHP;
     {
         $phpCode =
         <<<'PHP'
-class Blank {
-  %s
+class Blank
+{
+%s
 }
 PHP;
 
-        $this->assertCodeEquals(
+        $this->assertSameStrings(
             sprintf($phpCode, $innerPhpCode),
             $this->classWriter->writeGClass($this->gClass, $namespace = 'ACME')
         );

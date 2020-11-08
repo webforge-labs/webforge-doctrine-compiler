@@ -94,7 +94,7 @@ class ClassWriter
         $that = $this;
         $this->namespaceContext = $namespace;
 
-        $php = null;
+        $php = '';
 
         /* DocBlock */
         if ($gClass->hasDocBlock()) {
@@ -106,26 +106,25 @@ class ClassWriter
 
         /* Class */
         if ($gClass->isInterface()) {
-            $php .= 'interface ' . $gClass->getName() . ' ';
+            $php .= 'interface ' . $gClass->getName();
         } else {
-            $php .= 'class ' . $gClass->getName() . ' ';
+            $php .= 'class ' . $gClass->getName();
         }
 
         /* Extends */
         if (($parent = $gClass->getParent()) != null) {
             // its important to use the contextNamespace here, because $namespace can be !== $gClass->getNamespace()
             if ($parent->getNamespace() === $namespace) {
-                $php .= 'extends ' . $parent->getName(); // don't prefix with namespace
+                $php .= ' extends ' . $parent->getName(); // don't prefix with namespace
             } else {
                 // should it add to use, or use \FQN in extends?
-                $php .= 'extends ' . '\\' . $parent->getFQN();
+                $php .= ' extends ' . '\\' . $parent->getFQN();
             }
-            $php .= ' ';
         }
 
         /* Interfaces */
         if (count($gClass->getInterfaces()) > 0) {
-            $php .= 'implements ';
+            $php .= ' implements ';
             $php .= A::implode(
                 $gClass->getInterfaces(),
                 ', ',
@@ -137,7 +136,6 @@ class ClassWriter
                     }
                 }
             );
-            $php .= ' ';
         }
 
         $php .= $eol . '{' . $eol;
@@ -147,27 +145,27 @@ class ClassWriter
         /* Constants */
         $php .= A::joinc(
             $gClass->getConstants(),
-            '    ' . $eol . '%s;' . $eol,
+            '    %s;' . $eol,
             function ($constant) use ($that, $eol) {
-                return $that->writeConstant($constant, 2, $eol);
+                return $that->writeConstant($constant, 4, $eol);
             }
         );
 
         /* Properties */
         $php .= A::joinc(
             $gClass->getProperties(),
-            '    ' . $eol . '%s;' . $eol,
+            '    %s;' . $eol,
             function ($property) use ($that, $eol) {
-                return $that->writeProperty($property, 2, $eol);
+                return $that->writeProperty($property, 4, $eol);
             }
         );
 
         /* Methods */
         $php .= A::joinc(
             $gClass->getMethods(),
-            '    ' . $eol . '%s' . $eol,
+            '    %s' . $eol,
             function ($method) use ($that, $eol) {
-                return $that->writeMethod($method, 2, $eol);
+                return $that->writeMethod($method, 4, $eol);
             }
         );
 
@@ -184,14 +182,11 @@ class ClassWriter
      */
     public function writeMethod(GMethod $method, $baseIndent = 0, $eol = "\n")
     {
-        $php = null;
+        $php = '';
 
         if ($method->hasDocBlock()) {
             $php = $this->writeDocBlock($method->getDocBlock(), $baseIndent, $eol);
         }
-
-        // vor die modifier muss das indent
-        $php .= str_repeat('   ', $baseIndent);
 
         $php .= $this->writeModifiers($method->getModifiers());
         $php .= $this->writeGFunction($method, $baseIndent, $eol);
@@ -226,11 +221,16 @@ class ClassWriter
      */
     public function writeFunctionBody(GFunctionBody $body = null, $baseIndent = 0, $eol = "\n")
     {
-        $php = $eol . S::indent('{', $baseIndent) . $eol;
+        $php = NULL;
+
+        $phpBody = $body ? '    '.$body->php($baseIndent+4, $eol).$eol : '';
+
+        $php .= $eol.'{';
         //if ($this->cbraceComment != NULL) { // inline comment wie dieser
-        //$php .= ' '.$this->cbraceComment;
+          //$php .= ' '.$this->cbraceComment;
         //}
-        $php .= $body ? S::indent('', $baseIndent + 4) . $body->php($baseIndent + 4, $eol) . $eol : '';
+        $php .= $eol;
+        $php .= $phpBody;
         $php .= S::indent('}', $baseIndent, $eol);
 
         return $php;
@@ -348,8 +348,6 @@ class ClassWriter
         if ($property->hasDocBlock()) {
             $php = $this->writeDocBlock($property->getDocBlock(), $baseIndent, $eol);
         }
-
-        $php .= str_repeat(' ', $baseIndent);
 
         $php .= $this->writeModifiers($property->getModifiers());
 
