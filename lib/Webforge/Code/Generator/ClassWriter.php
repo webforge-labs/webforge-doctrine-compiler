@@ -205,7 +205,7 @@ class ClassWriter
      * returns PHPCode for a GFunction/GMethod
      *
      */
-    public function writeGFunction($function, $baseIndent = 0, $eol = "\n")
+    public function writeGFunction(GMethod $function, $baseIndent = 0, $eol = "\n")
     {
         $php = '';
 
@@ -229,9 +229,8 @@ class ClassWriter
     public function writeFunctionBody(GFunctionBody $body = null, $baseIndent = 0, $eol = "\n")
     {
         $php = $eol;
-        $php .= S::indent('{', $baseIndent, $eol);
-        $php .= $eol;
-        if ($body !== null) {
+        $php .= S::indent('{', $baseIndent, $eol) . $eol;
+        if ($body !== null && !$body->isEmpty()) {
             $php .= $body->php($baseIndent + 4, $eol) . $eol;
         }
         $php .= S::indent('}', $baseIndent, $eol);
@@ -239,7 +238,7 @@ class ClassWriter
         return $php;
     }
 
-    protected function writeFunctionSignature($function, $baseIndent = 0, $eol = "\n")
+    protected function writeFunctionSignature(GMethod $function, $baseIndent = 0, $eol = "\n")
     {
         $php = 'function ' . $function->getName() . $this->writeParameters(
             $function->getParameters(),
@@ -248,6 +247,9 @@ class ClassWriter
             $eol
         );
 
+        if ($hint = $function->getReturnTypeHint()) {
+            $php .= ': '.$hint;
+        }
         return $php;
     }
 

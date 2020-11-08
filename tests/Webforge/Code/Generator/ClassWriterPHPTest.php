@@ -123,7 +123,7 @@ public function __construct()
 }
 PHP;
 
-        $this->assertEquals($phpCode, $this->classWriter->writeMethod($method));
+        $this->assertSameStrings($phpCode, $this->classWriter->writeMethod($method));
     }
 
     public function testWritesParameterHintWithoutFQNWhenInNamespaceContext()
@@ -226,9 +226,30 @@ PHP;
         );
 
         $gClass->addProperty(
-            GProperty::create('other', new IntegerType())
-                ->setDocBlock(new DocBlock('@var int'))
+            GProperty::create('created', new GClass('DateTimeInterface'))
+                ->setDocBlock(new DocBlock('@var \DateTimeInterface'))
         );
+
+        $method = GMethod::create(
+            'noop',
+            array(
+            ),
+            GFunctionBody::create([])
+        );
+        $method->setReturnTypeHint('void');
+
+        $gClass->addMethod($method);
+
+        $method = GMethod::create(
+            'setCreated',
+            array(
+                GParameter::create('time', new GClass('DateTimeInterface'))
+            ),
+            GFunctionBody::create([
+                '$this->created = $time;'
+            ])
+        );
+        $gClass->addMethod($method);
 
         $phpCode = <<<'PHP'
 abstract class CompiledEntity
@@ -239,14 +260,23 @@ abstract class CompiledEntity
     protected $something = 'default';
 
     /**
-     * @var int
+     * @var \DateTimeInterface
      */
-    protected $other;
+    protected $created;
 
     public function __construct()
     {
         parent::__construct('TheName');
         $this->other = 'def';
+    }
+
+    public function noop(): void
+    {
+    }
+
+    public function setCreated(\DateTimeInterface $time)
+    {
+        $this->created = $time;
     }
 }
 PHP;

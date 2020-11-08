@@ -143,6 +143,7 @@ class EntityGenerator
             ),
             GMethod::MODIFIER_PUBLIC
         );
+        $gMethod->setReturnTypeHint('self');
 
         $gMethod->createDocBlock()
             ->append(sprintf('@param %s $%s', $property->getDocType(), $property->getName()));

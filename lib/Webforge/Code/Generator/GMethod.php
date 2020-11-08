@@ -9,7 +9,7 @@ class GMethod extends GModifiersObject
     public const PREPEND = 0;
 
     /**
-     * @var Webforge\Code\Generate\GObjectCollection
+     * @var \Webforge\Code\Generate\GObjectCollection
      */
     protected $parameters;
 
@@ -21,7 +21,7 @@ class GMethod extends GModifiersObject
     /**
      * The code from the method
      *
-     * @var Webforge\Code\Generator\GFunctionBody
+     * @var \Webforge\Code\Generator\GFunctionBody
      */
     protected $body = null;
 
@@ -31,14 +31,20 @@ class GMethod extends GModifiersObject
     protected $returnsReference;
 
     /**
-     * @var Webforge\Code\Generator\GClass
+     * @var \Webforge\Code\Generator\GClass
      */
     protected $gClass;
 
     /**
+     * @var string|null
+     */
+    protected $returnTypeHint;
+
+    /**
      * @param string $name name of the method
      * @param GParameter[] $parameters
-     * @param string|array body
+     * @param GFunctionBody body
+     * @param string|string[] $modifiers
      */
     public function __construct(
         $name = null,
@@ -247,4 +253,20 @@ class GMethod extends GModifiersObject
         return $this;
     }
     // @codeCoverageIgnoreEnd
+
+    /**
+     * @return string|null
+     */
+    public function getReturnTypeHint(): ?string
+    {
+        return $this->returnTypeHint;
+    }
+
+    /**
+     * @param string $returnTypeHint
+     */
+    public function setReturnTypeHint(string $returnTypeHint): void
+    {
+        $this->returnTypeHint = $returnTypeHint;
+    }
 }

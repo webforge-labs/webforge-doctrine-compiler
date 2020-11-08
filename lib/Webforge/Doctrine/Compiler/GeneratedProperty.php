@@ -179,10 +179,20 @@ class GeneratedProperty extends DefinitionPart
     {
         $propertyType = $this->gProperty->getType();
         if ($propertyType instanceof InterfacedType) {
-            return '\\' . ltrim($propertyType->getDocType(), '\\');
+            $type = '\\' . ltrim($propertyType->getDocType(), '\\');
+        } elseif($propertyType->getDocType() === 'array') {
+            $type = 'array<int|string, mixed>';
+        } elseif($propertyType->getDocType() === 'object') {
+            $type = '\\stdClass';
         } else {
-            return $propertyType->getDocType() ?: 'mixed';
+            $type = $propertyType->getDocType() ?: 'mixed';
         }
+
+        if ($this->isNullable()) {
+            $type .= '|null';
+        }
+
+        return $type;
     }
 
     public function getType()

@@ -81,4 +81,9 @@ class GFunctionBody
         A::insertArray($this->body, $codeLines, $index);
         return $this;
     }
+
+    public function isEmpty()
+    {
+        return count($this->body) === 0;
+    }
 }
