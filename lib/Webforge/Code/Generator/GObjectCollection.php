@@ -16,7 +16,7 @@ use Webforge\Common\ArrayUtil as A;
  */
 class GObjectCollection
 {
-    public const END = A::END;
+   public const END = A::END;
 
     /**
      * @var GObject[] key is the GObject::getKey()

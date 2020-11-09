@@ -4,7 +4,7 @@ namespace Webforge\Code\Generator;
 
 class GMethod extends GModifiersObject
 {
-    public const APPEND = GObjectCollection::END;
+   public const APPEND = GObjectCollection::END;
     public const END = GObjectCollection::END;
     public const PREPEND = 0;
 

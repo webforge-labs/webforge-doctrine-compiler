@@ -19,7 +19,7 @@ use Webforge\Common\System\File;
  */
 class ClassWriter
 {
-    public const OVERWRITE = true;
+   public const OVERWRITE = true;
 
     /**
      * @var \Webforge\Code\Generator\Imports
