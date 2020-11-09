@@ -184,16 +184,19 @@ class GeneratedProperty extends DefinitionPart
             $type = 'array<int|string, mixed>';
         } elseif($propertyType->getDocType() === 'object') {
             $type = '\\stdClass';
-        }else {
+        } else {
             $type = $propertyType->getDocType() ?: 'mixed';
         }
-  if ($this->isNullable()) {
+
+        if ($this->isNullable()) {
             $type .= '|null';
         }
 
-    return $type;
-    }public function getType()
-        {
+        return $type;
+    }
+
+    public function getType()
+    {
         return $this->gProperty->getType();
     }
 

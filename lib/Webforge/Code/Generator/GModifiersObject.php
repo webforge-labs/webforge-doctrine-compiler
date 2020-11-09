@@ -26,7 +26,7 @@ use ReflectionProperty;
  */
 abstract class GModifiersObject extends GObject
 {
-   public const MODIFIER_STATIC = ReflectionProperty::IS_STATIC;
+    public const MODIFIER_STATIC = ReflectionProperty::IS_STATIC;
     public const MODIFIER_ABSTRACT = ReflectionMethod::IS_ABSTRACT;
     public const MODIFIER_FINAL = ReflectionMethod::IS_FINAL;
 

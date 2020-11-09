@@ -11,7 +11,7 @@ use Webforge\Common\System\File;
  */
 class ClassCreater
 {
-   public const OVERWRITE = ClassWriter::OVERWRITE;
+    public const OVERWRITE = ClassWriter::OVERWRITE;
 
     /**
      * @var \Webforge\Code\Generator\ClassFileMapper
@@ -24,12 +24,12 @@ class ClassCreater
     protected $gClass;
 
     /**
-     * @var Webforge\Code\Generator\ClassWriter
+     * @var \Webforge\Code\Generator\ClassWriter
      */
     protected $writer;
 
     /**
-     * @var Webforge\Code\Generator\ClassElevator
+     * @var \Webforge\Code\Generator\ClassElevator
      */
     protected $elevator;
 

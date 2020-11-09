@@ -30,12 +30,12 @@ use Webforge\Framework\Package\Registry as PackageRegistry;
  */
 class GlobalClassFileMapper implements ClassFileMapper
 {
-   public const WITH_RESOLVING = 0x000001;
+    public const WITH_RESOLVING = 0x000001;
 
     /**
      * A Registry for Packages installed on the host (e.g.)
      *
-     * @var Webforge\Framework\Package\Registry
+     * @var \Webforge\Framework\Package\Registry
      */
     protected $packageRegistry;
 

@@ -19,7 +19,7 @@ use Webforge\Common\System\File;
  */
 class ClassWriter
 {
-   public const OVERWRITE = true;
+    public const OVERWRITE = true;
 
     /**
      * @var \Webforge\Code\Generator\Imports
@@ -37,7 +37,7 @@ class ClassWriter
     protected $namespaceContext;
 
     /**
-     * @var Webforge\Code\Generator\Imports
+     * @var \Webforge\Code\Generator\Imports
      */
     protected $classImports;
 
@@ -106,9 +106,9 @@ class ClassWriter
 
         /* Class */
         if ($gClass->isInterface()) {
-            $php .= 'interface ' . $gClass->getName() . ' ';
+            $php .= 'interface ' . $gClass->getName();
         } else {
-            $php .= 'class ' . $gClass->getName() . ' ';
+            $php .= 'class ' . $gClass->getName();
         }
 
         /* Extends */

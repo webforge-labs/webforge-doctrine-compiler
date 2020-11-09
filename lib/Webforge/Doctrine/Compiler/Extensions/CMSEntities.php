@@ -16,12 +16,10 @@ use Webforge\Types\CodeExporter;
 
 class CMSEntities implements Extension
 {
-
     public function __construct()
-
-        {$this->codeExporter = new CodeExporter(new CodeWriter());
+    {
+        $this->codeExporter = new CodeExporter(new CodeWriter());
     }
-
 
     public function onClassGeneration(GeneratedEntity $entity, GClass $gClass)
     {

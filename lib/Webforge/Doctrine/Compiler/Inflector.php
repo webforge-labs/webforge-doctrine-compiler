@@ -9,7 +9,7 @@ use Webforge\Common\StringUtil as S;
 
 class Inflector
 {
-   public const TO_SINGULAR = 'singular';
+    public const TO_SINGULAR = 'singular';
 
     protected function getDoName($do, GProperty $property, stdClass $definition, $flags = 0)
     {

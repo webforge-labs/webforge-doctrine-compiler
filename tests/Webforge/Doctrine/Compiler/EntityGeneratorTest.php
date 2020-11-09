@@ -47,7 +47,6 @@ JSON;
 
         try {
             $this->entityGenerator->generate($this->getModel($json));
-
         } catch (InvalidModelException $e) {
             $this->assertContains('no owning side for the association Page::contentStream => ContentStream::page', $e->getMessage());
             $this->assertContains('OneToOne', $e->getMessage());
@@ -82,7 +81,6 @@ JSON;
 
         try {
             $this->entityGenerator->generate($this->getModel($json));
-
         } catch (InvalidModelException $e) {
             $this->assertContains('duplicate table', $e->getMessage());
             $this->assertContains('Category::relatedCategories', $e->getMessage());

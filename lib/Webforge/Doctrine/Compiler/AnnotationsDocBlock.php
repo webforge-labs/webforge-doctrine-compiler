@@ -12,7 +12,6 @@ use Webforge\Doctrine\Annotations\Writer as AnnotationsWriter;
  *    they break some conventions the doctrine annotations have and can therefore not be written constistently with the writer
  */
 class AnnotationsDocBlock extends DocBlock
-
 {
     protected $annotations;
     protected $writer;

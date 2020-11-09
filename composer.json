@@ -34,8 +34,8 @@
   },
   "bin": [
     "bin/webforge-doctrine-compiler"
-
-  ],"extra": {
+  ],
+  "extra": {
     "branch-alias": {
       "dev-master": "2.0.x-dev"
     },

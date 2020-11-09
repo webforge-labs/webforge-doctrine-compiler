@@ -8,7 +8,7 @@ namespace Webforge\Code\Generator;
  */
 abstract class GObject
 {
-   public const UNDEFINED = '::.WebforgeCodeGeneratorDefaultIsUndefined.::';
+    public const UNDEFINED = '::.WebforgeCodeGeneratorDefaultIsUndefined.::';
 
     /**
      * @var Webforge\Code\Generator\DocBlock
