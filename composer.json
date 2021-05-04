@@ -21,6 +21,7 @@
   "require": {
     "php": ">=7.3",
     "webforge/doctrine": "1.2.*",
+    "doctrine/dbal": "2.7.x",
     "webforge/webforge": "^1.11@dev",
     "webforge/serializer": "1.0.*",
     "beberlei/assert": "1.6.*@stable"

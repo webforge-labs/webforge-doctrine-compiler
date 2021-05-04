@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3b19e700a8bd50668dcfa5931bb5de00",
+    "content-hash": "ec40715daeb265e5acfae8e722a7851f",
     "packages": [
         {
             "name": "beberlei/assert",
@@ -341,16 +341,16 @@
         },
         {
             "name": "doctrine/dbal",
-            "version": "2.7.x-dev",
+            "version": "v2.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal.git",
-                "reference": "9efbf7f3e260442ceefe4aec163c18b193c8e0c2"
+                "reference": "c0e5736016a51b427a8cba8bc470fbea78165819"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/9efbf7f3e260442ceefe4aec163c18b193c8e0c2",
-                "reference": "9efbf7f3e260442ceefe4aec163c18b193c8e0c2",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/c0e5736016a51b427a8cba8bc470fbea78165819",
+                "reference": "c0e5736016a51b427a8cba8bc470fbea78165819",
                 "shasum": ""
             },
             "require": {
@@ -412,7 +412,11 @@
                 "persistence",
                 "queryobject"
             ],
-            "time": "2018-07-13T04:50:24+00:00"
+            "support": {
+                "issues": "https://github.com/doctrine/dbal/issues",
+                "source": "https://github.com/doctrine/dbal/tree/v2.7.2"
+            },
+            "time": "2018-07-13T04:49:01+00:00"
         },
         {
             "name": "doctrine/event-manager",
@@ -2729,5 +2733,5 @@
         "php": ">=7.3"
     },
     "platform-dev": [],
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.0.0"
 }
